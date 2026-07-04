@@ -11,6 +11,7 @@ MVP d'une plateforme legaltech française : un utilisateur (particulier, freelan
 - **PostgreSQL + Prisma** (Postgres via docker-compose)
 - **Auth.js** (e-mail + mot de passe, sessions JWT, 3 rôles : `CLIENT`, `LAWYER`, `ADMIN`)
 - **@anthropic-ai/sdk** pour le triage et la relecture IA (Phase 1+)
+- **mammoth** (DOCX) + **unpdf** (PDF) pour l'extraction de texte
 - **Zod** pour la validation des entrées API et des sorties JSON de l'IA
 - Stockage fichiers : disque local `./storage` derrière une interface `StorageProvider`
 
@@ -50,6 +51,7 @@ app/
   admin/            # administration (rôle ADMIN)
   legal/            # CGU, mentions légales, confidentialité
   api/auth/         # routes Auth.js
+  api/contracts/    # POST …/analyze (triage IA)
 components/
   ui/               # composants shadcn/ui
   auth/, layout/    # composants applicatifs
@@ -59,8 +61,10 @@ lib/
   db.ts             # client Prisma singleton
   config.ts         # tarifs par défaut (surcharge via env)
   storage/          # interface StorageProvider + implémentation disque local
-  actions/          # server actions (auth)
+  actions/          # server actions (auth, contracts)
   validation/       # schémas Zod
+  ai/               # client Anthropic, prompts, triage
+  contracts/        # extraction texte, constantes
 prisma/
   schema.prisma     # modèle de données complet
   seed.ts           # données de démonstration
@@ -70,7 +74,7 @@ proxy.ts            # protection des routes par rôle
 ## Feuille de route
 
 - [x] **Phase 0 — Socle** : scaffold, Prisma + Postgres, Auth.js 3 rôles, layout, seed, README
-- [ ] **Phase 1 — Triage** : upload + extraction de texte, endpoint `analyze`, écran de résultat
+- [x] **Phase 1 — Triage** : upload + extraction de texte, endpoint `analyze`, écran de résultat
 - [ ] **Phase 2 — Relecture IA** : endpoint `review`, vue diff, consentement + disclaimer
 - [ ] **Phase 3 — Marketplace** : matching, missions, messagerie, validation avocat, admin
 - [ ] **Phase 4 — Paiements et finitions** : Stripe test, notation, scénario de démonstration
