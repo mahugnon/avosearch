@@ -178,17 +178,134 @@
     "uploadedOn": "Uploaded on {date}"
   },
   "chat": {
-    "title": "New analysis",
-    "subtitle": "Guided conversation before triaging your request.",
+    "title": "Drafting & analysis",
+    "subtitle": "Describe your need — one question at a time, like a conversation.",
     "online": "Online",
-    "welcome": "Hello. Describe your contractual situation or upload a document — I'll ask a few questions before guiding you to the right solution.",
-    "clarification1": "What type of contract is involved (lease, services, NDA…)? Do you already have the text, or is this a general question?",
-    "clarification2": "What is the main stake (amount, duration, disputed clause, imminent signature)? Is a regulated act involved?",
-    "clarification3": "Do you mainly want to understand the document, have it reviewed clause by clause, or get lawyer validation before signing?",
-    "triagePreview": "I have enough information to start triage. In Phase 1, I would guide you toward: AI-assisted review, lawyer validation, or referral to a regulated professional. The engine is not connected yet.",
-    "placeholder": "Describe your question or contract…",
-    "send": "Send message",
-    "attach": "Attach a contract"
+    "welcome": "Hello. Tell me what you need — for example: \"I want to draft an NDA for my website.\" I'll ask only what's necessary, one question at a time.",
+    "placeholder": "E.g.: I want to draft an NDA contract…",
+    "placeholderDone": "Ask another question or start analysis from the preview…",
+    "send": "Send",
+    "attach": "Attach a contract (coming soon)",
+    "emptyMessage": "Write a message to continue.",
+    "notDraftIntent": "To draft a contract, describe the type (e.g. NDA, services agreement). To analyze an existing document, attach a PDF or DOCX (coming soon here).",
+    "noTemplateMatch": "No matching template found. Specify the contract type (NDA, services…).",
+    "sessionLost": "Draft session not found. Start again by describing your need.",
+    "missingFields": "Some information is still missing. Answer the question above.",
+    "errors": {
+      "unauthorized": "Sign in as a client to draft a contract.",
+      "sessionExpired": "Session expired — please sign in again.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "viewer": {
+      "label": "Generated contract",
+      "copy": "Copy",
+      "analyze": "Start analysis",
+      "disclaimer": "Document assistance template — have a lawyer review if needed."
+    }
+  },
+  "contracts": {
+    "questionLabel": "Your question (optional if you upload a file)",
+    "questionPlaceholder": "Describe your situation or contractual question…",
+    "fileLabel": "Contract (PDF, DOCX or TXT)",
+    "fileHint": "10 MB max. Provide a file, a question, or both.",
+    "formHint": "Automated document assistance — not legal advice.",
+    "submit": "Start analysis",
+    "submitting": "Uploading…",
+    "backToDashboard": "← Back to my contracts",
+    "awaitingAnalysis": "Awaiting analysis",
+    "triageIaSuffit": "Assisted review possible",
+    "triageAvocat": "Lawyer recommended",
+    "triageActe": "Regulated act",
+    "draftInProgress": "Draft in progress",
+    "documentPreview": "Document preview",
+    "errors": {
+      "unauthorized": "You must be signed in as a client.",
+      "missingInput": "Upload a file or describe your contractual question.",
+      "fileTooLarge": "File exceeds the maximum size (10 MB).",
+      "unsupportedFile": "Unsupported format. Use PDF, DOCX or TXT.",
+      "extractionFailed": "Could not extract text from this file.",
+      "sessionExpired": "Your session expired. Please sign in again."
+    },
+    "triage": {
+      "analyzing": "Analyzing…",
+      "notAnalyzedYet": "This contract has not been analyzed yet.",
+      "startAnalysis": "Start analysis",
+      "reanalyze": "Re-run analysis",
+      "retry": "Retry",
+      "confidence": "Confidence score: {value}%",
+      "flagsTitle": "Key points",
+      "requiredPro": "Recommended professional: {pro}",
+      "disclaimer": "This analysis is automated document assistance. It is not legal advice.",
+      "pro": {
+        "AVOCAT": "lawyer",
+        "NOTAIRE": "notary"
+      },
+      "errors": {
+        "title": "Analysis failed",
+        "aiNotConfigured": "NVIDIA_API_KEY is not configured. Add it to your .env file.",
+        "aiFailed": "Automated analysis failed. Please try again shortly.",
+        "network": "Network error. Check your connection and retry.",
+        "generic": "An error occurred during analysis."
+      },
+      "demoMode": "Demo mode — set NVIDIA_API_KEY in .env for real AI analysis.",
+      "outOfScope": {
+        "title": "Outside contractual scope",
+        "description": "AvoSearch handles contractual matters only.",
+        "alertTitle": "Referral",
+        "alertDescription": "For this type of matter, consult the appropriate professional directly (specialized lawyer, notary, etc.). No substantive analysis was performed."
+      },
+      "cases": {
+        "IA_SUFFIT": {
+          "title": "Assisted review possible",
+          "subtitle": "Changes can be suggested in tracked-change mode."
+        },
+        "AVOCAT_RECOMMANDE": {
+          "title": "Lawyer recommended",
+          "subtitle": "The stakes or complexity justify involving a lawyer."
+        },
+        "ACTE_REGLEMENTE": {
+          "title": "Regulated act or specific situation",
+          "subtitle": "This matter requires a legal professional."
+        }
+      },
+      "nextSteps": {
+        "phase2Hint": "Available in Phase 2 — tracked-change review.",
+        "phase3Hint": "Available in Phase 3 — lawyer matching",
+        "iaSuffit": {
+          "title": "Choose your plan",
+          "description": "You will accept or reject each suggested change.",
+          "aiOnly": "AI only",
+          "aiLawyer": "AI + lawyer validation",
+          "aiLawyerHint": "A verified lawyer validates each change — response within 24 h."
+        },
+        "avocat": {
+          "title": "Flat-fee lawyer mission",
+          "description": "We will suggest lawyers suited to your case.",
+          "priceRange": "Indicative range: {min} – {max}"
+        },
+        "acte": {
+          "title": "Professional referral",
+          "description": "This type of act requires a regulated professional.",
+          "alertTitle": "No automated substantive analysis",
+          "alertDescription": "AvoSearch refers you to the right contact. You can also consult a lawyer via the platform when relevant."
+        }
+      }
+    },
+    "draft": {
+      "pageTitle": "Guided drafting",
+      "intro": "Answer step-by-step questions and we will fill in the contract template for you.",
+      "backToDashboard": "← Back to my contracts",
+      "progress": "Step {current} of {total}",
+      "back": "Back",
+      "next": "Continue",
+      "finish": "Generate contract",
+      "saving": "Saving…",
+      "disclaimer": "Document assistance template — not legal advice.",
+      "errors": {
+        "required": "This field is required to continue.",
+        "missingFields": "Some information is missing. Complete all steps."
+      }
+    }
   },
   "lawyer": {
     "areaLabel": "Lawyer dashboard",

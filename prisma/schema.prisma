@@ -55,6 +55,28 @@ enum RiskLevel {
   ELEVE
 }
 
+enum ContractDraftStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+model ContractTemplate {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  domain      String
+  tags        String[]
+  body        String
+  // [{ "title": "...", "fields": [{ "id", "label", "description?", "placeholder?", "type", "required" }] }]
+  steps       Json
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  contracts Contract[]
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -100,7 +122,10 @@ model Contract {
   mimeType      String?
   extractedText String
   userQuestion  String?
-  // Timestamp of the explicit "documentary aid, not legal advice" consent
+  templateId    String?
+  template      ContractTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  draftAnswers  Json?
+  draftStatus   ContractDraftStatus?
   aiConsentAt   DateTime?
   createdAt     DateTime  @default(now())
 

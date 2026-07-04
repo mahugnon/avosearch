@@ -1,5 +1,6 @@
 import { ChevronRight, FileText, FolderOpen } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { AnalysisChat } from "@/components/app/analysis-chat";
 import { Badge } from "@/components/ui/badge";
 import { auth } from "@/lib/auth";
@@ -9,12 +10,18 @@ import { intlLocale, type AppLocale } from "@/lib/i18n";
 export default async function ClientHomePage() {
   const session = await auth();
   const t = await getTranslations("client");
-  const tc = await getTranslations("common");
+  const tc = await getTranslations("contracts");
   const locale = (await getLocale()) as AppLocale;
   const contracts = await prisma.contract.findMany({
     where: { ownerId: session!.user.id },
     orderBy: { createdAt: "desc" },
-    select: { id: true, title: true, createdAt: true, analysis: { select: { triage: true } } },
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      draftStatus: true,
+      analysis: { select: { triage: true } },
+    },
   });
 
   const firstName = (session!.user.name ?? "").split(" ")[0];
@@ -52,8 +59,18 @@ export default async function ClientHomePage() {
           </div>
         ) : (
           <ul className="space-y-2">
-            {contracts.map((contract) => (
+            {contracts.map((contract) => {
+              const href = `/app/contracts/${contract.id}`;
+              const statusLabel =
+                contract.draftStatus === "IN_PROGRESS"
+                  ? tc("draftInProgress")
+                  : contract.analysis
+                    ? tc(`triage${contract.analysis.triage === "IA_SUFFIT" ? "IaSuffit" : contract.analysis.triage === "AVOCAT_RECOMMANDE" ? "Avocat" : "Acte"}`)
+                    : tc("awaitingAnalysis");
+
+              return (
               <li key={contract.id}>
+                <Link href={href} className="block">
                 <div className="surface-elevated surface-interactive group flex items-center justify-between gap-4 rounded-xl px-4 py-3.5 sm:px-5">
                   <div className="flex min-w-0 items-center gap-3.5">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -75,7 +92,7 @@ export default async function ClientHomePage() {
                       variant={contract.analysis ? "secondary" : "outline"}
                       className="hidden sm:inline-flex"
                     >
-                      {contract.analysis ? tc("analyzed") : tc("pending")}
+                      {statusLabel}
                     </Badge>
                     <ChevronRight
                       className="size-4 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5"
@@ -83,8 +100,10 @@ export default async function ClientHomePage() {
                     />
                   </div>
                 </div>
+                </Link>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </section>

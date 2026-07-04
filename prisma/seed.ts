@@ -1,5 +1,11 @@
 import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import {
+  NDA_SITE_WEB_BODY,
+  NDA_SITE_WEB_STEPS,
+  PRESTATION_BODY,
+  PRESTATION_STEPS,
+} from "../lib/templates/catalog";
 
 const prisma = new PrismaClient();
 
@@ -77,6 +83,7 @@ async function main() {
   await prisma.modification.deleteMany();
   await prisma.analysis.deleteMany();
   await prisma.contract.deleteMany();
+  await prisma.contractTemplate.deleteMany();
   await prisma.lawyerProfile.deleteMany();
   await prisma.user.deleteMany();
 
@@ -209,6 +216,31 @@ async function main() {
     });
   }
 
+  await prisma.contractTemplate.createMany({
+    data: [
+      {
+        slug: "nda-site-web",
+        title: "Accord de confidentialité (NDA) — site web",
+        description:
+          "Modèle d'accord de confidentialité pour protéger les informations liées à un site web ou une activité en ligne.",
+        domain: "confidentialité / NDA",
+        tags: ["nda", "confidentialité", "site web", "internet", "saas"],
+        body: NDA_SITE_WEB_BODY,
+        steps: NDA_SITE_WEB_STEPS,
+      },
+      {
+        slug: "prestation-services",
+        title: "Contrat de prestation de services",
+        description:
+          "Modèle de contrat entre un client et un prestataire freelance ou TPE.",
+        domain: "prestation de services",
+        tags: ["prestation", "services", "freelance", "développement"],
+        body: PRESTATION_BODY,
+        steps: PRESTATION_STEPS,
+      },
+    ],
+  });
+
   await prisma.contract.create({
     data: {
       ownerId: client1.id,
@@ -216,6 +248,23 @@ async function main() {
       extractedText: BAIL_COMMERCIAL_TEXT,
       userQuestion:
         "On me propose ce bail pour ma première boutique. Certaines clauses me semblent dures (dépôt de garantie, travaux, cession) : est-ce normal ?",
+      analysis: {
+        create: {
+          triage: "IA_SUFFIT",
+          confidence: 0.82,
+          domain: "bail commercial",
+          justification:
+            "Il s'agit d'un bail commercial standard avec quelques clauses exigeantes (dépôt de garantie élevé, renonciation à la résiliation triennale, cession restreinte). Des ajustements ciblés peuvent être envisagés en suivi de modifications, sous réserve de votre situation.",
+          flags: [
+            "dépôt de garantie de 6 mois",
+            "renonciation à la résiliation triennale",
+            "cession soumise à agrément discrétionnaire",
+            "charges incluant grosses réparations",
+          ],
+          requiredPro: null,
+          model: "seed",
+        },
+      },
     },
   });
 
@@ -226,11 +275,28 @@ async function main() {
       extractedText: PRESTATION_TEXT,
       userQuestion:
         "Je suis la cliente : le prestataire garde la propriété du code et limite fortement sa responsabilité. Que faut-il renégocier ?",
+      analysis: {
+        create: {
+          triage: "AVOCAT_RECOMMANDE",
+          confidence: 0.88,
+          domain: "prestation de services / propriété intellectuelle",
+          justification:
+            "Le contrat présente une asymétrie notable : cession de propriété intellectuelle au profit du prestataire, plafond de responsabilité très bas et pénalités de retard élevées. L'enjeu justifie l'accompagnement d'un avocat pour renégocier les clauses essentielles.",
+          flags: [
+            "propriété intellectuelle conservée par le prestataire",
+            "responsabilité plafonnée à 10 %",
+            "pénalités de retard de 15 % par mois",
+            "clause de non-sollicitation de 3 ans",
+          ],
+          requiredPro: "AVOCAT",
+          model: "seed",
+        },
+      },
     },
   });
 
   console.log("Seed completed:");
-  console.log("  1 admin, 2 clients, 6 lawyers (4 verified, 2 pending), 2 contracts");
+  console.log("  1 admin, 2 clients, 6 lawyers (4 verified, 2 pending), 2 contracts, 2 templates");
   console.log(`  All demo accounts use password: ${DEMO_PASSWORD}`);
 }
 

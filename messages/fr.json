@@ -178,17 +178,134 @@
     "uploadedOn": "Déposé le {date}"
   },
   "chat": {
-    "title": "Nouvelle analyse",
-    "subtitle": "Conversation guidée avant le triage de votre demande.",
+    "title": "Rédaction & analyse",
+    "subtitle": "Décrivez votre besoin — une question à la fois, comme une conversation.",
     "online": "En ligne",
-    "welcome": "Bonjour. Décrivez votre situation contractuelle ou déposez un document — je vous poserai quelques questions avant de vous orienter vers la bonne solution.",
-    "clarification1": "Quel type de contrat est concerné (bail, prestation, NDA…) ? Avez-vous déjà le texte, ou s'agit-il d'une question générale ?",
-    "clarification2": "Quel est l'enjeu principal (montant, durée, clause litigieuse, signature imminente) ? Y a-t-il un acte réglementé en jeu ?",
-    "clarification3": "Souhaitez-vous surtout comprendre le document, le faire relire clause par clause, ou obtenir une validation avocat avant signature ?",
-    "triagePreview": "J'ai assez d'éléments pour lancer le triage. En Phase 1, je vous orienterais vers : relecture assistée, validation avocat, ou orientation vers un professionnel réglementé. Le moteur n'est pas encore connecté.",
-    "placeholder": "Décrivez votre question ou votre contrat…",
-    "send": "Envoyer le message",
-    "attach": "Joindre un contrat"
+    "welcome": "Bonjour. Décrivez ce que vous souhaitez faire — par exemple : « je souhaite rédiger un contrat NDA pour mon site web ». Je vous poserai les questions nécessaires, une par une.",
+    "placeholder": "Ex. : je souhaite rédiger un contrat NDA…",
+    "placeholderDone": "Posez une autre question ou lancez l'analyse depuis l'aperçu…",
+    "send": "Envoyer",
+    "attach": "Joindre un contrat (bientôt)",
+    "emptyMessage": "Écrivez un message pour continuer.",
+    "notDraftIntent": "Pour rédiger un contrat, décrivez le type souhaité (ex. NDA, prestation de services). Pour analyser un document existant, joignez un fichier PDF ou DOCX (bientôt disponible ici).",
+    "noTemplateMatch": "Je n'ai pas trouvé de modèle correspondant. Précisez le type de contrat (NDA, prestation de services…).",
+    "sessionLost": "Session de rédaction introuvable. Recommencez en décrivant votre besoin.",
+    "missingFields": "Il manque encore des informations. Répondez à la question ci-dessus.",
+    "errors": {
+      "unauthorized": "Connectez-vous en tant que client pour rédiger un contrat.",
+      "sessionExpired": "Session expirée — reconnectez-vous.",
+      "generic": "Une erreur est survenue. Réessayez."
+    },
+    "viewer": {
+      "label": "Contrat généré",
+      "copy": "Copier",
+      "analyze": "Lancer l'analyse",
+      "disclaimer": "Modèle d'aide documentaire — faites relire par un avocat si nécessaire."
+    }
+  },
+  "contracts": {
+    "questionLabel": "Votre question (optionnel si vous téléversez un fichier)",
+    "questionPlaceholder": "Décrivez votre situation ou votre question contractuelle…",
+    "fileLabel": "Contrat (PDF, DOCX ou TXT)",
+    "fileHint": "10 Mo maximum. Fournissez un fichier, une question, ou les deux.",
+    "formHint": "Aide documentaire automatisée — ne constitue pas une consultation juridique.",
+    "submit": "Lancer l'analyse",
+    "submitting": "Envoi en cours…",
+    "backToDashboard": "← Retour à mes contrats",
+    "awaitingAnalysis": "En attente d'analyse",
+    "triageIaSuffit": "Relecture assistée possible",
+    "triageAvocat": "Avocat recommandé",
+    "triageActe": "Acte réglementé",
+    "draftInProgress": "Rédaction en cours",
+    "documentPreview": "Aperçu du document",
+    "errors": {
+      "unauthorized": "Vous devez être connecté en tant que client.",
+      "missingInput": "Déposez un fichier ou décrivez votre question contractuelle.",
+      "fileTooLarge": "Le fichier dépasse la taille maximale (10 Mo).",
+      "unsupportedFile": "Format non pris en charge. Utilisez PDF, DOCX ou TXT.",
+      "extractionFailed": "Impossible d'extraire le texte de ce fichier.",
+      "sessionExpired": "Votre session a expiré. Reconnectez-vous."
+    },
+    "triage": {
+      "analyzing": "Analyse en cours…",
+      "notAnalyzedYet": "Ce contrat n'a pas encore été analysé.",
+      "startAnalysis": "Lancer l'analyse",
+      "reanalyze": "Relancer l'analyse",
+      "retry": "Réessayer",
+      "confidence": "Indice de confiance : {value} %",
+      "flagsTitle": "Points d'attention",
+      "requiredPro": "Professionnel recommandé : {pro}",
+      "disclaimer": "Cette analyse est une aide documentaire automatisée. Elle ne constitue pas une consultation juridique.",
+      "pro": {
+        "AVOCAT": "avocat",
+        "NOTAIRE": "notaire"
+      },
+      "errors": {
+        "title": "Analyse impossible",
+        "aiNotConfigured": "La clé NVIDIA_API_KEY n'est pas configurée. Ajoutez-la dans votre fichier .env.",
+        "aiFailed": "L'analyse automatique a échoué. Réessayez dans quelques instants.",
+        "network": "Erreur réseau. Vérifiez votre connexion et réessayez.",
+        "generic": "Une erreur est survenue lors de l'analyse."
+      },
+      "demoMode": "Mode démo — configurez NVIDIA_API_KEY dans .env pour l'analyse IA réelle.",
+      "outOfScope": {
+        "title": "Hors périmètre contractuel",
+        "description": "AvoSearch ne traite que les questions contractuelles.",
+        "alertTitle": "Orientation",
+        "alertDescription": "Pour ce type de sujet, consultez directement le professionnel compétent (avocat spécialisé, notaire, etc.). Aucune analyse du fond n'a été réalisée."
+      },
+      "cases": {
+        "IA_SUFFIT": {
+          "title": "Relecture assistée possible",
+          "subtitle": "Des ajustements peuvent être proposés en suivi de modifications."
+        },
+        "AVOCAT_RECOMMANDE": {
+          "title": "Avocat recommandé",
+          "subtitle": "L'enjeu ou la complexité justifie l'intervention d'un avocat."
+        },
+        "ACTE_REGLEMENTE": {
+          "title": "Acte réglementé ou situation spécifique",
+          "subtitle": "Ce dossier appelle l'intervention d'un professionnel du droit."
+        }
+      },
+      "nextSteps": {
+        "phase2Hint": "Disponible en Phase 2 — relecture en suivi de modifications.",
+        "phase3Hint": "Disponible en Phase 3 — matching avocats",
+        "iaSuffit": {
+          "title": "Choisissez votre formule",
+          "description": "Vous pourrez accepter ou rejeter chaque modification proposée.",
+          "aiOnly": "IA seule",
+          "aiLawyer": "IA + validation avocat",
+          "aiLawyerHint": "Un avocat vérifié valide chaque modification — réponse sous 24 h."
+        },
+        "avocat": {
+          "title": "Mission avocat au forfait",
+          "description": "Nous vous proposerons des avocats adaptés à votre dossier.",
+          "priceRange": "Fourchette indicative : {min} – {max}"
+        },
+        "acte": {
+          "title": "Orientation professionnelle",
+          "description": "Ce type d'acte nécessite un professionnel réglementé.",
+          "alertTitle": "Pas d'analyse automatisée du fond",
+          "alertDescription": "AvoSearch vous oriente vers le bon interlocuteur. Vous pouvez aussi consulter un avocat via la plateforme si pertinent."
+        }
+      }
+    },
+    "draft": {
+      "pageTitle": "Rédaction guidée",
+      "intro": "Répondez aux questions pas à pas : nous remplirons le modèle de contrat pour vous.",
+      "backToDashboard": "← Retour à mes contrats",
+      "progress": "Étape {current} sur {total}",
+      "back": "Retour",
+      "next": "Continuer",
+      "finish": "Générer le contrat",
+      "saving": "Enregistrement…",
+      "disclaimer": "Modèle d'aide documentaire — ne constitue pas une consultation juridique.",
+      "errors": {
+        "required": "Ce champ est obligatoire pour continuer.",
+        "missingFields": "Certaines informations manquent. Complétez toutes les étapes."
+      }
+    }
   },
   "lawyer": {
     "areaLabel": "Espace avocat",
