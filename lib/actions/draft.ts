@@ -5,12 +5,13 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { localizedPath, type AppLocale } from "@/lib/i18n";
 import { isDraftIntent, pickBestTemplate } from "@/lib/templates/match";
+import { loadTemplateBody } from "@/lib/templates/load";
 import {
+  applyPlaceholderDefaults,
   parseDraftAnswers,
   renderTemplateBody,
   validateDraftAnswers,
 } from "@/lib/templates/render";
-import { flattenTemplateFields, parseTemplateSteps } from "@/lib/templates/types";
 import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 
@@ -41,35 +42,25 @@ async function requireDraftContract(contractId: string) {
   return { contract, locale };
 }
 
-export async function saveDraftFieldAction(
-  contractId: string,
-  fieldId: string,
-  value: string
-): Promise<DraftActionState> {
-  const { contract } = await requireDraftContract(contractId);
-  const answers = parseDraftAnswers(contract.draftAnswers);
-  answers[fieldId] = value.trim();
-
-  await prisma.contract.update({
-    where: { id: contractId },
-    data: { draftAnswers: answers },
-  });
-
-  return undefined;
-}
-
 export async function completeDraftAction(contractId: string): Promise<DraftActionState> {
   const { contract, locale } = await requireDraftContract(contractId);
-  const steps = parseTemplateSteps(contract.template!.steps);
-  const fields = flattenTemplateFields(steps);
-  const answers = parseDraftAnswers(contract.draftAnswers);
+  const answers = applyPlaceholderDefaults(parseDraftAnswers(contract.draftAnswers));
 
-  const validation = validateDraftAnswers(fields, answers);
+  let templateBody: string;
+  try {
+    templateBody = contract.template!.body?.trim()
+      ? contract.template!.body!
+      : await loadTemplateBody(contract.template!);
+  } catch {
+    return { error: "template_load_failed" };
+  }
+
+  const validation = validateDraftAnswers(templateBody, answers);
   if (!validation.ok) {
     return { error: "missing_fields" };
   }
 
-  const extractedText = renderTemplateBody(contract.template!.body, answers);
+  const extractedText = renderTemplateBody(templateBody, answers);
 
   await prisma.contract.update({
     where: { id: contractId },
@@ -82,10 +73,7 @@ export async function completeDraftAction(contractId: string): Promise<DraftActi
   redirect(localizedPath(`/app/contracts/${contractId}?analyze=1`, locale));
 }
 
-export async function findTemplateForDraftQuestion(
-  question: string,
-  hasFile: boolean
-) {
+export async function findTemplateForDraftQuestion(question: string, hasFile: boolean) {
   if (!isDraftIntent(question, hasFile)) return null;
 
   const templates = await prisma.contractTemplate.findMany({

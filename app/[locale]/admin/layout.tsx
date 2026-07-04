@@ -4,6 +4,8 @@ import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { auth } from "@/lib/auth";
 import { localizedPath, type AppLocale } from "@/lib/i18n";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminAreaLayout({
   children,
 }: {

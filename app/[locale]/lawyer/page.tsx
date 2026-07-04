@@ -1,6 +1,9 @@
+import { MissionStatus } from "@prisma/client";
 import { getLocale, getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -23,11 +26,29 @@ export default async function LawyerDashboardPage() {
     where: { userId: session!.user.id },
   });
 
+  const missions = await prisma.mission.findMany({
+    where: { lawyerId: session!.user.id },
+    select: { status: true, priceCents: true },
+  });
+
+  const validationsPending = missions.filter(
+    (m) => m.status === MissionStatus.ACCEPTEE || m.status === MissionStatus.EN_COURS
+  ).length;
+  const inProgress = missions.filter((m) => m.status === MissionStatus.EN_COURS).length;
+  const earnings = missions
+    .filter((m) => m.status === MissionStatus.TERMINEE || m.status === MissionStatus.LIVREE)
+    .reduce((sum, m) => sum + m.priceCents, 0);
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("dashboardTitle")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("dashboardIntro")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">{t("dashboardTitle")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("dashboardIntro")}</p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/lawyer/missions">{t("viewMissions")}</Link>
+        </Button>
       </div>
 
       {profile && !profile.verified && (
@@ -41,19 +62,19 @@ export default async function LawyerDashboardPage() {
         <Card>
           <CardHeader>
             <CardDescription>{t("validationsPending")}</CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{validationsPending}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("missionsInProgress")}</CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{inProgress}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader>
             <CardDescription>{t("totalEarnings")}</CardDescription>
-            <CardTitle className="text-3xl">{formatEuros(0, locale)}</CardTitle>
+            <CardTitle className="text-3xl">{formatEuros(earnings, locale)}</CardTitle>
           </CardHeader>
         </Card>
       </div>

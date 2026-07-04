@@ -34,6 +34,11 @@ export async function DashboardHeader({ homeHref, areaLabel, userName }: Dashboa
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <LocaleSwitcher />
+          {homeHref === "/app" && (
+            <Button asChild variant="ghost" size="sm" className="hidden text-muted-foreground sm:inline-flex">
+              <Link href="/app/settings">{t("settings")}</Link>
+            </Button>
+          )}
           <div className="hidden items-center gap-2.5 sm:flex">
             <Avatar className="size-7">
               <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">

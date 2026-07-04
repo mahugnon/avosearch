@@ -1,9 +1,11 @@
 "use client";
 
-import type { RequiredPro, TriageResult } from "@prisma/client";
-import { AlertTriangle, Scale, ShieldCheck, UserRound } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { RequestLawyerButton } from "@/components/contracts/request-lawyer-button";
+import { AlertTriangle, Scale, ShieldCheck, UserRound } from "lucide-react";
+import type { RequiredPro, TriageResult } from "@prisma/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -119,25 +121,13 @@ export function TriageResultView({ data, contractId }: Props) {
         <Card>
           <CardHeader>
             <CardTitle>{t("nextSteps.iaSuffit.title")}</CardTitle>
-            <CardDescription>{t("nextSteps.iaSuffit.description")}</CardDescription>
+            <CardDescription>{t("nextSteps.lawyerReviewOnly")}</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-lg border p-4">
-              <p className="font-medium">{t("nextSteps.iaSuffit.aiOnly")}</p>
-              <p className="mt-1 text-2xl font-semibold">
-                {formatEuros(pricing.aiOnlyCents, locale)}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">{t("nextSteps.phase2Hint")}</p>
-            </div>
-            <div className="rounded-lg border border-foreground/20 p-4">
-              <p className="font-medium">{t("nextSteps.iaSuffit.aiLawyer")}</p>
-              <p className="mt-1 text-2xl font-semibold">
-                {formatEuros(pricing.aiPlusLawyerCents, locale)}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {t("nextSteps.iaSuffit.aiLawyerHint")}
-              </p>
-            </div>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              {t("nextSteps.iaSuffit.aiLawyerHint")}
+            </p>
+            <RequestLawyerButton contractId={contractId} />
           </CardContent>
         </Card>
       )}
@@ -155,9 +145,9 @@ export function TriageResultView({ data, contractId }: Props) {
                 max: formatEuros(pricing.missionMaxCents, locale),
               })}
             </p>
-            <Button asChild disabled>
+            <Button asChild>
               <Link href={`/app/contracts/${contractId}/matching`}>
-                {t("nextSteps.phase3Hint")}
+                {t("nextSteps.findLawyer")}
               </Link>
             </Button>
           </CardContent>
@@ -175,9 +165,9 @@ export function TriageResultView({ data, contractId }: Props) {
               <AlertTitle>{t("nextSteps.acte.alertTitle")}</AlertTitle>
               <AlertDescription>{t("nextSteps.acte.alertDescription")}</AlertDescription>
             </Alert>
-            <Button asChild variant="outline" disabled>
+            <Button asChild variant="outline">
               <Link href={`/app/contracts/${contractId}/matching`}>
-                {t("nextSteps.phase3Hint")}
+                {t("nextSteps.findLawyer")}
               </Link>
             </Button>
           </CardContent>

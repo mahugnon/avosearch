@@ -23,8 +23,11 @@ export async function SiteFooter() {
             <Link href="/legal/mentions-legales" className="transition-colors hover:text-white">
               {t("mentionsLegales")}
             </Link>
-            <Link href="/legal/confidentialite" className="transition-colors hover:text-white">
-              {t("confidentialite")}
+            <Link href="/legal/sous-traitants" className="transition-colors hover:text-white">
+              {t("sousTraitants")}
+            </Link>
+            <Link href="/legal/registre-traitements" className="transition-colors hover:text-white">
+              {t("registreTraitements")}
             </Link>
           </nav>
         </div>

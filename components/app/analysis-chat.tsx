@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUp, Paperclip, Sparkles } from "lucide-react";
+import { ArrowUp, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { draftChatAction } from "@/lib/actions/draft-chat";
@@ -189,18 +189,6 @@ export function AnalysisChat() {
               <ArrowUp />
             </Button>
           </div>
-          <div className="px-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled
-              className="h-8 gap-1.5 text-muted-foreground"
-            >
-              <Paperclip className="size-3.5" />
-              {t("attach")}
-            </Button>
-          </div>
         </footer>
       </section>
 
@@ -209,6 +197,7 @@ export function AnalysisChat() {
           title={contractTitle}
           body={contractBody}
           contractId={contractId}
+          showLawyerRequest
           className="min-h-[28rem] lg:max-h-[calc(28rem+8rem)]"
         />
       )}

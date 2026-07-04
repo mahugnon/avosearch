@@ -8,7 +8,9 @@
     "registerLawyer": "Lawyer registration",
     "cgu": "Terms of use",
     "mentionsLegales": "Legal notice",
-    "confidentialite": "Privacy policy"
+    "confidentialite": "Privacy policy",
+    "registreTraitements": "Processing register",
+    "sousTraitants": "Subprocessors (DPA)"
   },
   "common": {
     "brand": "AvoSearch",
@@ -19,7 +21,9 @@
     "pending": "Pending",
     "analyzed": "Analyzed",
     "awaitingAnalysis": "Awaiting analysis",
-    "close": "Close"
+    "close": "Close",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "header": {
     "howItWorks": "How it works",
@@ -28,7 +32,8 @@
     "signIn": "Sign in",
     "signUp": "Create an account",
     "mySpace": "My dashboard",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "settings": "Settings"
   },
   "localeSwitcher": {
     "label": "Language",
@@ -40,7 +45,9 @@
     "cgu": "Terms of use",
     "mentionsLegales": "Legal notice",
     "confidentialite": "Privacy policy",
-    "demoNotice": "Demo platform — no real data, no real lawyers."
+    "demoNotice": "Demo platform — no real data, no real lawyers.",
+    "registreTraitements": "Processing register",
+    "sousTraitants": "Subprocessors (DPA)"
   },
   "landing": {
     "heroBadge": "Contracts only — guidance in under a minute",
@@ -190,16 +197,22 @@
     "notDraftIntent": "To draft a contract, describe the type (e.g. NDA, services agreement). To analyze an existing document, attach a PDF or DOCX (coming soon here).",
     "noTemplateMatch": "No matching template found. Specify the contract type (NDA, services…).",
     "sessionLost": "Draft session not found. Start again by describing your need.",
+    "templateLoadFailed": "Could not load the contract template. Please contact support.",
     "missingFields": "Some information is still missing. Answer the question above.",
     "errors": {
       "unauthorized": "Sign in as a client to draft a contract.",
       "sessionExpired": "Session expired — please sign in again.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "aiRequiredForDraft": "Guided drafting requires NVIDIA_API_KEY in .env.",
+      "templateLoadFailed": "Could not load the contract template."
     },
     "viewer": {
       "label": "Generated contract",
       "copy": "Copy",
+      "pdf": "PDF",
       "analyze": "Start analysis",
+      "requestLawyer": "Request lawyer review",
+      "requestLawyerPending": "Assigning…",
       "disclaimer": "Document assistance template — have a lawyer review if needed."
     }
   },
@@ -269,8 +282,12 @@
         }
       },
       "nextSteps": {
-        "phase2Hint": "Available in Phase 2 — tracked-change review.",
-        "phase3Hint": "Available in Phase 3 — lawyer matching",
+        "lawyerReviewOnly": "Contract review is performed by a registered lawyer — not by platform administrators.",
+        "startReview": "Start AI review",
+        "startReviewLawyer": "Review + lawyer validation",
+        "findLawyer": "Find a lawyer",
+        "phase2Hint": "Tracked-change review.",
+        "phase3Hint": "Lawyer matching",
         "iaSuffit": {
           "title": "Choose your plan",
           "description": "You will accept or reject each suggested change.",
@@ -289,6 +306,79 @@
           "alertTitle": "No automated substantive analysis",
           "alertDescription": "AvoSearch refers you to the right contact. You can also consult a lawyer via the platform when relevant."
         }
+      }
+    },
+    "review": {
+      "pageTitle": "Assisted review",
+      "back": "← Back to contract",
+      "planLabel": "Plan",
+      "planAiOnly": "AI only",
+      "planAiLawyer": "AI + lawyer validation",
+      "generate": "Generate modifications",
+      "generating": "Analyzing…",
+      "noModifications": "No modifications yet.",
+      "modification": "Change {order}",
+      "original": "Original text",
+      "proposed": "Proposed text",
+      "lawyerNote": "Lawyer note",
+      "accept": "Accept",
+      "reject": "Reject",
+      "continueMatching": "Choose validating lawyer",
+      "backToContract": "Back to contract",
+      "consent": {
+        "title": "AI processing consent",
+        "description": "Before automated review, confirm you understand the nature of the service.",
+        "disclaimer": "AvoSearch is automated document assistance. This is not legal advice. Suggestions may be incomplete or inaccurate.",
+        "checkbox": "I agree that my document will be analyzed by an AI model to propose tracked changes, and I understand this is document assistance only.",
+        "submit": "Continue",
+        "submitting": "Saving…",
+        "error": "Could not save consent."
+      },
+      "status": {
+        "PROPOSEE": "Pending",
+        "ACCEPTEE_CLIENT": "Accepted",
+        "REJETEE_CLIENT": "Rejected",
+        "VALIDEE_AVOCAT": "Lawyer approved",
+        "REJETEE_AVOCAT": "Lawyer rejected",
+        "AMENDEE_AVOCAT": "Lawyer amended"
+      },
+      "errors": {
+        "REVIEW_FAILED": "Automated review failed.",
+        "NETWORK_ERROR": "Network error.",
+        "NO_CONSENT": "Consent required."
+      }
+    },
+    "matching": {
+      "title": "Recommended lawyers",
+      "subtitle": "Select a verified lawyer for your mission.",
+      "back": "← Back",
+      "empty": "No lawyers available right now.",
+      "responseTime": "Response within {hours} h",
+      "select": "Choose this lawyer",
+      "creating": "Creating mission…",
+      "confirmAndPay": "Confirm and pay",
+      "selectedSummary": "Selected lawyer: {name}"
+    },
+    "lawyerSelection": {
+      "title": "Lawyer selected for you",
+      "description": "We found the best-matched lawyer for your contract. You can pick another if you prefer.",
+      "searchingTitle": "Finding a lawyer…",
+      "searchingDescription": "Matching specialty, price, responsiveness and client reviews.",
+      "searchingHint": "This only takes a few seconds.",
+      "selectedLabel": "Recommended for you",
+      "changeLabel": "Choose another lawyer",
+      "responseTime": "Response within {hours} h",
+      "choose": "Choose",
+      "selected": "Selected",
+      "confirmAndPay": "Confirm and pay",
+      "confirming": "Processing payment…",
+      "confirmPrice": "Amount: {price} — instant payment (demo)",
+      "errors": {
+        "no_lawyers": "No lawyers available at the moment.",
+        "not_found": "Contract not found.",
+        "out_of_scope": "This contract cannot be processed.",
+        "analysis_failed": "Analysis failed. Please try again.",
+        "generic": "Could not find a lawyer. Please try again later."
       }
     },
     "draft": {
@@ -310,7 +400,8 @@
   "lawyer": {
     "areaLabel": "Lawyer dashboard",
     "dashboardTitle": "Dashboard",
-    "dashboardIntro": "Your validations, missions, and earnings — workflows arrive in Phase 3.",
+    "dashboardIntro": "Manage your validations, missions, and earnings.",
+    "viewMissions": "View my missions",
     "pendingProfileTitle": "Profile pending verification",
     "pendingProfileDescription": "Our team manually verifies each profile. You won't receive missions until your profile is verified.",
     "validationsPending": "Validations to process",
@@ -322,23 +413,272 @@
     "validationPrice": "Validation fee",
     "responseTime": "Advertised response time",
     "responseTimeHours": "{hours} h",
-    "specialties": "Specialties"
+    "specialties": "Specialties",
+    "missions": {
+      "title": "My missions",
+      "back": "← Dashboard",
+      "empty": "No missions yet.",
+      "status": {
+        "PROPOSEE": "Awaiting payment",
+        "ACCEPTEE": "Paid — to start",
+        "EN_COURS": "In progress",
+        "LIVREE": "Delivered",
+        "TERMINEE": "Completed",
+        "ANNULEE": "Cancelled"
+      }
+    },
+    "mission": {
+      "back": "← Missions",
+      "client": "Client",
+      "start": "Start mission",
+      "mod": "Change {order}",
+      "validate": "Approve",
+      "reject": "Reject",
+      "deliver": "Deliver mission",
+      "generateReview": "Generate review suggestions",
+      "generatingReview": "Analysis in progress…",
+      "reviewLawyerOnly": "Only lawyers can review contracts.",
+      "globalNotePlaceholder": "Global note for the client…",
+      "chatTitle": "Messaging",
+      "autoAssigned": "Mission auto-assigned by specialty, price, responsiveness and client reviews.",
+      "contractText": "Contract text to review",
+      "timer": {
+        "label": "Work time",
+        "projectedPrice": "Estimated price (live)",
+        "rate": "{rate} / h (15-minute billing increments)",
+        "hint": "Timer runs from mission start. Final price is computed on delivery, with a minimum at the quoted fee."
+      },
+      "status": {
+        "PROPOSEE": "Pending",
+        "ACCEPTEE": "Paid",
+        "EN_COURS": "In progress",
+        "LIVREE": "Delivered",
+        "TERMINEE": "Completed",
+        "ANNULEE": "Cancelled"
+      }
+    }
+  },
+  "missions": {
+    "back": "← Back",
+    "lawyer": "Lawyer",
+    "estimatedPrice": "Estimated fee: {price}",
+    "finalPrice": "Billed amount: {price}",
+    "autoAssigned": "Lawyer selected automatically (specialty, price, responsiveness, reviews).",
+    "pay": "Pay for mission",
+    "paymentPending": "Complete payment to start the mission.",
+    "paymentSuccess": "Payment recorded — your lawyer will take over shortly.",
+    "paymentCancelled": "Payment cancelled.",
+    "modificationsTitle": "Proposed changes",
+    "lawyerDelivery": "Lawyer's note",
+    "chatTitle": "Message your lawyer",
+    "status": {
+      "PROPOSEE": "Awaiting payment",
+      "ACCEPTEE": "Paid",
+      "EN_COURS": "In progress",
+      "LIVREE": "Delivered",
+      "TERMINEE": "Completed",
+      "ANNULEE": "Cancelled"
+    },
+    "chat": {
+      "empty": "No messages yet.",
+      "placeholder": "Your message…",
+      "send": "Send",
+      "you": "You",
+      "attach": "Attach",
+      "attachmentOnly": "📎 Attachment",
+      "downloadAttachment": "Download"
+    },
+    "review": {
+      "title": "Rate your lawyer",
+      "rating": "Rating",
+      "comment": "Comment (optional)",
+      "submit": "Submit review",
+      "thanks": "Thank you for your feedback."
+    }
+  },
+  "settings": {
+    "title": "Account settings",
+    "subtitle": "Export your data or delete your account (GDPR).",
+    "back": "← Back",
+    "rgpdNotice": "Under GDPR, you can export all your data or request account deletion. Deletion is permanent and removes contracts, analyses, and messages.",
+    "export": {
+      "title": "Export my data",
+      "description": "Download a JSON copy of your contracts, analyses, and missions.",
+      "button": "Generate export"
+    },
+    "delete": {
+      "title": "Delete my account",
+      "description": "This action is irreversible. All your data will be erased.",
+      "button": "Delete permanently",
+      "confirm": "Are you sure you want to permanently delete your account and all data?"
+    },
+    "errors": {
+      "generic": "Something went wrong."
+    }
   },
   "admin": {
     "areaLabel": "Administration",
     "title": "Lawyer verification",
-    "pendingCount": "{count, plural, one {# profile pending} other {# profiles pending}}. Verify / Reject actions arrive in Phase 3.",
+    "pendingCount": "{count, plural, one {# profile pending} other {# profiles pending}}.",
+    "verify": "Verify",
+    "reject": "Reject",
+    "nav": {
+      "lawyers": "Lawyers",
+      "templates": "Contract templates"
+    },
     "columns": {
       "lawyer": "Lawyer",
       "barreau": "Bar association",
       "specialties": "Specialties",
       "validationPrice": "Validation fee",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "templates": {
+      "title": "Contract templates",
+      "subtitle": "PDF, DOCX or TXT files stored outside the database. Metadata and guided fields stay in the DB.",
+      "add": "Add template",
+      "empty": "No templates yet.",
+      "inlineBody": "Inline text (seed)",
+      "edit": "Edit",
+      "delete": "Delete",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "newTitle": "New template",
+      "newSubtitle": "Upload a document with placeholder variables (e.g. DISCLOSING_PARTY_NAME) and define guided questions.",
+      "editTitle": "Edit template",
+      "editSubtitle": "Update metadata or replace the source file.",
+      "columns": {
+        "title": "Title",
+        "domain": "Domain",
+        "file": "File",
+        "tags": "Tags",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "form": {
+        "sections": {
+          "general": "Metadata",
+          "generalHint": "Information shown to clients and used for template matching.",
+          "steps": "Guided questions",
+          "stepsHint": "Each field maps to a variable in the document (e.g. DISCLOSING_PARTY_NAME).",
+          "draftGuide": "AI drafting instructions",
+          "draftGuideHint": "Optional hints for the drafting conversation. {{VARIABLE}} placeholders are auto-detected from the template file.",
+          "file": "Template file",
+          "fileHint": "PDF, DOCX or TXT — text is extracted when generating the contract."
+        },
+        "title": "Title",
+        "slug": "Slug",
+        "slugHint": "Lowercase and hyphens only — used for file storage.",
+        "description": "Description",
+        "domain": "Legal domain",
+        "tags": "Tags",
+        "tagsHint": "Comma-separated — used to match client requests.",
+        "fileReplace": "Replace file (optional)",
+        "currentFile": "Current file",
+        "active": "Active template (visible to clients)",
+        "draftGuidePlaceholder": "E.g. start with the disclosing party, then recipient, then website URL…",
+        "create": "Create template",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel"
+      },
+      "stepsBuilder": {
+        "stepLabel": "Step {index}",
+        "removeStep": "Remove step",
+        "stepTitle": "Step title",
+        "stepTitlePlaceholder": "E.g. Disclosing party",
+        "stepDescription": "Description (optional)",
+        "stepDescriptionPlaceholder": "Context shown in the wizard…",
+        "fieldsTitle": "Fields to collect",
+        "fieldLabel": "Field {index}",
+        "fieldId": "Variable id",
+        "fieldIdHint": "UPPER_SNAKE_CASE — must match the document placeholder.",
+        "fieldLabelText": "Label",
+        "fieldChatPrompt": "Question asked to the client",
+        "fieldChatPromptPlaceholder": "What is your company name?",
+        "fieldPlaceholder": "Example (optional)",
+        "fieldDescription": "Help text (optional)",
+        "fieldType": "Input type",
+        "fieldRequired": "Required field",
+        "fieldTypes": {
+          "text": "Short text",
+          "textarea": "Long text",
+          "email": "Email",
+          "date": "Date",
+          "number": "Number"
+        },
+        "addField": "Add field",
+        "addStep": "Add step",
+        "hint": "Answers will replace variables with the same name in the template file."
+      },
+      "errors": {
+        "unauthorized": "Access denied.",
+        "validation_failed": "Some fields are invalid.",
+        "invalid_steps_json": "Invalid steps JSON.",
+        "slug_taken": "This slug is already in use.",
+        "file_required": "A template file is required.",
+        "file_too_large": "File too large (max 10 MB).",
+        "file_type_invalid": "Unsupported format — PDF, DOCX or TXT only.",
+        "not_found": "Template not found."
+      }
     }
   },
+  "cookies": {
+    "title": "Cookies",
+    "description": "We use strictly necessary cookies (session, language, consent). No advertising cookies.",
+    "accept": "Accept",
+    "privacyLink": "Privacy policy",
+    "registerLink": "Processing register"
+  },
   "legal": {
-    "draftTitle": "Draft document",
-    "draftDescription": "To be reviewed by a lawyer before production release.",
+    "draftTitle": "Draft document — lawyer review required",
+    "draftDescription": "These texts are drafts and must be reviewed by a lawyer before production. Last internal review: July 2026.",
+    "nav": {
+      "cgu": "Terms",
+      "confidentialite": "Privacy",
+      "mentions": "Legal notice",
+      "register": "GDPR register",
+      "subprocessors": "Subprocessors"
+    },
+    "register": {
+      "title": "Record of processing activities",
+      "lastUpdated": "Last updated: July 2026 (draft)",
+      "intro": "Simplified register of personal data processing via AvoSearch (controller: AvoSearch — demo).",
+      "tableTitle": "Processing activities",
+      "columns": {
+        "purpose": "Purpose",
+        "data": "Data",
+        "legalBasis": "Legal basis",
+        "retention": "Retention"
+      },
+      "rows": {
+        "1": { "purpose": "User account", "data": "Name, email, hashed password, role", "legalBasis": "Contract (ToS)", "retention": "Account lifetime" },
+        "2": { "purpose": "AI analysis / review", "data": "Contract texts, questions, results", "legalBasis": "Explicit consent", "retention": "Account lifetime" },
+        "3": { "purpose": "Lawyer missions", "data": "Messages, attachments", "legalBasis": "Contract", "retention": "Account lifetime" },
+        "4": { "purpose": "Payments", "data": "Stripe IDs, amounts", "legalBasis": "Contract / legal obligation", "retention": "10 years (prod)" },
+        "5": { "purpose": "Email notifications", "data": "Email, notification content", "legalBasis": "Legitimate interest", "retention": "12 months" },
+        "6": { "purpose": "Essential cookies", "data": "Session, language, consent", "legalBasis": "Legitimate interest", "retention": "13 months max." }
+      },
+      "subprocessorsHint": "Subprocessors:",
+      "subprocessorsLink": "Subprocessors (DPA) page"
+    },
+    "subprocessors": {
+      "title": "Subprocessors and DPAs",
+      "lastUpdated": "Last updated: July 2026 (draft)",
+      "intro": "AvoSearch uses the following subprocessors. SCCs apply for transfers outside the EU where relevant.",
+      "role": "Role",
+      "location": "Location",
+      "data": "Data processed",
+      "safeguards": "Safeguards",
+      "vendors": {
+        "1": { "name": "NVIDIA NIM", "role": "LLM contract processing", "location": "US / EU", "data": "Contract excerpts", "safeguards": "DPA / SCC" },
+        "2": { "name": "Stripe", "role": "Payments", "location": "EU / US", "data": "Transaction data", "safeguards": "PCI-DSS, DPA" },
+        "3": { "name": "Hosting", "role": "App hosting", "location": "EU", "data": "All platform data", "safeguards": "DPA, encryption" },
+        "4": { "name": "SMTP provider", "role": "Transactional email", "location": "EU", "data": "Email addresses", "safeguards": "DPA" }
+      },
+      "dpaNote": "Signed DPAs must be archived before production."
+    },
     "cgu": {
       "title": "Terms of use",
       "sections": {
@@ -398,7 +738,7 @@
         },
         "3": {
           "title": "Sub-processors",
-          "body": "Automated processing of contract text uses the Anthropic API. Documents are not used to train models."
+          "body": "Automated processing of contract text uses the NVIDIA NIM API (Nemotron model). Documents are not used to train models."
         },
         "4": {
           "title": "Your rights",

@@ -1,20 +1,25 @@
 "use server";
 
-import { ContractDraftStatus } from "@prisma/client";
+import { ContractDraftStatus, type ContractTemplate } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getClientSession } from "@/lib/auth/client-session";
+import { runDraftStartWithLlm, runDraftTurnWithLlm } from "@/lib/ai/draft-chat-llm";
+import { isAiConfigured } from "@/lib/ai/llm";
 import {
-  applyFieldDefaults,
   buildCompletionMessage,
-  buildFieldQuestion,
-  buildTemplateIntro,
   detectLawyerValidationIntent,
-  getNextPendingField,
-  normalizeFieldValue,
 } from "@/lib/templates/draft-chat";
-import { isDraftIntent, pickBestTemplate } from "@/lib/templates/match";
-import { parseDraftAnswers, renderTemplateBody, validateDraftAnswers } from "@/lib/templates/render";
-import { flattenTemplateFields, parseTemplateSteps } from "@/lib/templates/types";
+import { loadTemplateBody } from "@/lib/templates/load";
+import {
+  applyPlaceholderDefaults,
+  extractPlaceholderKeys,
+  missingPlaceholders,
+} from "@/lib/templates/placeholders";
+import {
+  parseDraftAnswers,
+  renderTemplateBody,
+  validateDraftAnswers,
+} from "@/lib/templates/render";
 import { getTranslations } from "next-intl/server";
 
 export type DraftChatResult = {
@@ -38,6 +43,80 @@ async function loadDraftContract(contractId: string, userId: string) {
   });
 }
 
+async function resolveTemplateBody(template: ContractTemplate): Promise<string> {
+  if (template.body?.trim()) return template.body;
+  return loadTemplateBody(template);
+}
+
+async function buildTemplateCatalog(
+  templates: Array<
+    Pick<ContractTemplate, "slug" | "title" | "domain" | "tags" | "body" | "draftGuide" | "fileKey">
+  >
+) {
+  return Promise.all(
+    templates.map(async (template) => {
+      let body = template.body ?? "";
+      if (!body.trim() && template.fileKey) {
+        try {
+          body = await loadTemplateBody(template as ContractTemplate);
+        } catch {
+          body = "";
+        }
+      }
+      return {
+        slug: template.slug,
+        title: template.title,
+        domain: template.domain,
+        tags: template.tags,
+        placeholders: extractPlaceholderKeys(body),
+        draftGuide: template.draftGuide,
+      };
+    })
+  );
+}
+
+async function completeDraftContract(
+  contractId: string,
+  contract: NonNullable<Awaited<ReturnType<typeof loadDraftContract>>>,
+  answers: Record<string, string>,
+  history: string[],
+  lastMessage: string
+): Promise<DraftChatResult> {
+  const t = await getTranslations("chat");
+  let templateBody: string;
+  try {
+    templateBody = await resolveTemplateBody(contract.template!);
+  } catch {
+    return { contractId, assistantMessage: t("errors.templateLoadFailed"), completed: false };
+  }
+
+  const normalized = applyPlaceholderDefaults(answers);
+  const validation = validateDraftAnswers(templateBody, normalized);
+  if (!validation.ok) {
+    return { contractId, assistantMessage: t("missingFields"), completed: false };
+  }
+
+  const contractBody = renderTemplateBody(templateBody, normalized);
+  const wantsLawyer = detectLawyerValidationIntent([...history, lastMessage].join("\n"));
+
+  await prisma.contract.update({
+    where: { id: contractId },
+    data: {
+      extractedText: contractBody,
+      draftAnswers: normalized,
+      draftStatus: ContractDraftStatus.COMPLETED,
+    },
+  });
+
+  return {
+    contractId,
+    assistantMessage: buildCompletionMessage(wantsLawyer),
+    completed: true,
+    contractBody,
+    contractTitle: contract.title,
+  };
+}
+
 export async function draftChatAction(input: {
   contractId?: string;
   message: string;
@@ -54,31 +133,41 @@ export async function draftChatAction(input: {
     return { assistantMessage: t("emptyMessage") };
   }
 
+  if (!isAiConfigured()) {
+    return { assistantMessage: t("errors.aiRequiredForDraft") };
+  }
+
   if (input.contractId) {
     return continueDraftChat(input.contractId, session.userId, message, input.history ?? []);
   }
 
-  if (!isDraftIntent(message, false)) {
-    return {
-      assistantMessage: t("notDraftIntent"),
-    };
-  }
-
   const templates = await prisma.contractTemplate.findMany({
     where: { active: true },
-    select: { id: true, slug: true, title: true, tags: true, domain: true, body: true, steps: true },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      tags: true,
+      domain: true,
+      body: true,
+      draftGuide: true,
+      fileKey: true,
+    },
   });
 
-  const template = pickBestTemplate(message, templates);
-  if (!template) {
-    return { assistantMessage: t("noTemplateMatch") };
+  const catalog = await buildTemplateCatalog(templates);
+  const llmStart = await runDraftStartWithLlm({ userMessage: message, templates: catalog });
+
+  if (!llmStart) {
+    return { assistantMessage: t("errors.generic") };
   }
 
-  const steps = parseTemplateSteps(template.steps);
-  const fields = flattenTemplateFields(steps);
-  const firstField = getNextPendingField(fields, {});
+  if (!llmStart.result.is_draft_intent) {
+    return { assistantMessage: t("notDraftIntent") };
+  }
 
-  if (!firstField) {
+  const template = templates.find((item) => item.slug === llmStart.result.template_slug);
+  if (!template) {
     return { assistantMessage: t("noTemplateMatch") };
   }
 
@@ -94,10 +183,9 @@ export async function draftChatAction(input: {
     },
   });
 
-  const firstQuestion = buildFieldQuestion(firstField, 0, fields.length);
   return {
     contractId: contract.id,
-    assistantMessage: buildTemplateIntro(template.title, firstQuestion),
+    assistantMessage: llmStart.result.assistant_message,
     completed: false,
   };
 }
@@ -115,80 +203,91 @@ async function continueDraftChat(
     return { assistantMessage: t("sessionLost") };
   }
 
-  const steps = parseTemplateSteps(contract.template.steps);
-  const fields = flattenTemplateFields(steps);
+  let templateBody: string;
+  try {
+    templateBody = await resolveTemplateBody(contract.template);
+  } catch {
+    return { contractId, assistantMessage: t("errors.templateLoadFailed") };
+  }
+
+  const placeholders = extractPlaceholderKeys(templateBody);
   let answers = parseDraftAnswers(contract.draftAnswers);
-  const pending = getNextPendingField(fields, answers);
+  const missingBefore = missingPlaceholders(placeholders, answers);
 
-  if (pending) {
-    answers[pending.id] = normalizeFieldValue(pending, message);
-    await prisma.contract.update({
-      where: { id: contractId },
-      data: { draftAnswers: answers },
-    });
+  const llmTurn = await runDraftTurnWithLlm({
+    templateTitle: contract.template.title,
+    draftGuide: contract.template.draftGuide,
+    templateExcerpt: templateBody,
+    placeholders,
+    missing: missingBefore,
+    answers,
+    userMessage: message,
+    history,
+  });
+
+  if (!llmTurn) {
+    return { contractId, assistantMessage: t("errors.generic") };
   }
 
-  const wantsLawyer = detectLawyerValidationIntent([...history, message].join("\n"));
-  const next = getNextPendingField(fields, answers);
-
-  if (next) {
-    const answeredCount = fields.filter((f) => f.required && answers[f.id]?.trim()).length;
-    const question = buildFieldQuestion(next, answeredCount, fields.length);
-    return {
-      contractId,
-      assistantMessage: question,
-      completed: false,
-    };
-  }
-
-  answers = applyFieldDefaults(answers);
-  const validation = validateDraftAnswers(fields, answers);
-  if (!validation.ok) {
-    return {
-      contractId,
-      assistantMessage: t("missingFields"),
-      completed: false,
-    };
-  }
-
-  const contractBody = renderTemplateBody(contract.template.body, answers);
-
+  answers = { ...answers, ...llmTurn.result.collected };
   await prisma.contract.update({
     where: { id: contractId },
-    data: {
-      extractedText: contractBody,
-      draftAnswers: answers,
-      draftStatus: ContractDraftStatus.COMPLETED,
-    },
+    data: { draftAnswers: answers },
   });
+
+  const missingAfter = missingPlaceholders(placeholders, answers);
+  const allFilled = missingAfter.length === 0;
+
+  if (llmTurn.result.complete && allFilled) {
+    return completeDraftContract(contractId, contract, answers, history, message);
+  }
+
+  if (allFilled) {
+    return completeDraftContract(contractId, contract, answers, history, message);
+  }
 
   return {
     contractId,
-    assistantMessage: buildCompletionMessage(wantsLawyer),
-    completed: true,
-    contractBody,
-    contractTitle: contract.title,
+    assistantMessage: llmTurn.result.assistant_message,
+    completed: false,
   };
 }
 
 export async function resumeDraftChatAction(contractId: string): Promise<DraftChatResult | null> {
   const session = await getClientSession();
-  if (!session.ok) return null;
+  if (!session.ok || !isAiConfigured()) return null;
 
   const contract = await loadDraftContract(contractId, session.userId);
   if (!contract?.template) return null;
 
-  const steps = parseTemplateSteps(contract.template.steps);
-  const fields = flattenTemplateFields(steps);
+  let templateBody: string;
+  try {
+    templateBody = await resolveTemplateBody(contract.template);
+  } catch {
+    return null;
+  }
+
+  const placeholders = extractPlaceholderKeys(templateBody);
   const answers = parseDraftAnswers(contract.draftAnswers);
-  const next = getNextPendingField(fields, answers);
+  const missing = missingPlaceholders(placeholders, answers);
+  if (missing.length === 0) return null;
 
-  if (!next) return null;
+  const llmTurn = await runDraftTurnWithLlm({
+    templateTitle: contract.template.title,
+    draftGuide: contract.template.draftGuide,
+    templateExcerpt: templateBody,
+    placeholders,
+    missing,
+    answers,
+    userMessage: "Reprends la conversation et pose la prochaine question.",
+    history: [],
+  });
 
-  const answeredCount = fields.filter((f) => f.required && answers[f.id]?.trim()).length;
+  if (!llmTurn) return null;
+
   return {
     contractId: contract.id,
-    assistantMessage: buildFieldQuestion(next, answeredCount, fields.length),
+    assistantMessage: llmTurn.result.assistant_message,
     completed: false,
   };
 }

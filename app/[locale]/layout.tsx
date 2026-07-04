@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { Toaster } from "@/components/ui/sonner";
+import { CookieConsent } from "@/components/layout/cookie-consent";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -59,8 +60,11 @@ export default async function LocaleLayout({ children, params }: Props) {
       className={`${plusJakarta.variable} ${ibmPlexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
-        <Toaster />
+        <NextIntlClientProvider messages={messages}>
+          {children}
+          <CookieConsent />
+          <Toaster />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

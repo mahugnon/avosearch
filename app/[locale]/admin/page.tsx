@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,9 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { verifyLawyerAction, rejectLawyerAction } from "@/lib/actions/admin";
 import { prisma } from "@/lib/db";
 import { formatEuros } from "@/lib/config";
 import type { AppLocale } from "@/lib/i18n";
+import { AdminNav } from "@/components/admin/admin-nav";
 
 export default async function AdminPage() {
   const t = await getTranslations("admin");
@@ -26,6 +29,8 @@ export default async function AdminPage() {
 
   return (
     <div className="space-y-8">
+      <AdminNav />
+
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -42,6 +47,7 @@ export default async function AdminPage() {
               <TableHead>{t("columns.specialties")}</TableHead>
               <TableHead>{t("columns.validationPrice")}</TableHead>
               <TableHead>{t("columns.status")}</TableHead>
+              <TableHead>{t("columns.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,6 +69,24 @@ export default async function AdminPage() {
                     <Badge>{tc("verified")}</Badge>
                   ) : (
                     <Badge variant="secondary">{tc("pending")}</Badge>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {!profile.verified ? (
+                    <div className="flex gap-2">
+                      <form action={verifyLawyerAction.bind(null, profile.id)}>
+                        <Button type="submit" size="sm">
+                          {t("verify")}
+                        </Button>
+                      </form>
+                      <form action={rejectLawyerAction.bind(null, profile.id)}>
+                        <Button type="submit" size="sm" variant="outline">
+                          {t("reject")}
+                        </Button>
+                      </form>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
                   )}
                 </TableCell>
               </TableRow>

@@ -9,12 +9,15 @@ export async function requireClientContract(contractId: string) {
   const locale = (await getLocale()) as AppLocale;
 
   if (!session || session.user.role !== "CLIENT") {
-    redirect(localizedPath("/login", locale));
+    redirect(localizedPath(session?.user.role === "ADMIN" ? "/admin" : "/login", locale));
   }
 
   const contract = await prisma.contract.findUnique({
     where: { id: contractId },
-    include: { analysis: true, template: true },
+    include: {
+      analysis: { include: { modifications: { orderBy: { order: "asc" } } } },
+      template: true,
+    },
   });
 
   if (!contract || contract.ownerId !== session.user.id) {

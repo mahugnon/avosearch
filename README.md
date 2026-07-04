@@ -75,9 +75,32 @@ proxy.ts            # protection des routes par rôle
 
 - [x] **Phase 0 — Socle** : scaffold, Prisma + Postgres, Auth.js 3 rôles, layout, seed, README
 - [x] **Phase 1 — Triage** : upload + extraction de texte, endpoint `analyze`, écran de résultat
-- [ ] **Phase 2 — Relecture IA** : endpoint `review`, vue diff, consentement + disclaimer
-- [ ] **Phase 3 — Marketplace** : matching, missions, messagerie, validation avocat, admin
-- [ ] **Phase 4 — Paiements et finitions** : Stripe test, notation, scénario de démonstration
+- [x] **Phase 2 — Relecture IA** : endpoint `review`, vue diff, consentement + disclaimer
+- [x] **Phase 3 — Marketplace** : matching, missions, messagerie, validation avocat, admin
+- [x] **Phase 4 — Paiements et finitions** : Stripe test (ou mode démo), notation, scénario de démonstration
+
+## Mise en production (hors phases MVP)
+
+Fonctionnalités prêtes côté code ; validation juridique et clés live restent à votre charge.
+
+| Domaine | Implémentation |
+| --- | --- |
+| **Pages légales** | CGU, confidentialité, mentions, [registre des traitements](/legal/registre-traitements), [sous-traitants / DPA](/legal/sous-traitants) — brouillons marqués « validation avocat requise » |
+| **RGPD avancé** | Bandeau cookies (`CookieConsent`), registre + DPA, export JSON et suppression compte (`/app/settings`) |
+| **Stripe prod** | Webhook idempotent (`ProcessedStripeEvent`), `paidAt` sur mission ; sans clé → mode démo |
+| **E-mail** | SMTP optionnel (`lib/email/send.ts`) ; notifications mission, paiement, message, livraison, vérif avocat |
+| **PDF contrat** | `GET /api/contracts/[id]/export` + bouton dans le viewer |
+| **PJ messagerie** | Upload dans le chat mission (`/api/missions/attachments/[key]`) |
+| **Modèles admin** | Upload PDF/DOCX/TXT + métadonnées → `/admin/templates` (fichiers dans `./storage/templates/`) |
+
+### Checklist avant go-live
+
+1. **Avocat** — faire valider CGU, confidentialité, mentions, registre et page sous-traitants.
+2. **Migration** — `pnpm db:migrate` (ou `npx prisma migrate deploy` en CI) pour les champs PJ, paiement et `ProcessedStripeEvent`.
+3. **Stripe** — clés `sk_live_…`, webhook pointant vers `/api/webhooks/stripe`, secret `whsec_…` en prod. En local : `pnpm stripe:listen`.
+4. **SMTP** — renseigner `SMTP_*` et `EMAIL_FROM` ; sans SMTP les e-mails sont logués en console.
+5. **URL** — `NEXT_PUBLIC_APP_URL` = URL publique (redirects Stripe et liens e-mail).
+6. **Build** — `pnpm build` puis `pnpm start`.
 
 ## Variables d'environnement
 
@@ -87,5 +110,20 @@ Voir [.env.example](.env.example). Les montants des formules sont configurables 
 
 - Interface exclusivement en français ; code et identifiants en anglais.
 - Aucun wording du type « conseil juridique » ; disclaimers systématiques sur les livrables IA.
+- Consentement IA explicite (`aiConsentAt`) avant relecture automatisée.
+- Export JSON et suppression de compte (RGPD) : `/app/settings`.
+- Bandeau cookies, registre des traitements et page sous-traitants (DPA) : `/legal/*`.
+- Export PDF des contrats générés et pièces jointes dans la messagerie mission.
+- Notifications e-mail transactionnelles (SMTP ou logs console).
 - Seed 100 % fictif (« Me Exemple Un », cabinet « Démo & Associés »).
 - Pages légales : documents de travail, à faire valider par un avocat avant mise en production.
+
+## Scénario de démonstration (Phases 1–4)
+
+1. **Client** `client1@avosearch.test` / `demo1234` — déposer ou rédiger un contrat, lancer le triage.
+2. **Phase 2** — choisir « IA seule » ou « IA + avocat », consentir, générer les modifications, accepter/rejeter.
+3. **Phase 3** — matching avocat, créer une mission, échanger via la messagerie.
+4. **Phase 4** — payer (Stripe test ou mode démo sans clé), l'avocat valide et livre, le client note.
+5. **Admin** `admin@avosearch.test` — vérifier les profils avocats en attente.
+6. **Avocat** `avocat1@avosearch.test` — traiter les missions depuis `/lawyer/missions`.
+7. **RGPD** — `/app/settings` : export JSON ou suppression de compte.

@@ -2,14 +2,18 @@ import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import {
   NDA_SITE_WEB_BODY,
-  NDA_SITE_WEB_STEPS,
+  NDA_SITE_WEB_DRAFT_GUIDE,
   PRESTATION_BODY,
-  PRESTATION_STEPS,
+  PRESTATION_DRAFT_GUIDE,
 } from "../lib/templates/catalog";
 
 const prisma = new PrismaClient();
 
 const DEMO_PASSWORD = "demo1234";
+
+function lawyerPhoto(seed: string) {
+  return `https://api.dicebear.com/9.x/personas/png?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+}
 
 const BAIL_COMMERCIAL_TEXT = `BAIL COMMERCIAL
 
@@ -125,11 +129,13 @@ async function main() {
       specialties: ["Baux commerciaux", "Droit commercial"],
       bio: "Avocat fictif du cabinet Démo & Associés. Intervient sur les baux commerciaux et les contrats de distribution. Profil de démonstration.",
       validationPriceCents: 7900,
+      hourlyRateCents: 18000,
       flatFees: { RELECTURE: 25000, REDACTION: 40000, NEGOCIATION: 50000 },
       responseTimeHours: 24,
       verified: true,
       rating: 4.8,
       ratingCount: 32,
+      photoUrl: lawyerPhoto("avocat1"),
     },
     {
       email: "avocat2@avosearch.test",
@@ -139,11 +145,13 @@ async function main() {
       specialties: ["Droit des sociétés", "Prestation de services"],
       bio: "Avocate fictive du cabinet Démo & Associés. Accompagne les TPE et freelances sur leurs contrats du quotidien. Profil de démonstration.",
       validationPriceCents: 6900,
+      hourlyRateCents: 16000,
       flatFees: { RELECTURE: 20000, REDACTION: 35000, NEGOCIATION: 45000 },
       responseTimeHours: 12,
       verified: true,
       rating: 4.9,
       ratingCount: 51,
+      photoUrl: lawyerPhoto("avocat2"),
     },
     {
       email: "avocat3@avosearch.test",
@@ -153,11 +161,13 @@ async function main() {
       specialties: ["Droit du travail", "Contrats de freelance"],
       bio: "Avocat fictif. Spécialisé dans les relations contractuelles entre indépendants et donneurs d'ordre. Profil de démonstration.",
       validationPriceCents: 7500,
+      hourlyRateCents: 17000,
       flatFees: { RELECTURE: 22000, REDACTION: 38000, NEGOCIATION: 48000 },
       responseTimeHours: 24,
       verified: true,
       rating: 4.5,
       ratingCount: 18,
+      photoUrl: lawyerPhoto("avocat3"),
     },
     {
       email: "avocat4@avosearch.test",
@@ -167,11 +177,13 @@ async function main() {
       specialties: ["Propriété intellectuelle", "Numérique"],
       bio: "Avocate fictive. Contrats IT, licences logicielles et prestations numériques. Profil de démonstration.",
       validationPriceCents: 8900,
+      hourlyRateCents: 20000,
       flatFees: { RELECTURE: 28000, REDACTION: 42000, NEGOCIATION: 52000 },
       responseTimeHours: 48,
       verified: true,
       rating: 4.2,
       ratingCount: 9,
+      photoUrl: lawyerPhoto("avocat4"),
     },
     {
       email: "avocat5@avosearch.test",
@@ -181,6 +193,7 @@ async function main() {
       specialties: ["Droit commercial", "Droit de la consommation"],
       bio: "Avocat fictif en attente de vérification par l'équipe AvoSearch. Profil de démonstration.",
       validationPriceCents: 5900,
+      hourlyRateCents: 14000,
       flatFees: { RELECTURE: 18000, REDACTION: 30000, NEGOCIATION: 40000 },
       responseTimeHours: 24,
       verified: false,
@@ -195,6 +208,7 @@ async function main() {
       specialties: ["Baux commerciaux", "Droit immobilier contractuel"],
       bio: "Avocate fictive en attente de vérification par l'équipe AvoSearch. Profil de démonstration.",
       validationPriceCents: 6500,
+      hourlyRateCents: 15000,
       flatFees: { RELECTURE: 21000, REDACTION: 36000, NEGOCIATION: 46000 },
       responseTimeHours: 12,
       verified: false,
@@ -226,7 +240,7 @@ async function main() {
         domain: "confidentialité / NDA",
         tags: ["nda", "confidentialité", "site web", "internet", "saas"],
         body: NDA_SITE_WEB_BODY,
-        steps: NDA_SITE_WEB_STEPS,
+        draftGuide: NDA_SITE_WEB_DRAFT_GUIDE,
       },
       {
         slug: "prestation-services",
@@ -236,7 +250,7 @@ async function main() {
         domain: "prestation de services",
         tags: ["prestation", "services", "freelance", "développement"],
         body: PRESTATION_BODY,
-        steps: PRESTATION_STEPS,
+        draftGuide: PRESTATION_DRAFT_GUIDE,
       },
     ],
   });

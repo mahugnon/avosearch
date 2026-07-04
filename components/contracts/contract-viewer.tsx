@@ -1,8 +1,9 @@
 "use client";
 
-import { Copy, ExternalLink } from "lucide-react";
+import { Download, Copy, ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { RequestLawyerButton } from "@/components/contracts/request-lawyer-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -11,13 +12,20 @@ type Props = {
   body: string;
   contractId?: string;
   className?: string;
+  /** After draft completion, show lawyer opinion as primary action. */
+  showLawyerRequest?: boolean;
 };
 
-export function ContractViewer({ title, body, contractId, className }: Props) {
+export function ContractViewer({ title, body, contractId, className, showLawyerRequest }: Props) {
   const t = useTranslations("chat.viewer");
 
   async function handleCopy() {
     await navigator.clipboard.writeText(body);
+  }
+
+  function handlePdfDownload() {
+    if (!contractId) return;
+    window.open(`/api/contracts/${contractId}/export`, "_blank");
   }
 
   return (
@@ -40,12 +48,27 @@ export function ContractViewer({ title, body, contractId, className }: Props) {
             {t("copy")}
           </Button>
           {contractId && (
-            <Button asChild variant="outline" size="sm" className="h-8 gap-1.5">
-              <Link href={`/app/contracts/${contractId}?analyze=1`}>
-                <ExternalLink className="size-3.5" />
-                {t("analyze")}
-              </Link>
-            </Button>
+            <>
+              {showLawyerRequest && <RequestLawyerButton contractId={contractId} />}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1.5"
+                onClick={handlePdfDownload}
+              >
+                <Download className="size-3.5" />
+                {t("pdf")}
+              </Button>
+              {!showLawyerRequest && (
+                <Button asChild variant="outline" size="sm" className="h-8 gap-1.5">
+                  <Link href={`/app/contracts/${contractId}?analyze=1`}>
+                    <ExternalLink className="size-3.5" />
+                    {t("analyze")}
+                  </Link>
+                </Button>
+              )}
+            </>
           )}
         </div>
       </header>

@@ -1,4 +1,8 @@
-import type { TemplateField } from "@/lib/templates/types";
+import {
+  applyPlaceholderDefaults,
+  extractPlaceholderKeys,
+  missingPlaceholders,
+} from "@/lib/templates/placeholders";
 
 export function renderTemplateBody(
   body: string,
@@ -11,15 +15,13 @@ export function renderTemplateBody(
 }
 
 export function validateDraftAnswers(
-  fields: TemplateField[],
+  body: string,
   answers: Record<string, string>
-): { ok: true } | { ok: false; fieldId: string; message: string } {
-  for (const field of fields) {
-    if (!field.required) continue;
-    const value = answers[field.id]?.trim();
-    if (!value) {
-      return { ok: false, fieldId: field.id, message: "required" };
-    }
+): { ok: true } | { ok: false; missing: string[] } {
+  const placeholders = extractPlaceholderKeys(body);
+  const missing = missingPlaceholders(placeholders, answers);
+  if (missing.length > 0) {
+    return { ok: false, missing };
   }
   return { ok: true };
 }
@@ -32,3 +34,5 @@ export function parseDraftAnswers(raw: unknown): Record<string, string> {
   }
   return result;
 }
+
+export { applyPlaceholderDefaults, extractPlaceholderKeys, missingPlaceholders };
