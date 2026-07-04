@@ -1,8 +1,10 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
+import { LawyerSidebar } from "@/components/lawyer/lawyer-sidebar";
 import { auth } from "@/lib/auth";
 import { localizedPath, type AppLocale } from "@/lib/i18n";
+import { getLawyerActionCount } from "@/lib/lawyer/dashboard-data";
 
 export const dynamic = "force-dynamic";
 
@@ -19,15 +21,22 @@ export default async function LawyerAreaLayout({
     redirect(localizedPath("/login", locale));
   }
 
+  const actionCount = await getLawyerActionCount(session.user.id);
+
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader
-        homeHref="/lawyer"
+        homeHref="/lawyer/missions"
         areaLabel={t("areaLabel")}
         userName={session.user.name ?? session.user.email ?? ""}
         profileHref="/lawyer/profile"
       />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">{children}</main>
+      <div className="flex flex-1 flex-col md:flex-row">
+        <LawyerSidebar actionCount={actionCount} />
+        <main className="flex-1 overflow-auto px-4 py-8 sm:px-8 sm:py-10">
+          <div className="mx-auto w-full max-w-7xl">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

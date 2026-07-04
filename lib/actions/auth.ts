@@ -16,7 +16,7 @@ export type AuthActionState = { error?: string } | undefined;
 
 const ROLE_HOME = {
   CLIENT: "/app",
-  LAWYER: "/lawyer",
+  LAWYER: "/lawyer/missions",
   ADMIN: "/admin",
 } as const;
 
@@ -154,7 +154,7 @@ export async function registerLawyerAction(
     await signIn("credentials", {
       email,
       password: parsed.data.password,
-      redirectTo: localizedPath("/lawyer", locale),
+      redirectTo: localizedPath("/lawyer/missions", locale),
     });
   } catch (error) {
     if (error instanceof AuthError) {

@@ -104,6 +104,6 @@ export async function notifyLawyerVerified(lawyerUserId: string) {
   await sendEmail({
     to: user.email,
     subject: "[AvoSearch] Profil avocat vérifié",
-    text: `Bonjour ${user.name},\n\nVotre profil AvoSearch est désormais vérifié. Vous pouvez recevoir des missions clients.\n\n${APP_URL()}${localizedPath("/lawyer", "fr")}`,
+    text: `Bonjour ${user.name},\n\nVotre profil AvoSearch est désormais vérifié. Vous pouvez recevoir des missions clients.\n\n${APP_URL()}${localizedPath("/lawyer/missions", "fr")}`,
   });
 }

@@ -14,7 +14,7 @@ const intlMiddleware = createIntlMiddleware(routing);
 
 const ROLE_HOME = {
   CLIENT: "/app",
-  LAWYER: "/lawyer",
+  LAWYER: "/lawyer/missions",
   ADMIN: "/admin",
 } as const;
 

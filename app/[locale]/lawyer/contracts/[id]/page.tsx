@@ -46,7 +46,7 @@ export default async function LawyerContractReviewPage({ params }: Props) {
     <div className="space-y-6">
       <div>
         <Button asChild variant="ghost" size="sm" className="-ml-2 mb-2">
-          <Link href="/lawyer">{t("backToDashboard")}</Link>
+          <Link href="/lawyer/missions">{t("backToMissions")}</Link>
         </Button>
         <h1 className="text-2xl font-semibold tracking-tight">{contract.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">

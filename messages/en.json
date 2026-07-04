@@ -408,7 +408,8 @@
   "lawyer": {
     "areaLabel": "Lawyer dashboard",
     "dashboardTitle": "Dashboard",
-    "dashboardIntro": "Manage your validations, missions, and earnings.",
+    "dashboardIntro": "Your priority missions and key metrics.",
+    "statsTitle": "Overview",
     "viewMissions": "View my missions",
     "pendingProfileTitle": "Profile pending verification",
     "pendingProfileDescription": "Our team manually verifies each profile. You won't receive missions until your profile is verified.",
@@ -422,29 +423,121 @@
     "responseTime": "Advertised response time",
     "responseTimeHours": "{hours} h",
     "specialties": "Specialties",
+    "nav": {
+      "label": "Lawyer navigation",
+      "missions": "Missions",
+      "profile": "Profile"
+    },
+    "workQueue": {
+      "title": "My work ({count})",
+      "subtitle": "Missions requiring your action, sorted by priority.",
+      "viewAll": "View all",
+      "emptyTitle": "No pending actions",
+      "emptyHint": "New paid missions will appear here as soon as a client selects you.",
+      "actionStart": "Start mission →",
+      "actionContinue": "Continue review →",
+      "waitingDays": "waiting {days, plural, one {# day} other {# days}}",
+      "deadline": "due {date}",
+      "deadlineSoon": "Due soon",
+      "deadlineOverdue": "Overdue"
+    },
     "profile": {
       "title": "My profile",
-      "subtitle": "Information shown on your lawyer profile.",
-      "back": "← Back to dashboard",
+      "subtitle": "Your activity and the information clients can see.",
       "bio": "Bio",
-      "rating": "Client rating"
+      "rating": "Client rating",
+      "viewMissions": "View my missions",
+      "earningsHint": "Delivered or closed missions (demo)",
+      "hourlyRate": "Hourly rate",
+      "hourlyRateValue": "{rate} / h",
+      "flatFees": "Flat fees by mission type",
+      "sections": {
+        "practice": "Practice",
+        "rates": "Rates & responsiveness"
+      },
+      "stats": {
+        "delivered": "Missions delivered",
+        "inProgressHint": "{count, plural, one {# in progress} other {# in progress}}",
+        "awaitingClientHint": "{count, plural, one {# awaiting client} other {# awaiting client}}"
+      }
     },
     "review": {
-      "backToDashboard": "← Back to dashboard",
+      "backToMissions": "← Missions",
       "clientLabel": "Client: {name}",
       "intro": "Highlighted passages were filled by AI from the template. Validate each field before closing the review.",
       "documentPreview": "Document preview"
     },
     "missions": {
       "title": "My missions",
+      "subtitle": "All your missions, from payment to delivery.",
       "back": "← Dashboard",
       "empty": "No missions yet.",
+      "emptyFiltered": "No missions match your filters.",
+      "emptyFilteredHint": "Try a different search or reset the filters.",
+      "type": {
+        "VALIDATION": "Validation",
+        "RELECTURE": "Review",
+        "REDACTION": "Drafting",
+        "NEGOCIATION": "Negotiation"
+      },
+      "filters": {
+        "searchPlaceholder": "Search contract or client…",
+        "sortLabel": "Sort by",
+        "statusLabel": "Filter by status",
+        "viewLabel": "View mode",
+        "resultCount": "{count, plural, one {# mission} other {# missions}}",
+        "clear": "Reset",
+        "view": {
+          "board": "Board",
+          "table": "List"
+        },
+        "status": {
+          "all": "All",
+          "ACCEPTEE": "To start",
+          "EN_COURS": "In progress",
+          "done": "Finished",
+          "ANNULEE": "Cancelled"
+        },
+        "sort": {
+          "createdAt:desc": "Newest first",
+          "createdAt:asc": "Oldest first",
+          "deadline:asc": "Nearest deadline",
+          "deadline:desc": "Farthest deadline",
+          "price:desc": "Highest amount",
+          "price:asc": "Lowest amount",
+          "status:asc": "Action priority"
+        }
+      },
+      "table": {
+        "contract": "Contract",
+        "client": "Client",
+        "type": "Type",
+        "status": "Status",
+        "amount": "Amount",
+        "created": "Created",
+        "deadline": "Deadline",
+        "open": "Open",
+        "openMission": "Open {title}",
+        "deadlineSoon": "Soon",
+        "deadlineOverdue": "Overdue"
+      },
+      "board": {
+        "emptyColumn": "No missions",
+        "actionStart": "Start",
+        "actionOpen": "Open",
+        "columns": {
+          "ACCEPTEE": "To start",
+          "EN_COURS": "In progress",
+          "done": "Finished",
+          "ANNULEE": "Cancelled"
+        }
+      },
       "status": {
         "PROPOSEE": "Awaiting payment",
-        "ACCEPTEE": "Paid — to start",
+        "ACCEPTEE": "To start",
         "EN_COURS": "In progress",
-        "LIVREE": "Delivered",
-        "TERMINEE": "Completed",
+        "LIVREE": "Awaiting client",
+        "TERMINEE": "Closed",
         "ANNULEE": "Cancelled"
       }
     },
@@ -470,11 +563,11 @@
         "hint": "Timer runs from mission start. Final price is computed on delivery, with a minimum at the quoted fee."
       },
       "status": {
-        "PROPOSEE": "Pending",
-        "ACCEPTEE": "Paid",
+        "PROPOSEE": "Awaiting payment",
+        "ACCEPTEE": "To start",
         "EN_COURS": "In progress",
-        "LIVREE": "Delivered",
-        "TERMINEE": "Completed",
+        "LIVREE": "Awaiting client",
+        "TERMINEE": "Closed",
         "ANNULEE": "Cancelled"
       }
     }

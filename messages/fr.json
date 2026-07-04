@@ -408,7 +408,8 @@
   "lawyer": {
     "areaLabel": "Espace avocat",
     "dashboardTitle": "Tableau de bord",
-    "dashboardIntro": "Gérez vos validations, missions et gains.",
+    "dashboardIntro": "Vos missions prioritaires et indicateurs clés.",
+    "statsTitle": "Vue d'ensemble",
     "viewMissions": "Voir mes missions",
     "pendingProfileTitle": "Profil en attente de vérification",
     "pendingProfileDescription": "Notre équipe vérifie manuellement chaque profil. Vous ne recevrez pas de missions tant que votre profil n'est pas vérifié.",
@@ -422,29 +423,121 @@
     "responseTime": "Délai de réponse annoncé",
     "responseTimeHours": "{hours} h",
     "specialties": "Spécialités",
+    "nav": {
+      "label": "Navigation avocat",
+      "missions": "Missions",
+      "profile": "Profil"
+    },
+    "workQueue": {
+      "title": "Mon travail ({count})",
+      "subtitle": "Missions nécessitant votre action, par ordre de priorité.",
+      "viewAll": "Tout voir",
+      "emptyTitle": "Aucune action en attente",
+      "emptyHint": "Les nouvelles missions payées apparaîtront ici dès qu'un client vous choisit.",
+      "actionStart": "Démarrer la mission →",
+      "actionContinue": "Continuer la relecture →",
+      "waitingDays": "en attente depuis {days, plural, one {# jour} other {# jours}}",
+      "deadline": "échéance {date}",
+      "deadlineSoon": "Échéance proche",
+      "deadlineOverdue": "En retard"
+    },
     "profile": {
       "title": "Mon profil",
-      "subtitle": "Informations visibles sur votre profil avocat.",
-      "back": "← Retour au tableau de bord",
+      "subtitle": "Votre activité et les informations visibles par les clients.",
       "bio": "Présentation",
-      "rating": "Note clients"
+      "rating": "Note clients",
+      "viewMissions": "Voir mes missions",
+      "earningsHint": "Missions livrées ou clôturées (démo)",
+      "hourlyRate": "Taux horaire",
+      "hourlyRateValue": "{rate} / h",
+      "flatFees": "Forfaits par type de mission",
+      "sections": {
+        "practice": "Pratique",
+        "rates": "Tarifs & réactivité"
+      },
+      "stats": {
+        "delivered": "Missions réalisées",
+        "inProgressHint": "{count, plural, one {# en cours} other {# en cours}}",
+        "awaitingClientHint": "{count, plural, one {# en attente client} other {# en attente client}}"
+      }
     },
     "review": {
-      "backToDashboard": "← Retour au tableau de bord",
+      "backToMissions": "← Missions",
       "clientLabel": "Client : {name}",
       "intro": "Les passages surlignés ont été remplis par l'IA à partir du modèle. Validez chaque champ avant de clôturer la relecture.",
       "documentPreview": "Aperçu du document"
     },
     "missions": {
       "title": "Mes missions",
+      "subtitle": "Toutes vos missions, du paiement à la livraison.",
       "back": "← Tableau de bord",
       "empty": "Aucune mission pour le moment.",
+      "emptyFiltered": "Aucune mission ne correspond à vos filtres.",
+      "emptyFilteredHint": "Modifiez la recherche ou réinitialisez les filtres.",
+      "type": {
+        "VALIDATION": "Validation",
+        "RELECTURE": "Relecture",
+        "REDACTION": "Rédaction",
+        "NEGOCIATION": "Négociation"
+      },
+      "filters": {
+        "searchPlaceholder": "Rechercher un contrat ou un client…",
+        "sortLabel": "Trier par",
+        "statusLabel": "Filtrer par statut",
+        "viewLabel": "Mode d'affichage",
+        "resultCount": "{count, plural, one {# mission} other {# missions}}",
+        "clear": "Réinitialiser",
+        "view": {
+          "board": "Board",
+          "table": "Liste"
+        },
+        "status": {
+          "all": "Toutes",
+          "ACCEPTEE": "À démarrer",
+          "EN_COURS": "En cours",
+          "done": "Terminées",
+          "ANNULEE": "Annulées"
+        },
+        "sort": {
+          "createdAt:desc": "Plus récentes",
+          "createdAt:asc": "Plus anciennes",
+          "deadline:asc": "Échéance la plus proche",
+          "deadline:desc": "Échéance la plus lointaine",
+          "price:desc": "Montant décroissant",
+          "price:asc": "Montant croissant",
+          "status:asc": "Priorité d'action"
+        }
+      },
+      "table": {
+        "contract": "Contrat",
+        "client": "Client",
+        "type": "Type",
+        "status": "Statut",
+        "amount": "Montant",
+        "created": "Créée le",
+        "deadline": "Échéance",
+        "open": "Ouvrir",
+        "openMission": "Ouvrir {title}",
+        "deadlineSoon": "Bientôt",
+        "deadlineOverdue": "Retard"
+      },
+      "board": {
+        "emptyColumn": "Aucune mission",
+        "actionStart": "Démarrer",
+        "actionOpen": "Ouvrir",
+        "columns": {
+          "ACCEPTEE": "À démarrer",
+          "EN_COURS": "En cours",
+          "done": "Terminées",
+          "ANNULEE": "Annulées"
+        }
+      },
       "status": {
         "PROPOSEE": "En attente de paiement",
-        "ACCEPTEE": "Payée — à démarrer",
+        "ACCEPTEE": "À démarrer",
         "EN_COURS": "En cours",
-        "LIVREE": "Livrée",
-        "TERMINEE": "Terminée",
+        "LIVREE": "En attente client",
+        "TERMINEE": "Clôturée",
         "ANNULEE": "Annulée"
       }
     },
@@ -470,11 +563,11 @@
         "hint": "Le chronomètre tourne depuis le démarrage. Le prix final est calculé à la livraison, avec un minimum au tarif annoncé."
       },
       "status": {
-        "PROPOSEE": "En attente",
-        "ACCEPTEE": "Payée",
+        "PROPOSEE": "En attente de paiement",
+        "ACCEPTEE": "À démarrer",
         "EN_COURS": "En cours",
-        "LIVREE": "Livrée",
-        "TERMINEE": "Terminée",
+        "LIVREE": "En attente client",
+        "TERMINEE": "Clôturée",
         "ANNULEE": "Annulée"
       }
     }
