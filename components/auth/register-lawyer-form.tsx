@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import { useDictionary } from "@/components/providers/locale-provider";
 import { registerLawyerAction } from "@/lib/actions/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -18,16 +19,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export function RegisterLawyerForm() {
+  const dict = useDictionary();
   const [state, formAction, pending] = useActionState(registerLawyerAction, undefined);
 
   return (
-    <Card>
+    <Card className="surface-elevated border-0 shadow-none">
       <CardHeader>
-        <CardTitle>Inscription avocat</CardTitle>
-        <CardDescription>
-          Votre profil sera vérifié manuellement par notre équipe avant d&apos;être visible des
-          clients.
-        </CardDescription>
+        <CardTitle>{dict.auth.lawyerRegisterTitle}</CardTitle>
+        <CardDescription>{dict.auth.lawyerRegisterDesc}</CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-4">
@@ -37,15 +36,15 @@ export function RegisterLawyerForm() {
             </Alert>
           )}
           <div className="space-y-2">
-            <Label htmlFor="name">Nom complet</Label>
+            <Label htmlFor="name">{dict.auth.name}</Label>
             <Input id="name" name="name" autoComplete="name" placeholder="Me Exemple Sept" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Adresse e-mail professionnelle</Label>
+            <Label htmlFor="email">{dict.auth.email}</Label>
             <Input id="email" name="email" type="email" autoComplete="email" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password">{dict.auth.password}</Label>
             <Input
               id="password"
               name="password"
@@ -116,12 +115,12 @@ export function RegisterLawyerForm() {
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-3">
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Création du compte..." : "Créer mon compte avocat"}
+            {pending ? dict.auth.submittingRegister : dict.auth.submitRegister}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Déjà inscrit ?{" "}
-            <Link href="/login" className="font-medium text-foreground underline">
-              Se connecter
+            {dict.auth.alreadyRegistered}{" "}
+            <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
+              {dict.auth.signInLink}
             </Link>
           </p>
         </CardFooter>

@@ -6,7 +6,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6">
+      <main className="mx-auto w-full max-w-3xl flex-1 bg-brand-surface/40 px-4 py-12 sm:px-6">
         <Alert className="mb-8">
           <AlertTitle>Document de travail</AlertTitle>
           <AlertDescription>

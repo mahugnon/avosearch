@@ -1,211 +1,183 @@
 import Link from "next/link";
-import { FileText, Scale, ShieldCheck } from "lucide-react";
+import { ChevronDown, FileText, Scale, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { formatEuros, pricing } from "@/lib/config";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { getLocale } from "@/lib/i18n/get-locale";
 
-const STEPS = [
-  {
-    icon: FileText,
-    title: "1. Déposez votre contrat",
-    description:
-      "Téléversez un PDF, un DOCX ou un texte, ou décrivez simplement votre question contractuelle.",
-  },
-  {
-    icon: Scale,
-    title: "2. Obtenez une orientation claire",
-    description:
-      "Notre outil identifie le type de contrat, les points d'attention, et vous oriente : relecture assistée, avocat au forfait, ou professionnel réglementé.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "3. Choisissez votre niveau de sécurité",
-    description:
-      "Relisez les modifications proposées vous-même, ou faites-les valider une à une par un avocat inscrit au barreau, sous 24 h.",
-  },
-] as const;
+const STEP_ICONS = [FileText, Scale, ShieldCheck] as const;
 
-const FAQ = [
-  {
-    question: "AvoSearch remplace-t-il un avocat ?",
-    answer:
-      "Non. AvoSearch est un outil d'aide documentaire : il vous aide à comprendre votre contrat et à préparer des modifications. Pour un avis sur votre situation, choisissez la formule avec validation par un avocat ou une mission au forfait.",
-  },
-  {
-    question: "Quels documents puis-je faire analyser ?",
-    answer:
-      "Uniquement des contrats : bail commercial, prestation de services, CGV, partenariat, etc. Les sujets pénaux, familiaux ou contentieux sont hors périmètre : nous vous orientons alors vers le bon professionnel, sans analyse.",
-  },
-  {
-    question: "Qui sont les avocats de la plateforme ?",
-    answer:
-      "Des avocats inscrits à un barreau français. Chaque profil est vérifié manuellement par notre équipe avant d'obtenir le badge « Vérifié ».",
-  },
-  {
-    question: "Combien ça coûte ?",
-    answer:
-      "Trois formules à prix fixes, affichés avant tout engagement : relecture assistée, relecture avec validation avocat, ou mission au forfait convenue à l'avance. Aucune facturation à l'heure, aucune surprise.",
-  },
-  {
-    question: "Mes documents sont-ils confidentiels ?",
-    answer:
-      "Vos documents ne sont accessibles qu'à vous et, si vous le décidez, à l'avocat missionné. Vous pouvez exporter vos données et supprimer votre compte à tout moment.",
-  },
-] as const;
+export default async function LandingPage() {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
 
-export default function LandingPage() {
   return (
     <>
       <SiteHeader />
       <main className="flex-1">
-        {/* Hero */}
-        <section className="mx-auto flex w-full max-w-6xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-28">
-          <Badge variant="secondary">Contrats uniquement — orientation en moins d&apos;une minute</Badge>
-          <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-            Vos contrats, relus et sécurisés — avec ou sans avocat
-          </h1>
-          <p className="max-w-2xl text-lg text-muted-foreground">
-            Déposez votre contrat : AvoSearch repère les clauses à risque, propose des
-            modifications en suivi de modifications, et vous met en relation avec un avocat
-            vérifié quand votre situation le demande.
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg">
-              <Link href="/register">Analyser mon contrat</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/register/lawyer">Je suis avocat</Link>
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Aide documentaire automatisée — ne constitue pas une consultation juridique.
-          </p>
-        </section>
-
-        {/* How it works */}
-        <section id="comment-ca-marche" className="border-t bg-muted/30">
-          <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-            <h2 className="text-center text-3xl font-semibold tracking-tight">
-              Comment ça marche
-            </h2>
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {STEPS.map((step) => (
-                <Card key={step.title}>
-                  <CardHeader>
-                    <step.icon className="mb-2 h-6 w-6 text-muted-foreground" aria-hidden />
-                    <CardTitle className="text-lg">{step.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm text-muted-foreground">
-                    {step.description}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing */}
-        <section id="tarifs" className="border-t">
-          <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6">
-            <h2 className="text-center text-3xl font-semibold tracking-tight">Nos formules</h2>
-            <p className="mx-auto mt-3 max-w-xl text-center text-sm text-muted-foreground">
-              Des prix fixes, connus avant tout engagement. Prix TTC indicatifs.
+        <section className="relative overflow-hidden bg-brand-surface">
+          <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center gap-7 px-4 py-24 text-center sm:px-6 sm:py-32">
+            <Badge
+              variant="secondary"
+              className="rounded-full border-0 bg-foreground/[0.04] px-3 py-1 font-normal text-muted-foreground"
+            >
+              {dict.landing.badge}
+            </Badge>
+            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-[2.75rem] sm:leading-[1.1]">
+              {dict.landing.heroTitle}
+            </h1>
+            <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
+              {dict.landing.heroSubtitle}
             </p>
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
-              <Card className="flex flex-col">
-                <CardHeader>
-                  <CardTitle>Relecture assistée</CardTitle>
-                  <CardDescription>
-                    Modifications proposées en suivi de modifications ; vous acceptez ou rejetez
-                    chaque changement.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="mt-auto">
-                  <p className="text-3xl font-semibold">
-                    {formatEuros(pricing.aiOnlyCents)}
-                    <span className="text-sm font-normal text-muted-foreground"> / contrat</span>
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="flex flex-col border-foreground/20">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle>Relecture + validation avocat</CardTitle>
-                    <Badge>Recommandée</Badge>
+            <div className="flex flex-col gap-3 pt-1 sm:flex-row">
+              <Button asChild size="lg" className="h-11 rounded-xl px-7">
+                <Link href="/register">{dict.landing.ctaPrimary}</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="h-11 rounded-xl px-7">
+                <Link href="/register/lawyer">{dict.landing.ctaLawyer}</Link>
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground/80">{dict.landing.heroDisclaimer}</p>
+          </div>
+        </section>
+
+        <section id="comment-ca-marche" className="border-t border-border/60">
+          <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
+            <div className="mx-auto max-w-xl text-center">
+              <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                {dict.landing.processEyebrow}
+              </p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+                {dict.landing.processTitle}
+              </h2>
+            </div>
+            <div className="mt-14 grid gap-5 md:grid-cols-3">
+              {dict.landing.steps.map((step, index) => {
+                const Icon = STEP_ICONS[index]!;
+                return (
+                  <div
+                    key={step.title}
+                    className="surface-elevated surface-interactive rounded-2xl p-6"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                        <Icon className="size-4" aria-hidden />
+                      </div>
+                      <span className="text-xs font-medium tabular-nums text-muted-foreground">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <h3 className="mt-5 text-base font-semibold">{step.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {step.description}
+                    </p>
                   </div>
-                  <CardDescription>
-                    Un avocat vérifié relit, valide ou amende chaque modification proposée.
-                    Réponse sous 24 h.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="mt-auto">
-                  <p className="text-3xl font-semibold">
-                    {formatEuros(pricing.aiPlusLawyerCents)}
-                    <span className="text-sm font-normal text-muted-foreground"> / contrat</span>
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="flex flex-col">
-                <CardHeader>
-                  <CardTitle>Mission avocat au forfait</CardTitle>
-                  <CardDescription>
-                    Relecture complète, rédaction ou négociation par un avocat, à prix fixe
-                    convenu à l&apos;avance.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="mt-auto">
-                  <p className="text-3xl font-semibold">
-                    {formatEuros(pricing.missionMinCents)} – {formatEuros(pricing.missionMaxCents)}
-                  </p>
-                </CardContent>
-              </Card>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* FAQ */}
-        <section id="faq" className="border-t bg-muted/30">
-          <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6">
-            <h2 className="text-center text-3xl font-semibold tracking-tight">
-              Questions fréquentes
-            </h2>
-            <div className="mt-10 space-y-4">
-              {FAQ.map((item) => (
-                <details
-                  key={item.question}
-                  className="group rounded-lg border bg-background p-4"
-                >
-                  <summary className="cursor-pointer list-none text-sm font-medium">
+        <section id="tarifs" className="border-t border-border/60 bg-brand-muted">
+          <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6">
+            <div className="mx-auto max-w-xl text-center">
+              <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                {dict.landing.pricingEyebrow}
+              </p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+                {dict.landing.pricingTitle}
+              </h2>
+              <p className="mt-3 text-sm text-muted-foreground">{dict.landing.pricingSubtitle}</p>
+            </div>
+            <div className="mt-14 grid gap-5 md:grid-cols-3">
+              <div className="surface-elevated flex flex-col rounded-2xl p-6">
+                <h3 className="font-semibold">{dict.landing.plans[0]!.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                  {dict.landing.plans[0]!.description}
+                </p>
+                <p className="mt-8 text-3xl font-semibold tracking-tight">
+                  {formatEuros(pricing.aiOnlyCents)}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {dict.common.perContract}
+                  </span>
+                </p>
+              </div>
+              <div className="relative flex flex-col rounded-2xl bg-foreground p-6 text-background">
+                <div className="absolute -top-3 left-6">
+                  <Badge className="rounded-full bg-primary text-primary-foreground">
+                    {dict.landing.recommended}
+                  </Badge>
+                </div>
+                <h3 className="font-semibold">{dict.landing.plans[1]!.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-background/70">
+                  {dict.landing.plans[1]!.description}
+                </p>
+                <p className="mt-8 text-3xl font-semibold tracking-tight">
+                  {formatEuros(pricing.aiPlusLawyerCents)}
+                  <span className="text-sm font-normal text-background/60">
+                    {dict.common.perContract}
+                  </span>
+                </p>
+              </div>
+              <div className="surface-elevated flex flex-col rounded-2xl p-6">
+                <h3 className="font-semibold">{dict.landing.plans[2]!.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                  {dict.landing.plans[2]!.description}
+                </p>
+                <p className="mt-8 text-3xl font-semibold tracking-tight">
+                  {formatEuros(pricing.missionMinCents)} – {formatEuros(pricing.missionMaxCents)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="faq" className="border-t border-border/60">
+          <div className="mx-auto w-full max-w-2xl px-4 py-20 sm:px-6">
+            <div className="text-center">
+              <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                {dict.landing.faqEyebrow}
+              </p>
+              <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+                {dict.landing.faqTitle}
+              </h2>
+            </div>
+            <div className="mt-12 divide-y divide-border/60">
+              {dict.landing.faq.map((item) => (
+                <details key={item.question} className="group py-5">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-medium">
                     {item.question}
+                    <ChevronDown
+                      className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+                      aria-hidden
+                    />
                   </summary>
-                  <p className="mt-3 text-sm text-muted-foreground">{item.answer}</p>
+                  <p className="mt-3 pr-8 text-sm leading-relaxed text-muted-foreground">
+                    {item.answer}
+                  </p>
                 </details>
               ))}
             </div>
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="border-t">
-          <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-4 px-4 py-16 text-center sm:px-6">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              Un contrat à signer cette semaine ?
+        <section className="border-t border-border/60 bg-brand-ink">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-5 px-4 py-20 text-center sm:px-6">
+            <h2 className="max-w-md text-2xl font-semibold tracking-tight text-white">
+              {dict.landing.ctaTitle}
             </h2>
-            <p className="max-w-xl text-sm text-muted-foreground">
-              Déposez-le maintenant : vous saurez en quelques minutes s&apos;il peut être ajusté
-              directement ou s&apos;il mérite l&apos;œil d&apos;un avocat.
+            <p className="max-w-md text-sm leading-relaxed text-white/65">
+              {dict.landing.ctaSubtitle}
             </p>
-            <Button asChild size="lg">
-              <Link href="/register">Commencer gratuitement</Link>
+            <Button
+              asChild
+              size="lg"
+              className="mt-1 h-11 rounded-xl bg-white px-7 text-foreground hover:bg-white/90"
+            >
+              <Link href="/register">{dict.landing.ctaButton}</Link>
             </Button>
           </div>
         </section>

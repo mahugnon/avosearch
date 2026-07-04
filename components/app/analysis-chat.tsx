@@ -1,0 +1,169 @@
+"use client";
+
+import { ArrowUp, Paperclip, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useDictionary, useLocale } from "@/components/providers/locale-provider";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+
+type ChatRole = "assistant" | "user";
+
+type ChatMessage = {
+  id: string;
+  role: ChatRole;
+  content: string;
+};
+
+function TypingIndicator() {
+  return (
+    <div className="flex items-center gap-1 px-1 py-0.5">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="typing-dot size-1.5 rounded-full bg-muted-foreground/60"
+        />
+      ))}
+    </div>
+  );
+}
+
+export function AnalysisChat() {
+  const dict = useDictionary();
+  const locale = useLocale();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [draft, setDraft] = useState("");
+  const [isThinking, setIsThinking] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const userTurnRef = useRef(0);
+
+  useEffect(() => {
+    setMessages([{ id: "welcome", role: "assistant", content: dict.chat.welcome }]);
+    userTurnRef.current = 0;
+  }, [locale, dict.chat.welcome]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, isThinking]);
+
+  function buildAssistantReply(userTurn: number): string {
+    if (userTurn < dict.chat.clarifications.length) {
+      return dict.chat.clarifications[userTurn]!;
+    }
+    return dict.chat.triagePreview;
+  }
+
+  function handleSend() {
+    const text = draft.trim();
+    if (!text || isThinking) return;
+
+    setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "user", content: text }]);
+    setDraft("");
+    setIsThinking(true);
+
+    const turn = userTurnRef.current;
+    userTurnRef.current += 1;
+
+    window.setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), role: "assistant", content: buildAssistantReply(turn) },
+      ]);
+      setIsThinking(false);
+    }, 700);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
+    }
+  }
+
+  return (
+    <section className="surface-elevated overflow-hidden rounded-2xl">
+      <header className="flex items-start justify-between gap-4 border-b border-border/60 px-5 py-4 sm:px-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Sparkles className="size-3.5" aria-hidden />
+            </div>
+            <h2 className="text-base font-semibold tracking-tight">{dict.chat.title}</h2>
+          </div>
+          <p className="text-sm text-muted-foreground">{dict.chat.subtitle}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700">
+          <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden />
+          {dict.chat.online}
+        </div>
+      </header>
+
+      <div
+        ref={scrollRef}
+        className="flex max-h-[28rem] min-h-72 flex-col gap-5 overflow-y-auto bg-muted/25 px-5 py-6 sm:px-6"
+      >
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}
+          >
+            <div
+              className={cn(
+                "max-w-[88%] px-4 py-2.5 text-[0.9375rem] leading-relaxed",
+                message.role === "assistant"
+                  ? "rounded-2xl rounded-tl-md border border-border/50 bg-card text-foreground shadow-sm"
+                  : "rounded-2xl rounded-tr-md bg-foreground text-background"
+              )}
+            >
+              {message.content}
+            </div>
+          </div>
+        ))}
+
+        {isThinking && (
+          <div className="flex justify-start">
+            <div className="rounded-2xl rounded-tl-md border border-border/50 bg-card px-4 py-3 shadow-sm">
+              <TypingIndicator />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <footer className="space-y-3 border-t border-border/60 bg-card px-4 py-4 sm:px-5">
+        <div className="flex items-end gap-2 rounded-xl border border-border/60 bg-muted/30 p-2 focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10">
+          <Textarea
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={dict.chat.placeholder}
+            rows={1}
+            disabled={isThinking}
+            className="min-h-10 flex-1 resize-none border-0 bg-transparent px-2 py-2 shadow-none focus-visible:ring-0"
+          />
+          <Button
+            type="button"
+            size="icon"
+            className="size-9 shrink-0 rounded-lg"
+            onClick={handleSend}
+            disabled={!draft.trim() || isThinking}
+            aria-label={dict.chat.send}
+          >
+            <ArrowUp />
+          </Button>
+        </div>
+        <div className="px-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled
+            className="h-8 gap-1.5 text-muted-foreground"
+          >
+            <Paperclip className="size-3.5" />
+            {dict.chat.attach}
+          </Button>
+        </div>
+      </footer>
+    </section>
+  );
+}

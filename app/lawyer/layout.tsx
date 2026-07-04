@@ -14,10 +14,10 @@ export default async function LawyerAreaLayout({
     <div className="flex min-h-screen flex-col">
       <DashboardHeader
         homeHref="/lawyer"
-        areaLabel="Espace avocat"
+        area="lawyer"
         userName={session.user.name ?? session.user.email ?? ""}
       />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 bg-brand-surface/40 px-4 py-10 sm:px-6">{children}</main>
     </div>
   );
 }

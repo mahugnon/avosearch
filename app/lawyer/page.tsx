@@ -10,9 +10,13 @@ import {
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatEuros } from "@/lib/config";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { getLocale } from "@/lib/i18n/get-locale";
 
 export default async function LawyerDashboardPage() {
   const session = await auth();
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
   const profile = await prisma.lawyerProfile.findUnique({
     where: { userId: session!.user.id },
   });
@@ -20,19 +24,14 @@ export default async function LawyerDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Tableau de bord</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Vos validations, missions et gains — les flux arrivent avec la Phase 3.
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">{dict.lawyer.title}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{dict.lawyer.subtitle}</p>
       </div>
 
       {profile && !profile.verified && (
         <Alert>
-          <AlertTitle>Profil en attente de vérification</AlertTitle>
-          <AlertDescription>
-            Notre équipe vérifie manuellement chaque profil. Vous ne recevrez pas de missions
-            tant que votre profil n&apos;est pas vérifié.
-          </AlertDescription>
+          <AlertTitle>{dict.lawyer.pendingTitle}</AlertTitle>
+          <AlertDescription>{dict.lawyer.pendingDescription}</AlertDescription>
         </Alert>
       )}
 
@@ -63,9 +62,9 @@ export default async function LawyerDashboardPage() {
             <div className="flex items-center justify-between">
               <CardTitle>Mon profil</CardTitle>
               {profile.verified ? (
-                <Badge>Vérifié</Badge>
+                <Badge>{dict.admin.verified}</Badge>
               ) : (
-                <Badge variant="secondary">En attente de vérification</Badge>
+                <Badge variant="secondary">{dict.admin.pending}</Badge>
               )}
             </div>
           </CardHeader>

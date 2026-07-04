@@ -1,0 +1,118 @@
+export type Dictionary = {
+  common: {
+    logout: string;
+    mySpace: string;
+    signIn: string;
+    signUp: string;
+    perContract: string;
+    demoDisclaimer: string;
+    legalDisclaimer: string;
+  };
+  areas: {
+    client: string;
+    lawyer: string;
+    admin: string;
+  };
+  client: {
+    eyebrow: string;
+    greeting: string;
+    greetingName: string;
+    subtitle: string;
+    recentContracts: string;
+    documentsEmpty: string;
+    documentsCount: string;
+    documentsCountPlural: string;
+    emptyTitle: string;
+    emptyHint: string;
+    depositedOn: string;
+    statusAnalyzed: string;
+    statusPending: string;
+  };
+  chat: {
+    title: string;
+    subtitle: string;
+    online: string;
+    welcome: string;
+    clarifications: [string, string, string];
+    triagePreview: string;
+    placeholder: string;
+    send: string;
+    attach: string;
+  };
+  landing: {
+    badge: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    ctaPrimary: string;
+    ctaLawyer: string;
+    heroDisclaimer: string;
+    processEyebrow: string;
+    processTitle: string;
+    pricingEyebrow: string;
+    pricingTitle: string;
+    pricingSubtitle: string;
+    faqEyebrow: string;
+    faqTitle: string;
+    ctaTitle: string;
+    ctaSubtitle: string;
+    ctaButton: string;
+    navHow: string;
+    navPricing: string;
+    navFaq: string;
+    recommended: string;
+    steps: Array<{ title: string; description: string }>;
+    plans: Array<{ title: string; description: string }>;
+    faq: Array<{ question: string; answer: string }>;
+  };
+  auth: {
+    demoNote: string;
+    loginTitle: string;
+    loginSubtitle: string;
+    email: string;
+    password: string;
+    emailPlaceholder: string;
+    submitLogin: string;
+    submittingLogin: string;
+    noAccount: string;
+    createAccount: string;
+    registerTitle: string;
+    registerSubtitle: string;
+    name: string;
+    submitRegister: string;
+    submittingRegister: string;
+    hasAccount: string;
+    signInLink: string;
+    lawyerRegisterTitle: string;
+    lawyerRegisterSubtitle: string;
+    passwordHint: string;
+    alreadyRegistered: string;
+    areYouLawyer: string;
+    lawyerSignupLink: string;
+    lawyerRegisterDesc: string;
+  };
+  footer: {
+    description: string;
+    cgu: string;
+    legal: string;
+    privacy: string;
+    demoNote: string;
+  };
+  lawyer: {
+    title: string;
+    subtitle: string;
+    pendingTitle: string;
+    pendingDescription: string;
+  };
+  admin: {
+    title: string;
+    pendingSingular: string;
+    pendingPlural: string;
+    tableLawyer: string;
+    tableBar: string;
+    tableSpecialties: string;
+    tableRate: string;
+    tableStatus: string;
+    verified: string;
+    pending: string;
+  };
+};
