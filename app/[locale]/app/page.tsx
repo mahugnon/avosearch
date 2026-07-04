@@ -1,4 +1,5 @@
 import { FileText } from "lucide-react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,9 +12,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { intlLocale, type AppLocale } from "@/lib/i18n";
 
 export default async function ClientHomePage() {
   const session = await auth();
+  const t = await getTranslations("client");
+  const tc = await getTranslations("common");
+  const locale = (await getLocale()) as AppLocale;
+
   const contracts = await prisma.contract.findMany({
     where: { ownerId: session!.user.id },
     orderBy: { createdAt: "desc" },
@@ -26,45 +32,34 @@ export default async function ClientHomePage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Bonjour{firstName ? ` ${firstName}` : ""} 👋
+          {t("greeting", {
+            firstName: firstName ? t("greetingFirstName", { firstName }) : "",
+          })}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Décrivez votre besoin ou déposez votre contrat : nous vous orientons vers la bonne
-          solution.
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("intro")}</p>
       </div>
 
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Nouvelle analyse</CardTitle>
-            <Badge variant="secondary">Disponible en Phase 1</Badge>
+            <CardTitle>{t("newAnalysis")}</CardTitle>
+            <Badge variant="secondary">{t("phase1Badge")}</Badge>
           </div>
-          <CardDescription>
-            Téléversez un contrat (PDF, DOCX, TXT) ou posez votre question contractuelle.
-          </CardDescription>
+          <CardDescription>{t("newAnalysisDescription")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Textarea
-            placeholder="Ex. : On me propose un bail commercial avec 6 mois de dépôt de garantie et l'interdiction de céder le bail. Est-ce habituel ?"
-            rows={4}
-            disabled
-          />
+          <Textarea placeholder={t("questionPlaceholder")} rows={4} disabled />
           <div className="flex items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">
-              L&apos;upload et l&apos;analyse arrivent avec la Phase 1 (triage IA).
-            </p>
-            <Button disabled>Analyser</Button>
+            <p className="text-xs text-muted-foreground">{t("phase1Hint")}</p>
+            <Button disabled>{t("analyze")}</Button>
           </div>
         </CardContent>
       </Card>
 
       <section className="space-y-4">
-        <h2 className="text-lg font-medium">Mes contrats</h2>
+        <h2 className="text-lg font-medium">{t("myContracts")}</h2>
         {contracts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Aucun contrat pour le moment. Votre premier document apparaîtra ici.
-          </p>
+          <p className="text-sm text-muted-foreground">{t("noContracts")}</p>
         ) : (
           <ul className="space-y-3">
             {contracts.map((contract) => (
@@ -76,15 +71,16 @@ export default async function ClientHomePage() {
                       <div>
                         <p className="text-sm font-medium">{contract.title}</p>
                         <p className="text-xs text-muted-foreground">
-                          Déposé le{" "}
-                          {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(
-                            contract.createdAt
-                          )}
+                          {t("uploadedOn", {
+                            date: new Intl.DateTimeFormat(intlLocale(locale), {
+                              dateStyle: "long",
+                            }).format(contract.createdAt),
+                          })}
                         </p>
                       </div>
                     </div>
                     <Badge variant="outline">
-                      {contract.analysis ? "Analysé" : "En attente d'analyse"}
+                      {contract.analysis ? tc("analyzed") : tc("awaitingAnalysis")}
                     </Badge>
                   </CardContent>
                 </Card>

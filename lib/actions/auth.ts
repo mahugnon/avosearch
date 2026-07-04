@@ -2,9 +2,15 @@
 
 import { AuthError } from "next-auth";
 import bcrypt from "bcryptjs";
+import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { signIn, signOut } from "@/lib/auth";
-import { registerClientSchema, registerLawyerSchema } from "@/lib/validation/auth";
+import {
+  registerClientSchema,
+  registerLawyerSchema,
+  translateValidationIssue,
+} from "@/lib/validation/auth";
+import { localizedPath, type AppLocale } from "@/lib/i18n";
 
 export type AuthActionState = { error?: string } | undefined;
 
@@ -18,22 +24,21 @@ export async function loginAction(
   _prev: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const locale = (await getLocale()) as AppLocale;
+  const t = await getTranslations("errors");
   const email = String(formData.get("email") ?? "").toLowerCase();
-  // Resolve the landing area up front: redirecting to another role's home
-  // would bounce through the proxy and desync the URL after a server action.
   const user = await prisma.user.findUnique({ where: { email }, select: { role: true } });
 
   try {
     await signIn("credentials", {
       email,
       password: String(formData.get("password") ?? ""),
-      redirectTo: ROLE_HOME[user?.role ?? "CLIENT"],
+      redirectTo: localizedPath(ROLE_HOME[user?.role ?? "CLIENT"], locale),
     });
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: "E-mail ou mot de passe incorrect." };
+      return { error: t("invalidCredentials") };
     }
-    // Successful sign-in throws a NEXT_REDIRECT: let it bubble
     throw error;
   }
   return undefined;
@@ -43,19 +48,25 @@ export async function registerClientAction(
   _prev: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const locale = (await getLocale()) as AppLocale;
+  const tErrors = await getTranslations("errors");
+  const tValidation = await getTranslations("validation");
+
   const parsed = registerClientSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
+    return {
+      error: translateValidationIssue(parsed.error.issues[0]?.message, tValidation),
+    };
   }
 
   const email = parsed.data.email.toLowerCase();
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return { error: "Un compte existe déjà avec cette adresse e-mail." };
+    return { error: tErrors("emailExists") };
   }
 
   await prisma.user.create({
@@ -71,11 +82,11 @@ export async function registerClientAction(
     await signIn("credentials", {
       email,
       password: parsed.data.password,
-      redirectTo: "/app",
+      redirectTo: localizedPath("/app", locale),
     });
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: "Compte créé, mais la connexion a échoué. Connectez-vous manuellement." };
+      return { error: tErrors("signInAfterRegister") };
     }
     throw error;
   }
@@ -86,6 +97,10 @@ export async function registerLawyerAction(
   _prev: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const locale = (await getLocale()) as AppLocale;
+  const tErrors = await getTranslations("errors");
+  const tValidation = await getTranslations("validation");
+
   const parsed = registerLawyerSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -98,13 +113,15 @@ export async function registerLawyerAction(
     responseTimeHours: formData.get("responseTimeHours"),
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
+    return {
+      error: translateValidationIssue(parsed.error.issues[0]?.message, tValidation),
+    };
   }
 
   const email = parsed.data.email.toLowerCase();
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    return { error: "Un compte existe déjà avec cette adresse e-mail." };
+    return { error: tErrors("emailExists") };
   }
 
   const specialties = parsed.data.specialties
@@ -137,11 +154,11 @@ export async function registerLawyerAction(
     await signIn("credentials", {
       email,
       password: parsed.data.password,
-      redirectTo: "/lawyer",
+      redirectTo: localizedPath("/lawyer", locale),
     });
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: "Compte créé, mais la connexion a échoué. Connectez-vous manuellement." };
+      return { error: tErrors("signInAfterRegister") };
     }
     throw error;
   }
@@ -149,5 +166,6 @@ export async function registerLawyerAction(
 }
 
 export async function signOutAction(): Promise<void> {
-  await signOut({ redirectTo: "/" });
+  const locale = (await getLocale()) as AppLocale;
+  await signOut({ redirectTo: localizedPath("/", locale) });
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useActionState } from "react";
 import { registerLawyerAction } from "@/lib/actions/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -18,16 +19,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export function RegisterLawyerForm() {
+  const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(registerLawyerAction, undefined);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Inscription avocat</CardTitle>
-        <CardDescription>
-          Votre profil sera vérifié manuellement par notre équipe avant d&apos;être visible des
-          clients.
-        </CardDescription>
+        <CardTitle>{t("lawyerRegisterTitle")}</CardTitle>
+        <CardDescription>{t("lawyerRegisterDescription")}</CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-4">
@@ -37,15 +36,21 @@ export function RegisterLawyerForm() {
             </Alert>
           )}
           <div className="space-y-2">
-            <Label htmlFor="name">Nom complet</Label>
-            <Input id="name" name="name" autoComplete="name" placeholder="Me Exemple Sept" required />
+            <Label htmlFor="name">{t("fullName")}</Label>
+            <Input
+              id="name"
+              name="name"
+              autoComplete="name"
+              placeholder={t("lawyerNamePlaceholder")}
+              required
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Adresse e-mail professionnelle</Label>
+            <Label htmlFor="email">{t("professionalEmail")}</Label>
             <Input id="email" name="email" type="email" autoComplete="email" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <Input
               id="password"
               name="password"
@@ -57,27 +62,27 @@ export function RegisterLawyerForm() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="barreau">Barreau</Label>
-              <Input id="barreau" name="barreau" placeholder="Paris" required />
+              <Label htmlFor="barreau">{t("barreau")}</Label>
+              <Input id="barreau" name="barreau" placeholder={t("cityPlaceholder")} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="city">Ville d&apos;exercice</Label>
-              <Input id="city" name="city" placeholder="Paris" required />
+              <Label htmlFor="city">{t("city")}</Label>
+              <Input id="city" name="city" placeholder={t("cityPlaceholder")} required />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="specialties">Spécialités</Label>
+            <Label htmlFor="specialties">{t("specialties")}</Label>
             <Input
               id="specialties"
               name="specialties"
-              placeholder="Baux commerciaux, Droit commercial"
+              placeholder={t("specialtiesPlaceholder")}
               required
             />
-            <p className="text-xs text-muted-foreground">Séparez les spécialités par des virgules.</p>
+            <p className="text-xs text-muted-foreground">{t("specialtiesHint")}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="validationPriceCents">Tarif validation (centimes)</Label>
+              <Label htmlFor="validationPriceCents">{t("validationPriceCents")}</Label>
               <Input
                 id="validationPriceCents"
                 name="validationPriceCents"
@@ -87,10 +92,10 @@ export function RegisterLawyerForm() {
                 defaultValue={7900}
                 required
               />
-              <p className="text-xs text-muted-foreground">Ex. 7900 = 79 € TTC.</p>
+              <p className="text-xs text-muted-foreground">{t("validationPriceHint")}</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="responseTimeHours">Délai de réponse (heures)</Label>
+              <Label htmlFor="responseTimeHours">{t("responseTimeHours")}</Label>
               <Input
                 id="responseTimeHours"
                 name="responseTimeHours"
@@ -103,12 +108,12 @@ export function RegisterLawyerForm() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="bio">Présentation</Label>
+            <Label htmlFor="bio">{t("bio")}</Label>
             <Textarea
               id="bio"
               name="bio"
               rows={4}
-              placeholder="Votre pratique, vos types de dossiers, votre approche..."
+              placeholder={t("bioPlaceholder")}
               required
               minLength={20}
             />
@@ -116,12 +121,12 @@ export function RegisterLawyerForm() {
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-3">
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Création du compte..." : "Créer mon compte avocat"}
+            {pending ? t("creatingAccount") : t("createLawyerAccount")}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Déjà inscrit ?{" "}
+            {t("alreadyRegistered")}{" "}
             <Link href="/login" className="font-medium text-foreground underline">
-              Se connecter
+              {t("signIn")}
             </Link>
           </p>
         </CardFooter>

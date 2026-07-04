@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useActionState } from "react";
 import { registerClientAction } from "@/lib/actions/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -17,15 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function RegisterForm() {
+  const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(registerClientAction, undefined);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Créer un compte</CardTitle>
-        <CardDescription>
-          Déposez votre premier contrat en quelques minutes.
-        </CardDescription>
+        <CardTitle>{t("registerTitle")}</CardTitle>
+        <CardDescription>{t("registerDescription")}</CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-4">
@@ -35,22 +35,28 @@ export function RegisterForm() {
             </Alert>
           )}
           <div className="space-y-2">
-            <Label htmlFor="name">Nom complet</Label>
-            <Input id="name" name="name" autoComplete="name" placeholder="Camille Martin" required />
+            <Label htmlFor="name">{t("fullName")}</Label>
+            <Input
+              id="name"
+              name="name"
+              autoComplete="name"
+              placeholder={t("fullNamePlaceholder")}
+              required
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Adresse e-mail</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="vous@exemple.fr"
+              placeholder={t("emailPlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <Input
               id="password"
               name="password"
@@ -59,23 +65,23 @@ export function RegisterForm() {
               required
               minLength={8}
             />
-            <p className="text-xs text-muted-foreground">8 caractères minimum.</p>
+            <p className="text-xs text-muted-foreground">{t("passwordHint")}</p>
           </div>
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-3">
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Création du compte..." : "Créer mon compte"}
+            {pending ? t("creatingAccount") : t("createMyAccount")}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Déjà inscrit ?{" "}
+            {t("alreadyRegistered")}{" "}
             <Link href="/login" className="font-medium text-foreground underline">
-              Se connecter
+              {t("signIn")}
             </Link>
           </p>
           <p className="text-sm text-muted-foreground">
-            Vous êtes avocat ?{" "}
+            {t("areYouLawyer")}{" "}
             <Link href="/register/lawyer" className="font-medium text-foreground underline">
-              Inscription avocat
+              {t("lawyerRegistration")}
             </Link>
           </p>
         </CardFooter>

@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useActionState } from "react";
 import { loginAction } from "@/lib/actions/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -17,13 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
+  const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(loginAction, undefined);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Connexion</CardTitle>
-        <CardDescription>Accédez à votre espace AvoSearch.</CardDescription>
+        <CardTitle>{t("loginTitle")}</CardTitle>
+        <CardDescription>{t("loginDescription")}</CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-4">
@@ -33,18 +35,18 @@ export function LoginForm() {
             </Alert>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Adresse e-mail</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="vous@exemple.fr"
+              placeholder={t("emailPlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Mot de passe</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <Input
               id="password"
               name="password"
@@ -57,12 +59,12 @@ export function LoginForm() {
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-3">
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Connexion..." : "Se connecter"}
+            {pending ? t("signingIn") : t("signIn")}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Pas encore de compte ?{" "}
+            {t("noAccount")}{" "}
             <Link href="/register" className="font-medium text-foreground underline">
-              Créer un compte
+              {t("createAccount")}
             </Link>
           </p>
         </CardFooter>

@@ -1,0 +1,286 @@
+{
+  "metadata": {
+    "title": "AvoSearch — Your contracts, reviewed and secured",
+    "titleTemplate": "%s | AvoSearch",
+    "description": "Upload your contract: automated document assistance identifies key points, and bar-registered lawyers can validate each change or take over on a flat fee.",
+    "login": "Sign in",
+    "register": "Create an account",
+    "registerLawyer": "Lawyer registration",
+    "cgu": "Terms of use",
+    "mentionsLegales": "Legal notice",
+    "confidentialite": "Privacy policy"
+  },
+  "common": {
+    "brand": "AvoSearch",
+    "perContract": "/ contract",
+    "recommended": "Recommended",
+    "verified": "Verified",
+    "pendingVerification": "Pending verification",
+    "pending": "Pending",
+    "analyzed": "Analyzed",
+    "awaitingAnalysis": "Awaiting analysis",
+    "close": "Close"
+  },
+  "header": {
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "signIn": "Sign in",
+    "signUp": "Create an account",
+    "mySpace": "My dashboard",
+    "signOut": "Sign out"
+  },
+  "localeSwitcher": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "footer": {
+    "description": "AvoSearch is a document assistance tool and a platform connecting you with lawyers registered with a French bar. AvoSearch is not a law firm and does not provide legal advice.",
+    "cgu": "Terms of use",
+    "mentionsLegales": "Legal notice",
+    "confidentialite": "Privacy policy",
+    "demoNotice": "Demo platform — no real data, no real lawyers."
+  },
+  "landing": {
+    "heroBadge": "Contracts only — guidance in under a minute",
+    "heroTitle": "Your contracts, reviewed and secured — with or without a lawyer",
+    "heroDescription": "Upload your contract: AvoSearch flags risky clauses, suggests tracked changes, and connects you with a verified lawyer when your situation calls for it.",
+    "analyzeContract": "Review my contract",
+    "iAmLawyer": "I'm a lawyer",
+    "disclaimer": "Automated document assistance — not legal advice.",
+    "howItWorksTitle": "How it works",
+    "steps": {
+      "1": {
+        "title": "1. Upload your contract",
+        "description": "Upload a PDF, DOCX, or plain text, or simply describe your contractual question."
+      },
+      "2": {
+        "title": "2. Get clear guidance",
+        "description": "Our tool identifies the contract type, key points, and directs you: assisted review, flat-fee lawyer, or regulated professional."
+      },
+      "3": {
+        "title": "3. Choose your level of protection",
+        "description": "Review suggested changes yourself, or have each one validated by a bar-registered lawyer within 24 hours."
+      }
+    },
+    "pricingTitle": "Our plans",
+    "pricingSubtitle": "Fixed prices, known before you commit. Indicative prices incl. VAT.",
+    "plans": {
+      "aiOnly": {
+        "title": "Assisted review",
+        "description": "Suggested changes in tracked mode; you accept or reject each one."
+      },
+      "aiLawyer": {
+        "title": "Review + lawyer validation",
+        "description": "A verified lawyer reviews, validates, or amends each suggested change. Response within 24 h."
+      },
+      "mission": {
+        "title": "Flat-fee lawyer mission",
+        "description": "Full review, drafting, or negotiation by a lawyer, at a fixed price agreed upfront."
+      }
+    },
+    "faqTitle": "Frequently asked questions",
+    "faq": {
+      "1": {
+        "question": "Does AvoSearch replace a lawyer?",
+        "answer": "No. AvoSearch is a document assistance tool: it helps you understand your contract and prepare changes. For advice on your situation, choose the plan with lawyer validation or a flat-fee mission."
+      },
+      "2": {
+        "question": "What documents can I have analyzed?",
+        "answer": "Contracts only: commercial lease, service agreement, terms of sale, partnership, etc. Criminal, family, or litigation matters are out of scope: we refer you to the right professional without analysis."
+      },
+      "3": {
+        "question": "Who are the lawyers on the platform?",
+        "answer": "Lawyers registered with a French bar. Each profile is manually verified by our team before receiving the \"Verified\" badge."
+      },
+      "4": {
+        "question": "How much does it cost?",
+        "answer": "Three fixed-price plans, shown before you commit: assisted review, review with lawyer validation, or flat-fee mission agreed upfront. No hourly billing, no surprises."
+      },
+      "5": {
+        "question": "Are my documents confidential?",
+        "answer": "Your documents are accessible only to you and, if you choose, the assigned lawyer. You can export your data and delete your account at any time."
+      }
+    },
+    "ctaTitle": "A contract to sign this week?",
+    "ctaDescription": "Upload it now: in a few minutes you'll know whether it can be adjusted directly or deserves a lawyer's review.",
+    "ctaButton": "Get started for free"
+  },
+  "auth": {
+    "layoutDisclaimer": "Demo platform — no real data. AvoSearch is a document assistance tool and does not provide legal advice.",
+    "loginTitle": "Sign in",
+    "loginDescription": "Access your AvoSearch dashboard.",
+    "email": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "signingIn": "Signing in...",
+    "signIn": "Sign in",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Create an account",
+    "registerTitle": "Create an account",
+    "registerDescription": "Upload your first contract in minutes.",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "Alex Martin",
+    "passwordHint": "At least 8 characters.",
+    "creatingAccount": "Creating account...",
+    "createMyAccount": "Create my account",
+    "alreadyRegistered": "Already registered?",
+    "areYouLawyer": "Are you a lawyer?",
+    "lawyerRegistration": "Lawyer registration",
+    "lawyerRegisterTitle": "Lawyer registration",
+    "lawyerRegisterDescription": "Your profile will be manually verified by our team before being visible to clients.",
+    "professionalEmail": "Professional email address",
+    "lawyerNamePlaceholder": "Jane Doe, Esq.",
+    "barreau": "Bar association",
+    "city": "Practice city",
+    "cityPlaceholder": "Paris",
+    "specialties": "Specialties",
+    "specialtiesPlaceholder": "Commercial leases, Business law",
+    "specialtiesHint": "Separate specialties with commas.",
+    "validationPriceCents": "Validation fee (cents)",
+    "validationPriceHint": "E.g. 7900 = €79 incl. VAT.",
+    "responseTimeHours": "Response time (hours)",
+    "bio": "Bio",
+    "bioPlaceholder": "Your practice, case types, approach...",
+    "createLawyerAccount": "Create my lawyer account",
+    "demoAccountsTitle": "Demo accounts",
+    "demoAccountsList": "client1@avosearch.test · avocat1@avosearch.test · admin@avosearch.test",
+    "demoPassword": "Password:"
+  },
+  "validation": {
+    "nameTooShort": "Name too short",
+    "invalidEmail": "Invalid email address",
+    "passwordTooShort": "At least 8 characters",
+    "barreauRequired": "Bar association required",
+    "cityRequired": "City required",
+    "specialtyRequired": "At least one specialty",
+    "bioTooShort": "Describe your practice in a few sentences",
+    "invalidForm": "Invalid form."
+  },
+  "errors": {
+    "invalidCredentials": "Incorrect email or password.",
+    "emailExists": "An account already exists with this email address.",
+    "signInAfterRegister": "Account created, but sign-in failed. Please sign in manually."
+  },
+  "client": {
+    "areaLabel": "Client dashboard",
+    "footerDisclaimer": "AvoSearch is an automated document assistance tool and does not provide legal advice.",
+    "greeting": "Hello{firstName} 👋",
+    "greetingFirstName": " {firstName}",
+    "intro": "Describe your need or upload your contract: we'll guide you to the right solution.",
+    "newAnalysis": "New analysis",
+    "phase1Badge": "Available in Phase 1",
+    "newAnalysisDescription": "Upload a contract (PDF, DOCX, TXT) or ask your contractual question.",
+    "questionPlaceholder": "E.g.: I'm offered a commercial lease with a 6-month security deposit and a ban on assigning the lease. Is that normal?",
+    "phase1Hint": "Upload and analysis arrive with Phase 1 (AI triage).",
+    "analyze": "Analyze",
+    "myContracts": "My contracts",
+    "noContracts": "No contracts yet. Your first document will appear here.",
+    "uploadedOn": "Uploaded on {date}"
+  },
+  "lawyer": {
+    "areaLabel": "Lawyer dashboard",
+    "dashboardTitle": "Dashboard",
+    "dashboardIntro": "Your validations, missions, and earnings — workflows arrive in Phase 3.",
+    "pendingProfileTitle": "Profile pending verification",
+    "pendingProfileDescription": "Our team manually verifies each profile. You won't receive missions until your profile is verified.",
+    "validationsPending": "Validations to process",
+    "missionsInProgress": "Missions in progress",
+    "totalEarnings": "Total earnings (demo)",
+    "myProfile": "My profile",
+    "barreau": "Bar association",
+    "city": "City",
+    "validationPrice": "Validation fee",
+    "responseTime": "Advertised response time",
+    "responseTimeHours": "{hours} h",
+    "specialties": "Specialties"
+  },
+  "admin": {
+    "areaLabel": "Administration",
+    "title": "Lawyer verification",
+    "pendingCount": "{count, plural, one {# profile pending} other {# profiles pending}}. Verify / Reject actions arrive in Phase 3.",
+    "columns": {
+      "lawyer": "Lawyer",
+      "barreau": "Bar association",
+      "specialties": "Specialties",
+      "validationPrice": "Validation fee",
+      "status": "Status"
+    }
+  },
+  "legal": {
+    "draftTitle": "Draft document",
+    "draftDescription": "To be reviewed by a lawyer before production release.",
+    "cgu": {
+      "title": "Terms of use",
+      "sections": {
+        "1": {
+          "title": "1. Purpose of the service",
+          "body": "AvoSearch is a document assistance tool for contracts and a platform connecting users with lawyers registered with a French bar. AvoSearch is not a law firm, does not provide legal advice, and guarantees no outcome."
+        },
+        "2": {
+          "title": "2. Scope",
+          "body": "The service covers contractual matters only. Criminal, family, litigation, or regulated-act topics receive referral only, without analysis."
+        },
+        "3": {
+          "title": "3. Role of lawyers",
+          "body": "Lawyers act in their own name, under their professional responsibility and ethical rules. Mission fees are flat-rate and displayed before any commitment."
+        },
+        "4": {
+          "title": "4. Accounts and security",
+          "body": "Users are responsible for keeping their credentials confidential. Any fraudulent use must be reported immediately."
+        },
+        "5": {
+          "title": "5. User content",
+          "body": "Uploaded documents remain the user's property. They are used only to provide the service."
+        }
+      }
+    },
+    "mentions": {
+      "title": "Legal notice",
+      "sections": {
+        "1": {
+          "title": "Publisher",
+          "body": "AvoSearch (demo project) — fictional company in formation. Contact: contact@avosearch.test."
+        },
+        "2": {
+          "title": "Hosting",
+          "body": "Local development environment — no production host at this stage."
+        },
+        "3": {
+          "title": "Nature of the service",
+          "body": "AvoSearch is a document assistance tool and a referral platform. AvoSearch is not a law firm and does not provide legal advice."
+        },
+        "4": {
+          "title": "Intellectual property",
+          "body": "Platform content (text, interface, code) is protected. Unauthorized reproduction is prohibited."
+        }
+      }
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "sections": {
+        "1": {
+          "title": "Data collected",
+          "body": "Account (name, email, hashed password), uploaded documents and entered text, generated analyses, mission-related messages."
+        },
+        "2": {
+          "title": "Purposes",
+          "body": "Provide the service: contract document analysis, lawyer matching, mission tracking. No data resale, no advertising."
+        },
+        "3": {
+          "title": "Sub-processors",
+          "body": "Automated processing of contract text uses the Anthropic API. Documents are not used to train models."
+        },
+        "4": {
+          "title": "Your rights",
+          "body": "You can export your account data (JSON) and delete your account at any time; deletion cascades to your documents, analyses, and messages. Contact: privacy@avosearch.test."
+        },
+        "5": {
+          "title": "Retention period",
+          "body": "Data is kept while the account is active, then deleted when the account is closed."
+        }
+      }
+    }
+  }
+}

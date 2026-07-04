@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -9,8 +10,13 @@ import {
 } from "@/components/ui/table";
 import { prisma } from "@/lib/db";
 import { formatEuros } from "@/lib/config";
+import type { AppLocale } from "@/lib/i18n";
 
 export default async function AdminPage() {
+  const t = await getTranslations("admin");
+  const tc = await getTranslations("common");
+  const locale = (await getLocale()) as AppLocale;
+
   const profiles = await prisma.lawyerProfile.findMany({
     include: { user: { select: { name: true, email: true } } },
     orderBy: [{ verified: "asc" }, { createdAt: "asc" }],
@@ -21,10 +27,9 @@ export default async function AdminPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Vérification des avocats</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {pendingCount} profil{pendingCount > 1 ? "s" : ""} en attente. Les actions Vérifier /
-          Refuser arrivent avec la Phase 3.
+          {t("pendingCount", { count: pendingCount })}
         </p>
       </div>
 
@@ -32,11 +37,11 @@ export default async function AdminPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Avocat</TableHead>
-              <TableHead>Barreau</TableHead>
-              <TableHead>Spécialités</TableHead>
-              <TableHead>Tarif validation</TableHead>
-              <TableHead>Statut</TableHead>
+              <TableHead>{t("columns.lawyer")}</TableHead>
+              <TableHead>{t("columns.barreau")}</TableHead>
+              <TableHead>{t("columns.specialties")}</TableHead>
+              <TableHead>{t("columns.validationPrice")}</TableHead>
+              <TableHead>{t("columns.status")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -52,12 +57,12 @@ export default async function AdminPage() {
                     {profile.specialties.join(", ")}
                   </span>
                 </TableCell>
-                <TableCell>{formatEuros(profile.validationPriceCents)}</TableCell>
+                <TableCell>{formatEuros(profile.validationPriceCents, locale)}</TableCell>
                 <TableCell>
                   {profile.verified ? (
-                    <Badge>Vérifié</Badge>
+                    <Badge>{tc("verified")}</Badge>
                   ) : (
-                    <Badge variant="secondary">En attente</Badge>
+                    <Badge variant="secondary">{tc("pending")}</Badge>
                   )}
                 </TableCell>
               </TableRow>
