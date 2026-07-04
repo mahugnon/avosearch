@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { signOutAction } from "@/lib/actions/auth";
@@ -9,7 +10,9 @@ interface DashboardHeaderProps {
   userName: string;
 }
 
-export function DashboardHeader({ homeHref, areaLabel, userName }: DashboardHeaderProps) {
+export async function DashboardHeader({ homeHref, areaLabel, userName }: DashboardHeaderProps) {
+  const t = await getTranslations("header");
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -23,7 +26,7 @@ export function DashboardHeader({ homeHref, areaLabel, userName }: DashboardHead
           <span className="hidden text-sm text-muted-foreground sm:inline">{userName}</span>
           <form action={signOutAction}>
             <Button type="submit" variant="outline" size="sm">
-              Se déconnecter
+              {t("signOut")}
             </Button>
           </form>
         </div>

@@ -1,6 +1,8 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
+import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 
 const ROLE_HOME = {
   CLIENT: "/app",
@@ -9,6 +11,7 @@ const ROLE_HOME = {
 } as const;
 
 export async function SiteHeader() {
+  const t = await getTranslations("header");
   const session = await auth();
   const role = session?.user?.role;
   const homeHref = role ? ROLE_HOME[role] : null;
@@ -21,27 +24,28 @@ export async function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
           <Link href="/#comment-ca-marche" className="hover:text-foreground">
-            Comment ça marche
+            {t("howItWorks")}
           </Link>
           <Link href="/#tarifs" className="hover:text-foreground">
-            Tarifs
+            {t("pricing")}
           </Link>
           <Link href="/#faq" className="hover:text-foreground">
-            FAQ
+            {t("faq")}
           </Link>
         </nav>
         <div className="flex items-center gap-2">
+          <LocaleSwitcher />
           {homeHref ? (
             <Button asChild size="sm">
-              <Link href={homeHref}>Mon espace</Link>
+              <Link href={homeHref}>{t("mySpace")}</Link>
             </Button>
           ) : (
             <>
               <Button asChild variant="ghost" size="sm">
-                <Link href="/login">Se connecter</Link>
+                <Link href="/login">{t("signIn")}</Link>
               </Button>
               <Button asChild size="sm">
-                <Link href="/register">Créer un compte</Link>
+                <Link href="/register">{t("signUp")}</Link>
               </Button>
             </>
           )}
