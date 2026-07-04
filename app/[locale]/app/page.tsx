@@ -27,7 +27,7 @@ export default async function ClientHomePage() {
         <p className="max-w-lg text-base text-muted-foreground">{t("intro")}</p>
       </header>
 
-      <AnalysisChat />
+      <AnalysisChat key={locale} />
 
       {recent.length > 0 && (
         <section className="space-y-4">

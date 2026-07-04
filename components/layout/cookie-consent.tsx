@@ -12,8 +12,11 @@ export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(CONSENT_KEY);
-    if (!stored) setVisible(true);
+    // Deferred so the state update is not synchronous within the effect
+    const id = window.setTimeout(() => {
+      if (!localStorage.getItem(CONSENT_KEY)) setVisible(true);
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   function accept() {

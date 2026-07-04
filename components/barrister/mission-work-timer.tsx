@@ -24,25 +24,26 @@ export function MissionWorkTimer({
   const locale = useLocale() as AppLocale;
   const startedAt = workStartedAt ? new Date(workStartedAt).getTime() : null;
 
-  const [elapsed, setElapsed] = useState(storedSeconds);
+  // `now` is null on the server render; elapsed is derived so no setState
+  // runs synchronously inside the effect.
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!startedAt) {
-      setElapsed(storedSeconds);
-      return;
-    }
+    if (!startedAt) return;
 
-    const startMs = startedAt;
+    const update = () => setNow(Date.now());
+    const kickoff = window.setTimeout(update, 0);
+    const id = window.setInterval(update, 1000);
+    return () => {
+      window.clearTimeout(kickoff);
+      window.clearInterval(id);
+    };
+  }, [startedAt]);
 
-    function tick() {
-      const running = Math.max(0, Math.floor((Date.now() - startMs) / 1000));
-      setElapsed(storedSeconds + running);
-    }
-
-    tick();
-    const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
-  }, [startedAt, storedSeconds]);
+  const elapsed =
+    startedAt && now
+      ? storedSeconds + Math.max(0, Math.floor((now - startedAt) / 1000))
+      : storedSeconds;
 
   const quarterHours = Math.max(1, Math.ceil(elapsed / 900));
   const projectedCents = Math.max(
