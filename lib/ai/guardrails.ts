@@ -1,67 +1,84 @@
-import type { TriageAiResponse } from "@/lib/validation/triage";
-import { OUT_OF_SCOPE_JUSTIFICATION } from "./prompts";
+import type { RequiredPro, TriageResult } from "@prisma/client";
+import type { TriageResponse } from "@/lib/validation/triage";
+
+const OUT_OF_SCOPE_PATTERN =
+  /hors\s*p[ée]rim[èe]tre|p[ée]nal|famille|divorce|succession|contentieux/i;
 
 const HIGH_STAKES_KEYWORDS = [
-  "cession",
   "caution personnelle",
-  "caution solidaire",
+  "cession",
   "exclusivité",
-  "non-concurrence",
-  "non-concurrence",
-  "garantie solidaire",
   "renonciation",
-  "pénalité",
+  "garantie solidaire",
   "clause pénale",
   "indemnisation illimitée",
   "responsabilité illimitée",
-  "cautionnement",
-  "nantissement",
-  "fusion",
-  "acquisition",
-  "levée de fonds",
+  "pénalité",
+  "non-concurrence",
+  "non-sollicitation",
+  "asymétri",
+  "dépôt de garantie",
+  "clause résolutoire",
 ];
 
-export function flagIndicatesHighStakes(flags: string[]): boolean {
-  const combined = flags.join(" ").toLowerCase();
-  return HIGH_STAKES_KEYWORDS.some((keyword) => combined.includes(keyword));
+export type GuardedTriage = {
+  outOfScope: boolean;
+  triage: TriageResult;
+  confidence: number;
+  domain: string;
+  justification: string;
+  flags: string[];
+  requiredPro: RequiredPro | null;
+  guardrailNotes: string[];
+};
+
+function isOutOfScope(response: TriageResponse): boolean {
+  if (OUT_OF_SCOPE_PATTERN.test(response.domain)) return true;
+  return response.flags.some((flag) => OUT_OF_SCOPE_PATTERN.test(flag));
 }
 
-export function applyTriageGuardrails(raw: TriageAiResponse): TriageAiResponse {
-  if (!raw.in_scope) {
+function hasHighStakes(flags: string[]): boolean {
+  const joined = flags.join(" ").toLowerCase();
+  return HIGH_STAKES_KEYWORDS.some((keyword) => joined.includes(keyword));
+}
+
+export function applyTriageGuardrails(response: TriageResponse): GuardedTriage {
+  const guardrailNotes: string[] = [];
+
+  if (isOutOfScope(response)) {
     return {
+      outOfScope: true,
       triage: "ACTE_REGLEMENTE",
-      confidence: 1,
-      domain: "hors périmètre",
-      justification: OUT_OF_SCOPE_JUSTIFICATION,
-      flags: [],
-      required_pro: "AVOCAT",
-      in_scope: false,
+      confidence: 0,
+      domain: response.domain,
+      justification: response.justification,
+      flags: response.flags,
+      requiredPro: response.required_pro === "NOTAIRE" ? "NOTAIRE" : "AVOCAT",
+      guardrailNotes: ["out_of_scope"],
     };
   }
 
-  let triage = raw.triage;
-  const flags = [...raw.flags];
+  let triage: TriageResult = response.triage;
+  const confidence = response.confidence;
 
-  if (raw.confidence < 0.7 && triage === "IA_SUFFIT") {
+  if (confidence < 0.7 && triage === "IA_SUFFIT") {
     triage = "AVOCAT_RECOMMANDE";
-    if (!flags.some((f) => f.toLowerCase().includes("confiance"))) {
-      flags.push("Niveau de confiance insuffisant pour une relecture automatisée seule");
-    }
+    guardrailNotes.push("confidence_below_threshold");
   }
 
-  if (triage === "IA_SUFFIT" && flagIndicatesHighStakes(flags)) {
+  if (hasHighStakes(response.flags) && triage === "IA_SUFFIT") {
     triage = "AVOCAT_RECOMMANDE";
-    if (!flags.some((f) => f.toLowerCase().includes("enjeu"))) {
-      flags.push("Enjeu élevé détecté — recommandation avocat par prudence");
-    }
+    guardrailNotes.push("high_stakes_flags");
   }
 
-  return { ...raw, triage, flags };
-}
-
-export function isOutOfScope(analysis: { domain: string; flags: string[] }): boolean {
-  return (
-    analysis.domain.toLowerCase() === "hors périmètre" ||
-    analysis.flags.some((f) => f === "__OUT_OF_SCOPE__")
-  );
+  return {
+    outOfScope: false,
+    triage,
+    confidence,
+    domain: response.domain,
+    justification: response.justification,
+    flags: response.flags,
+    requiredPro: response.required_pro,
+    guardrailNotes,
+  };
 }

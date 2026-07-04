@@ -1,30 +1,39 @@
 import { z } from "zod";
 
-export const triageResultSchema = z.enum([
-  "IA_SUFFIT",
-  "AVOCAT_RECOMMANDE",
-  "ACTE_REGLEMENTE",
-]);
+const triageEnum = z.enum(["IA_SUFFIT", "AVOCAT_RECOMMANDE", "ACTE_REGLEMENTE"]);
+const requiredProEnum = z.enum(["AVOCAT", "NOTAIRE"]);
 
-export const requiredProSchema = z.enum(["AVOCAT", "NOTAIRE"]).nullable();
-
-/** Raw JSON shape returned by the triage model — validated before guardrails. */
-export const triageAiResponseSchema = z.object({
-  triage: triageResultSchema,
-  confidence: z.number().min(0).max(1),
+export const triageResponseSchema = z.object({
+  triage: triageEnum,
+  confidence: z.preprocess((value) => {
+    const n = Number(value);
+    if (Number.isNaN(n)) return value;
+    if (n > 1 && n <= 100) return n / 100;
+    return n;
+  }, z.number().min(0).max(1)),
   domain: z.string().min(1).max(200),
-  justification: z.string().min(10).max(2000),
-  flags: z.array(z.string().min(1).max(300)).max(20),
-  required_pro: requiredProSchema,
-  in_scope: z.boolean(),
+  justification: z.string().min(1).max(2000),
+  flags: z.preprocess(
+    (value) => (Array.isArray(value) ? value : []),
+    z.array(z.string().max(300)).max(20)
+  ),
+  required_pro: z.preprocess((value) => {
+    if (value === undefined || value === "null" || value === "") return null;
+    return value;
+  }, requiredProEnum.nullable()),
 });
 
-export type TriageAiResponse = z.infer<typeof triageAiResponseSchema>;
+export type TriageResponse = z.infer<typeof triageResponseSchema>;
 
-export const createContractSchema = z.object({
-  title: z.string().max(200).optional(),
-  userQuestion: z.string().max(5000).optional(),
-  pastedText: z.string().max(200_000).optional(),
-});
+export function parseTriageJson(raw: string): TriageResponse {
+  const trimmed = raw.trim();
+  const jsonMatch =
+    trimmed.match(/```(?:json)?\s*([\s\S]*?)```/) ?? [null, trimmed];
+  const candidate = (jsonMatch[1] ?? trimmed).trim();
+  const parsed = JSON.parse(candidate) as unknown;
+  return triageResponseSchema.parse(parsed);
+}
 
-export type CreateContractInput = z.infer<typeof createContractSchema>;
+export function isZodParseError(error: unknown): boolean {
+  return error instanceof z.ZodError || error instanceof SyntaxError;
+}

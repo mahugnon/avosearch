@@ -1,15 +1,25 @@
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { localizedPath, type AppLocale } from "@/lib/i18n";
+import { getLocale } from "next-intl/server";
 
-export async function getContractForClient(contractId: string, userId: string) {
-  return prisma.contract.findFirst({
-    where: { id: contractId, ownerId: userId },
+export async function requireClientContract(contractId: string) {
+  const session = await auth();
+  const locale = (await getLocale()) as AppLocale;
+
+  if (!session || session.user.role !== "CLIENT") {
+    redirect(localizedPath("/login", locale));
+  }
+
+  const contract = await prisma.contract.findUnique({
+    where: { id: contractId },
     include: { analysis: true },
   });
-}
 
-export function assertClientSession(session: { user: { id: string; role: string } } | null) {
-  if (!session?.user?.id || session.user.role !== "CLIENT") {
-    throw new Error("UNAUTHORIZED");
+  if (!contract || contract.ownerId !== session.user.id) {
+    notFound();
   }
-  return session.user.id;
+
+  return { session, contract, locale };
 }

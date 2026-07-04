@@ -1,93 +1,85 @@
-import { RequiredPro, TriageResult } from "@prisma/client";
-import { anthropic, assertAnthropicConfigured, MODEL } from "./client";
-import { applyTriageGuardrails } from "./guardrails";
-import { buildTriageUserMessage, TRIAGE_SYSTEM_PROMPT } from "./prompts";
-import { prisma } from "@/lib/db";
-import { triageAiResponseSchema, type TriageAiResponse } from "@/lib/validation/triage";
+import { runDemoTriage } from "@/lib/ai/demo-triage";
+import { applyTriageGuardrails, type GuardedTriage } from "@/lib/ai/guardrails";
+import {
+  callLlmChat,
+  isAiConfigured,
+  isLlmAuthError,
+} from "@/lib/ai/llm";
+import { buildTriageUserMessage, TRIAGE_SYSTEM_PROMPT } from "@/lib/ai/prompts";
+import { isZodParseError, parseTriageJson } from "@/lib/validation/triage";
 
-function extractJsonObject(text: string): unknown {
-  const trimmed = text.trim();
-  const start = trimmed.indexOf("{");
-  const end = trimmed.lastIndexOf("}");
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error("No JSON object found in model response.");
+export class TriageError extends Error {
+  constructor(
+    message: string,
+    readonly code: "AI_NOT_CONFIGURED" | "AI_FAILED" | "PARSE_FAILED"
+  ) {
+    super(message);
+    this.name = "TriageError";
   }
-  return JSON.parse(trimmed.slice(start, end + 1));
 }
+
+const DEMO_MODEL = "demo-heuristic";
 
 async function callTriageModel(input: {
   extractedText: string;
   userQuestion?: string | null;
-}): Promise<TriageAiResponse> {
-  assertAnthropicConfigured();
-
-  const response = await anthropic.messages.create({
-    model: MODEL,
-    max_tokens: 1500,
+}): Promise<{ text: string; model: string }> {
+  const { text, model } = await callLlmChat({
     system: TRIAGE_SYSTEM_PROMPT,
-    messages: [
-      {
-        role: "user",
-        content: buildTriageUserMessage(input),
-      },
-    ],
+    user: buildTriageUserMessage(input),
+    maxTokens: 1024,
   });
-
-  const textBlock = response.content.find((block) => block.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("Empty model response.");
-  }
-
-  return triageAiResponseSchema.parse(extractJsonObject(textBlock.text));
+  return { text, model };
 }
 
-async function callTriageWithRetry(input: {
+function runDemo(input: {
   extractedText: string;
   userQuestion?: string | null;
-}): Promise<TriageAiResponse> {
-  try {
-    return await callTriageModel(input);
-  } catch (firstError) {
-    console.warn("[triage] First attempt failed, retrying once:", firstError);
-    return await callTriageModel(input);
-  }
+}): { result: GuardedTriage; model: string } {
+  console.warn("[triage] Using demo heuristic (no LLM API key configured)");
+  const parsed = runDemoTriage(input);
+  return { result: applyTriageGuardrails(parsed), model: DEMO_MODEL };
 }
 
-function toRequiredPro(value: TriageAiResponse["required_pro"]): RequiredPro | null {
-  if (value === "AVOCAT") return RequiredPro.AVOCAT;
-  if (value === "NOTAIRE") return RequiredPro.NOTAIRE;
-  return null;
-}
-
-export async function analyzeContract(contractId: string) {
-  const contract = await prisma.contract.findUniqueOrThrow({
-    where: { id: contractId },
-    include: { analysis: true },
-  });
-
-  if (contract.analysis) {
-    return contract.analysis;
+export async function runContractTriage(input: {
+  extractedText: string;
+  userQuestion?: string | null;
+}): Promise<{ result: GuardedTriage; model: string }> {
+  if (!isAiConfigured()) {
+    return runDemo(input);
   }
 
-  const raw = await callTriageWithRetry({
-    extractedText: contract.extractedText,
-    userQuestion: contract.userQuestion,
-  });
+  let lastError: unknown;
+  let lastRaw: string | undefined;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const { text, model } = await callTriageModel(input);
+      lastRaw = text;
+      const parsed = parseTriageJson(text);
+      const result = applyTriageGuardrails(parsed);
+      console.log("[triage] parsed", { model, parsed, result });
+      return { result, model };
+    } catch (error) {
+      lastError = error;
+      if (isZodParseError(error)) {
+        console.error("[triage] JSON parse failed", {
+          attempt: attempt + 1,
+          raw: lastRaw,
+          error: error instanceof Error ? error.message : error,
+        });
+      }
+      if (isLlmAuthError(error)) {
+        console.warn("[triage] Invalid LLM API key — falling back to demo mode");
+        return runDemo(input);
+      }
+    }
+  }
 
-  const guarded = applyTriageGuardrails(raw);
-
-  return prisma.analysis.create({
-    data: {
-      contractId: contract.id,
-      triage: guarded.triage as TriageResult,
-      confidence: guarded.confidence,
-      domain: guarded.domain,
-      justification: guarded.justification,
-      flags: guarded.flags,
-      requiredPro: toRequiredPro(guarded.required_pro),
-      model: MODEL,
-    },
-  });
+  if (isZodParseError(lastError)) {
+    throw new TriageError("Failed to parse AI triage JSON", "PARSE_FAILED");
+  }
+  throw new TriageError(
+    lastError instanceof Error ? lastError.message : "AI triage failed",
+    "AI_FAILED"
+  );
 }
-
-export type TriageAnalysis = Awaited<ReturnType<typeof analyzeContract>>;

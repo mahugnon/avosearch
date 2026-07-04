@@ -10,8 +10,7 @@ MVP d'une plateforme legaltech française : un utilisateur (particulier, freelan
 - **Tailwind CSS + shadcn/ui**
 - **PostgreSQL + Prisma** (Postgres via docker-compose)
 - **Auth.js** (e-mail + mot de passe, sessions JWT, 3 rôles : `CLIENT`, `LAWYER`, `ADMIN`)
-- **@anthropic-ai/sdk** pour le triage et la relecture IA (Phase 1+)
-- **mammoth** (DOCX) + **unpdf** (PDF) pour l'extraction de texte
+- **NVIDIA NIM** (Nemotron) pour le triage et la relecture IA
 - **Zod** pour la validation des entrées API et des sorties JSON de l'IA
 - Stockage fichiers : disque local `./storage` derrière une interface `StorageProvider`
 
@@ -19,7 +18,7 @@ MVP d'une plateforme legaltech française : un utilisateur (particulier, freelan
 
 ```bash
 pnpm install
-cp .env.example .env      # puis renseignez AUTH_SECRET (openssl rand -base64 32) et ANTHROPIC_API_KEY
+cp .env.example .env      # puis renseignez NVIDIA_API_KEY et AUTH_SECRET
 pnpm db:up                # démarre Postgres (Docker) sur le port hôte 5433
 pnpm db:migrate           # applique les migrations puis exécute le seed
 pnpm dev                  # http://localhost:3000
@@ -51,7 +50,7 @@ app/
   admin/            # administration (rôle ADMIN)
   legal/            # CGU, mentions légales, confidentialité
   api/auth/         # routes Auth.js
-  api/contracts/    # POST …/analyze (triage IA)
+  api/contracts/    # analyse de triage (Phase 1+)
 components/
   ui/               # composants shadcn/ui
   auth/, layout/    # composants applicatifs
@@ -61,10 +60,11 @@ lib/
   db.ts             # client Prisma singleton
   config.ts         # tarifs par défaut (surcharge via env)
   storage/          # interface StorageProvider + implémentation disque local
-  actions/          # server actions (auth, contracts)
-  validation/       # schémas Zod
-  ai/               # client Anthropic, prompts, triage
-  contracts/        # extraction texte, constantes
+  actions/          # server actions (auth)
+  validation/       # schémas Zod (auth, triage)
+  extract/          # extraction PDF / DOCX / TXT
+  ai/               # client NVIDIA NIM, prompts, triage
+  contracts/        # helpers d'accès aux contrats
 prisma/
   schema.prisma     # modèle de données complet
   seed.ts           # données de démonstration

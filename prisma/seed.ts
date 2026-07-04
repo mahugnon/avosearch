@@ -216,6 +216,23 @@ async function main() {
       extractedText: BAIL_COMMERCIAL_TEXT,
       userQuestion:
         "On me propose ce bail pour ma première boutique. Certaines clauses me semblent dures (dépôt de garantie, travaux, cession) : est-ce normal ?",
+      analysis: {
+        create: {
+          triage: "IA_SUFFIT",
+          confidence: 0.82,
+          domain: "bail commercial",
+          justification:
+            "Il s'agit d'un bail commercial standard avec quelques clauses exigeantes (dépôt de garantie élevé, renonciation à la résiliation triennale, cession restreinte). Des ajustements ciblés peuvent être envisagés en suivi de modifications, sous réserve de votre situation.",
+          flags: [
+            "dépôt de garantie de 6 mois",
+            "renonciation à la résiliation triennale",
+            "cession soumise à agrément discrétionnaire",
+            "charges incluant grosses réparations",
+          ],
+          requiredPro: null,
+          model: "seed",
+        },
+      },
     },
   });
 
@@ -226,6 +243,23 @@ async function main() {
       extractedText: PRESTATION_TEXT,
       userQuestion:
         "Je suis la cliente : le prestataire garde la propriété du code et limite fortement sa responsabilité. Que faut-il renégocier ?",
+      analysis: {
+        create: {
+          triage: "AVOCAT_RECOMMANDE",
+          confidence: 0.88,
+          domain: "prestation de services / propriété intellectuelle",
+          justification:
+            "Le contrat présente une asymétrie notable : cession de propriété intellectuelle au profit du prestataire, plafond de responsabilité très bas et pénalités de retard élevées. L'enjeu justifie l'accompagnement d'un avocat pour renégocier les clauses essentielles.",
+          flags: [
+            "propriété intellectuelle conservée par le prestataire",
+            "responsabilité plafonnée à 10 %",
+            "pénalités de retard de 15 % par mois",
+            "clause de non-sollicitation de 3 ans",
+          ],
+          requiredPro: "AVOCAT",
+          model: "seed",
+        },
+      },
     },
   });
 
