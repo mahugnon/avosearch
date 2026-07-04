@@ -27,7 +27,9 @@ async function callTriageModel(input: {
   const { text, model } = await callLlmChat({
     system: TRIAGE_SYSTEM_PROMPT,
     user: buildTriageUserMessage(input),
-    maxTokens: 1024,
+    // Nemotron is a reasoning model: thinking tokens count against the
+    // completion budget, and 1024 was observed to truncate the JSON output.
+    maxTokens: 4096,
   });
   return { text, model };
 }

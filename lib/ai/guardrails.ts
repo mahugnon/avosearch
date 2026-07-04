@@ -1,8 +1,11 @@
 import type { RequiredPro, TriageResult } from "@prisma/client";
 import type { TriageResponse } from "@/lib/validation/triage";
 
-const OUT_OF_SCOPE_PATTERN =
+const OUT_OF_SCOPE_DOMAIN_PATTERN =
   /hors\s*p[ée]rim[èe]tre|p[ée]nal|famille|divorce|succession|contentieux/i;
+// Flags legitimately mention words like "contentieux" (e.g. jurisdiction
+// clauses), so only the explicit marker set by the prompt counts here.
+const OUT_OF_SCOPE_FLAG_PATTERN = /hors\s*p[ée]rim[èe]tre/i;
 
 const HIGH_STAKES_KEYWORDS = [
   "caution personnelle",
@@ -33,8 +36,8 @@ export type GuardedTriage = {
 };
 
 function isOutOfScope(response: TriageResponse): boolean {
-  if (OUT_OF_SCOPE_PATTERN.test(response.domain)) return true;
-  return response.flags.some((flag) => OUT_OF_SCOPE_PATTERN.test(flag));
+  if (OUT_OF_SCOPE_DOMAIN_PATTERN.test(response.domain)) return true;
+  return response.flags.some((flag) => OUT_OF_SCOPE_FLAG_PATTERN.test(flag));
 }
 
 function hasHighStakes(flags: string[]): boolean {
