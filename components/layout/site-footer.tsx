@@ -1,11 +1,9 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Logo } from "@/components/brand/logo";
-import { getDictionary } from "@/lib/i18n/get-dictionary";
-import { getLocale } from "@/lib/i18n/get-locale";
 
 export async function SiteFooter() {
-  const locale = await getLocale();
-  const dict = getDictionary(locale);
+  const t = await getTranslations("footer");
 
   return (
     <footer className="border-t border-white/10 bg-brand-ink text-gray-300">
@@ -16,21 +14,21 @@ export async function SiteFooter() {
               <Logo variant="markDark" className="h-9 w-9" />
               <span className="text-lg font-semibold tracking-tight text-white">AvoSearch</span>
             </div>
-            <p className="text-sm leading-relaxed text-gray-400">{dict.footer.description}</p>
+            <p className="text-sm leading-relaxed text-gray-400">{t("description")}</p>
           </div>
           <nav className="flex flex-col gap-2 text-sm text-gray-400">
             <Link href="/legal/cgu" className="transition-colors hover:text-white">
-              {dict.footer.cgu}
+              {t("cgu")}
             </Link>
             <Link href="/legal/mentions-legales" className="transition-colors hover:text-white">
-              {dict.footer.legal}
+              {t("mentionsLegales")}
             </Link>
             <Link href="/legal/confidentialite" className="transition-colors hover:text-white">
-              {dict.footer.privacy}
+              {t("confidentialite")}
             </Link>
           </nav>
         </div>
-        <p className="text-xs text-gray-500">{dict.footer.demoNote}</p>
+        <p className="text-xs text-gray-500">{t("demoNotice")}</p>
       </div>
     </footer>
   );

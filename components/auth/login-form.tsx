@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useActionState } from "react";
-import { useDictionary } from "@/components/providers/locale-provider";
 import { loginAction } from "@/lib/actions/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -18,14 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
-  const dict = useDictionary();
+  const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(loginAction, undefined);
 
   return (
     <Card className="surface-elevated border-0 shadow-none">
       <CardHeader>
-        <CardTitle>{dict.auth.loginTitle}</CardTitle>
-        <CardDescription>{dict.auth.loginSubtitle}</CardDescription>
+        <CardTitle>{t("loginTitle")}</CardTitle>
+        <CardDescription>{t("loginDescription")}</CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-4">
@@ -35,18 +35,18 @@ export function LoginForm() {
             </Alert>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">{dict.auth.email}</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               name="email"
               type="email"
               autoComplete="email"
-              placeholder={dict.auth.emailPlaceholder}
+              placeholder={t("emailPlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">{dict.auth.password}</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <Input
               id="password"
               name="password"
@@ -59,12 +59,12 @@ export function LoginForm() {
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-3">
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? dict.auth.submittingLogin : dict.auth.submitLogin}
+            {pending ? t("signingIn") : t("signIn")}
           </Button>
           <p className="text-sm text-muted-foreground">
-            {dict.auth.noAccount}{" "}
+            {t("noAccount")}{" "}
             <Link href="/register" className="font-medium text-primary underline-offset-4 hover:underline">
-              {dict.auth.createAccount}
+              {t("createAccount")}
             </Link>
           </p>
         </CardFooter>

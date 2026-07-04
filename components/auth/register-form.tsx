@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useActionState } from "react";
-import { useDictionary } from "@/components/providers/locale-provider";
 import { registerClientAction } from "@/lib/actions/auth";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -18,14 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function RegisterForm() {
-  const dict = useDictionary();
+  const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(registerClientAction, undefined);
 
   return (
     <Card className="surface-elevated border-0 shadow-none">
       <CardHeader>
-        <CardTitle>{dict.auth.registerTitle}</CardTitle>
-        <CardDescription>{dict.auth.registerSubtitle}</CardDescription>
+        <CardTitle>{t("registerTitle")}</CardTitle>
+        <CardDescription>{t("registerDescription")}</CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-4">
@@ -35,22 +35,28 @@ export function RegisterForm() {
             </Alert>
           )}
           <div className="space-y-2">
-            <Label htmlFor="name">{dict.auth.name}</Label>
-            <Input id="name" name="name" autoComplete="name" required />
+            <Label htmlFor="name">{t("fullName")}</Label>
+            <Input
+              id="name"
+              name="name"
+              autoComplete="name"
+              placeholder={t("fullNamePlaceholder")}
+              required
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">{dict.auth.email}</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               name="email"
               type="email"
               autoComplete="email"
-              placeholder={dict.auth.emailPlaceholder}
+              placeholder={t("emailPlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">{dict.auth.password}</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <Input
               id="password"
               name="password"
@@ -59,23 +65,23 @@ export function RegisterForm() {
               required
               minLength={8}
             />
-            <p className="text-xs text-muted-foreground">{dict.auth.passwordHint}</p>
+            <p className="text-xs text-muted-foreground">{t("passwordHint")}</p>
           </div>
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-3">
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? dict.auth.submittingRegister : dict.auth.submitRegister}
+            {pending ? t("creatingAccount") : t("createMyAccount")}
           </Button>
           <p className="text-sm text-muted-foreground">
-            {dict.auth.alreadyRegistered}{" "}
+            {t("alreadyRegistered")}{" "}
             <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
-              {dict.auth.signInLink}
+              {t("signIn")}
             </Link>
           </p>
           <p className="text-sm text-muted-foreground">
-            {dict.auth.areYouLawyer}{" "}
+            {t("areYouLawyer")}{" "}
             <Link href="/register/lawyer" className="font-medium text-primary underline-offset-4 hover:underline">
-              {dict.auth.lawyerSignupLink}
+              {t("lawyerRegistration")}
             </Link>
           </p>
         </CardFooter>

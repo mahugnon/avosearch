@@ -1,0 +1,297 @@
+{
+  "metadata": {
+    "title": "AvoSearch — Vos contrats, relus et sécurisés",
+    "titleTemplate": "%s | AvoSearch",
+    "description": "Déposez votre contrat : une aide documentaire automatisée identifie les points d'attention, et des avocats inscrits au barreau peuvent valider chaque modification ou prendre le relais au forfait.",
+    "login": "Connexion",
+    "register": "Créer un compte",
+    "registerLawyer": "Inscription avocat",
+    "cgu": "Conditions générales d'utilisation",
+    "mentionsLegales": "Mentions légales",
+    "confidentialite": "Politique de confidentialité"
+  },
+  "common": {
+    "brand": "AvoSearch",
+    "perContract": "/ contrat",
+    "recommended": "Recommandée",
+    "verified": "Vérifié",
+    "pendingVerification": "En attente de vérification",
+    "pending": "En attente",
+    "analyzed": "Analysé",
+    "awaitingAnalysis": "En attente d'analyse",
+    "close": "Fermer"
+  },
+  "header": {
+    "howItWorks": "Comment ça marche",
+    "pricing": "Tarifs",
+    "faq": "FAQ",
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "mySpace": "Mon espace",
+    "signOut": "Se déconnecter"
+  },
+  "localeSwitcher": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "footer": {
+    "description": "AvoSearch est un outil d'aide documentaire et une plateforme de mise en relation avec des avocats inscrits à un barreau français. AvoSearch n'est pas un cabinet d'avocats et ne fournit pas de consultation juridique.",
+    "cgu": "Conditions générales d'utilisation",
+    "mentionsLegales": "Mentions légales",
+    "confidentialite": "Politique de confidentialité",
+    "demoNotice": "Plateforme de démonstration — aucune donnée réelle, aucun avocat réel."
+  },
+  "landing": {
+    "heroBadge": "Contrats uniquement — orientation en moins d'une minute",
+    "heroTitle": "Vos contrats, relus et sécurisés — avec ou sans avocat",
+    "heroDescription": "Déposez votre contrat : AvoSearch repère les clauses à risque, propose des modifications en suivi de modifications, et vous met en relation avec un avocat vérifié quand votre situation le demande.",
+    "analyzeContract": "Analyser mon contrat",
+    "iAmLawyer": "Je suis avocat",
+    "disclaimer": "Aide documentaire automatisée — ne constitue pas une consultation juridique.",
+    "howItWorksTitle": "Comment ça marche",
+    "steps": {
+      "1": {
+        "title": "1. Déposez votre contrat",
+        "description": "Téléversez un PDF, un DOCX ou un texte, ou décrivez simplement votre question contractuelle."
+      },
+      "2": {
+        "title": "2. Obtenez une orientation claire",
+        "description": "Notre outil identifie le type de contrat, les points d'attention, et vous oriente : relecture assistée, avocat au forfait, ou professionnel réglementé."
+      },
+      "3": {
+        "title": "3. Choisissez votre niveau de sécurité",
+        "description": "Relisez les modifications proposées vous-même, ou faites-les valider une à une par un avocat inscrit au barreau, sous 24 h."
+      }
+    },
+    "pricingTitle": "Nos formules",
+    "pricingSubtitle": "Des prix fixes, connus avant tout engagement. Prix TTC indicatifs.",
+    "plans": {
+      "aiOnly": {
+        "title": "Relecture assistée",
+        "description": "Modifications proposées en suivi de modifications ; vous acceptez ou rejetez chaque changement."
+      },
+      "aiLawyer": {
+        "title": "Relecture + validation avocat",
+        "description": "Un avocat vérifié relit, valide ou amende chaque modification proposée. Réponse sous 24 h."
+      },
+      "mission": {
+        "title": "Mission avocat au forfait",
+        "description": "Relecture complète, rédaction ou négociation par un avocat, à prix fixe convenu à l'avance."
+      }
+    },
+    "faqTitle": "Questions fréquentes",
+    "faq": {
+      "1": {
+        "question": "AvoSearch remplace-t-il un avocat ?",
+        "answer": "Non. AvoSearch est un outil d'aide documentaire : il vous aide à comprendre votre contrat et à préparer des modifications. Pour un avis sur votre situation, choisissez la formule avec validation par un avocat ou une mission au forfait."
+      },
+      "2": {
+        "question": "Quels documents puis-je faire analyser ?",
+        "answer": "Uniquement des contrats : bail commercial, prestation de services, CGV, partenariat, etc. Les sujets pénaux, familiaux ou contentieux sont hors périmètre : nous vous orientons alors vers le bon professionnel, sans analyse."
+      },
+      "3": {
+        "question": "Qui sont les avocats de la plateforme ?",
+        "answer": "Des avocats inscrits à un barreau français. Chaque profil est vérifié manuellement par notre équipe avant d'obtenir le badge « Vérifié »."
+      },
+      "4": {
+        "question": "Combien ça coûte ?",
+        "answer": "Trois formules à prix fixes, affichés avant tout engagement : relecture assistée, relecture avec validation avocat, ou mission au forfait convenue à l'avance. Aucune facturation à l'heure, aucune surprise."
+      },
+      "5": {
+        "question": "Mes documents sont-ils confidentiels ?",
+        "answer": "Vos documents ne sont accessibles qu'à vous et, si vous le décidez, à l'avocat missionné. Vous pouvez exporter vos données et supprimer votre compte à tout moment."
+      }
+    },
+    "ctaTitle": "Un contrat à signer cette semaine ?",
+    "ctaDescription": "Déposez-le maintenant : vous saurez en quelques minutes s'il peut être ajusté directement ou s'il mérite l'œil d'un avocat.",
+    "ctaButton": "Commencer gratuitement"
+  },
+  "auth": {
+    "layoutDisclaimer": "Plateforme de démonstration — aucune donnée réelle. AvoSearch est un outil d'aide documentaire et ne fournit pas de consultation juridique.",
+    "loginTitle": "Connexion",
+    "loginDescription": "Accédez à votre espace AvoSearch.",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "vous@exemple.fr",
+    "password": "Mot de passe",
+    "signingIn": "Connexion...",
+    "signIn": "Se connecter",
+    "noAccount": "Pas encore de compte ?",
+    "createAccount": "Créer un compte",
+    "registerTitle": "Créer un compte",
+    "registerDescription": "Déposez votre premier contrat en quelques minutes.",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "Camille Martin",
+    "passwordHint": "8 caractères minimum.",
+    "creatingAccount": "Création du compte...",
+    "createMyAccount": "Créer mon compte",
+    "alreadyRegistered": "Déjà inscrit ?",
+    "areYouLawyer": "Vous êtes avocat ?",
+    "lawyerRegistration": "Inscription avocat",
+    "lawyerRegisterTitle": "Inscription avocat",
+    "lawyerRegisterDescription": "Votre profil sera vérifié manuellement par notre équipe avant d'être visible des clients.",
+    "professionalEmail": "Adresse e-mail professionnelle",
+    "lawyerNamePlaceholder": "Me Exemple Sept",
+    "barreau": "Barreau",
+    "city": "Ville d'exercice",
+    "cityPlaceholder": "Paris",
+    "specialties": "Spécialités",
+    "specialtiesPlaceholder": "Baux commerciaux, Droit commercial",
+    "specialtiesHint": "Séparez les spécialités par des virgules.",
+    "validationPriceCents": "Tarif validation (centimes)",
+    "validationPriceHint": "Ex. 7900 = 79 € TTC.",
+    "responseTimeHours": "Délai de réponse (heures)",
+    "bio": "Présentation",
+    "bioPlaceholder": "Votre pratique, vos types de dossiers, votre approche...",
+    "createLawyerAccount": "Créer mon compte avocat",
+    "demoAccountsTitle": "Comptes de démonstration",
+    "demoAccountsList": "client1@avosearch.test · avocat1@avosearch.test · admin@avosearch.test",
+    "demoPassword": "Mot de passe :"
+  },
+  "validation": {
+    "nameTooShort": "Nom trop court",
+    "invalidEmail": "Adresse e-mail invalide",
+    "passwordTooShort": "8 caractères minimum",
+    "barreauRequired": "Barreau requis",
+    "cityRequired": "Ville requise",
+    "specialtyRequired": "Au moins une spécialité",
+    "bioTooShort": "Présentez votre pratique en quelques phrases",
+    "invalidForm": "Formulaire invalide."
+  },
+  "errors": {
+    "invalidCredentials": "E-mail ou mot de passe incorrect.",
+    "emailExists": "Un compte existe déjà avec cette adresse e-mail.",
+    "signInAfterRegister": "Compte créé, mais la connexion a échoué. Connectez-vous manuellement."
+  },
+  "client": {
+    "areaLabel": "Espace client",
+    "footerDisclaimer": "AvoSearch est un outil d'aide documentaire automatisée et ne fournit pas de consultation juridique.",
+    "eyebrow": "Espace client",
+    "greeting": "Bonjour",
+    "greetingName": "Bonjour, {name}",
+    "intro": "Décrivez votre besoin ou déposez votre contrat — nous vous orientons vers la bonne solution.",
+    "recentContracts": "Mes derniers contrats",
+    "documentsEmpty": "Vos documents analysés apparaîtront ici.",
+    "documentsCount": "{count, plural, one {# document} other {# documents}}",
+    "emptyTitle": "Aucun contrat pour le moment",
+    "emptyHint": "Lancez une analyse ci-dessus pour déposer votre premier document.",
+    "uploadedOn": "Déposé le {date}"
+  },
+  "chat": {
+    "title": "Nouvelle analyse",
+    "subtitle": "Conversation guidée avant le triage de votre demande.",
+    "online": "En ligne",
+    "welcome": "Bonjour. Décrivez votre situation contractuelle ou déposez un document — je vous poserai quelques questions avant de vous orienter vers la bonne solution.",
+    "clarification1": "Quel type de contrat est concerné (bail, prestation, NDA…) ? Avez-vous déjà le texte, ou s'agit-il d'une question générale ?",
+    "clarification2": "Quel est l'enjeu principal (montant, durée, clause litigieuse, signature imminente) ? Y a-t-il un acte réglementé en jeu ?",
+    "clarification3": "Souhaitez-vous surtout comprendre le document, le faire relire clause par clause, ou obtenir une validation avocat avant signature ?",
+    "triagePreview": "J'ai assez d'éléments pour lancer le triage. En Phase 1, je vous orienterais vers : relecture assistée, validation avocat, ou orientation vers un professionnel réglementé. Le moteur n'est pas encore connecté.",
+    "placeholder": "Décrivez votre question ou votre contrat…",
+    "send": "Envoyer le message",
+    "attach": "Joindre un contrat"
+  },
+  "lawyer": {
+    "areaLabel": "Espace avocat",
+    "dashboardTitle": "Tableau de bord",
+    "dashboardIntro": "Vos validations, missions et gains — les flux arrivent avec la Phase 3.",
+    "pendingProfileTitle": "Profil en attente de vérification",
+    "pendingProfileDescription": "Notre équipe vérifie manuellement chaque profil. Vous ne recevrez pas de missions tant que votre profil n'est pas vérifié.",
+    "validationsPending": "Validations à traiter",
+    "missionsInProgress": "Missions en cours",
+    "totalEarnings": "Gains cumulés (démo)",
+    "myProfile": "Mon profil",
+    "barreau": "Barreau",
+    "city": "Ville",
+    "validationPrice": "Tarif validation",
+    "responseTime": "Délai de réponse annoncé",
+    "responseTimeHours": "{hours} h",
+    "specialties": "Spécialités"
+  },
+  "admin": {
+    "areaLabel": "Administration",
+    "title": "Vérification des avocats",
+    "pendingCount": "{count, plural, one {# profil en attente} other {# profils en attente}}. Les actions Vérifier / Refuser arrivent avec la Phase 3.",
+    "columns": {
+      "lawyer": "Avocat",
+      "barreau": "Barreau",
+      "specialties": "Spécialités",
+      "validationPrice": "Tarif validation",
+      "status": "Statut"
+    }
+  },
+  "legal": {
+    "draftTitle": "Document de travail",
+    "draftDescription": "À faire valider par un avocat avant mise en production.",
+    "cgu": {
+      "title": "Conditions générales d'utilisation",
+      "sections": {
+        "1": {
+          "title": "1. Objet du service",
+          "body": "AvoSearch est un outil d'aide documentaire appliqué aux contrats et une plateforme de mise en relation avec des avocats inscrits à un barreau français. AvoSearch n'est pas un cabinet d'avocats, ne fournit pas de consultation juridique et ne garantit aucun résultat."
+        },
+        "2": {
+          "title": "2. Périmètre",
+          "body": "Le service couvre exclusivement les questions contractuelles. Les sujets pénaux, familiaux, contentieux ou relevant d'actes réglementés font l'objet d'une simple orientation, sans analyse."
+        },
+        "3": {
+          "title": "3. Rôle des avocats",
+          "body": "Les avocats interviennent en leur nom propre, sous leur responsabilité professionnelle et dans le respect de leur déontologie. Les honoraires des missions sont fixés au forfait et affichés avant tout engagement."
+        },
+        "4": {
+          "title": "4. Comptes et sécurité",
+          "body": "L'utilisateur est responsable de la confidentialité de ses identifiants. Toute utilisation frauduleuse doit être signalée sans délai."
+        },
+        "5": {
+          "title": "5. Contenu utilisateur",
+          "body": "Les documents téléversés restent la propriété de l'utilisateur. Ils ne sont utilisés que pour fournir le service."
+        }
+      }
+    },
+    "mentions": {
+      "title": "Mentions légales",
+      "sections": {
+        "1": {
+          "title": "Éditeur",
+          "body": "AvoSearch (projet de démonstration) — société fictive en cours de constitution. Contact : contact@avosearch.test."
+        },
+        "2": {
+          "title": "Hébergement",
+          "body": "Environnement de développement local — aucun hébergeur de production à ce stade."
+        },
+        "3": {
+          "title": "Nature du service",
+          "body": "AvoSearch est un outil d'aide documentaire et une plateforme de mise en relation. AvoSearch n'est pas un cabinet d'avocats et ne fournit pas de consultation juridique."
+        },
+        "4": {
+          "title": "Propriété intellectuelle",
+          "body": "Les contenus de la plateforme (textes, interface, code) sont protégés. Toute reproduction non autorisée est interdite."
+        }
+      }
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "sections": {
+        "1": {
+          "title": "Données collectées",
+          "body": "Compte (nom, e-mail, mot de passe chiffré), documents téléversés et textes saisis, analyses produites, échanges de messagerie liés aux missions."
+        },
+        "2": {
+          "title": "Finalités",
+          "body": "Fournir le service : analyse documentaire des contrats, mise en relation avec des avocats, suivi des missions. Aucune revente de données, aucune publicité."
+        },
+        "3": {
+          "title": "Sous-traitants",
+          "body": "Le traitement automatisé des textes contractuels s'appuie sur l'API Anthropic. Les documents ne sont pas utilisés pour entraîner des modèles."
+        },
+        "4": {
+          "title": "Vos droits",
+          "body": "Vous pouvez exporter les données de votre compte (format JSON) et supprimer votre compte à tout moment ; la suppression entraîne l'effacement en cascade de vos documents, analyses et messages. Contact : privacy@avosearch.test."
+        },
+        "5": {
+          "title": "Durée de conservation",
+          "body": "Les données sont conservées tant que le compte est actif, puis supprimées à la fermeture du compte."
+        }
+      }
+    }
+  }
+}

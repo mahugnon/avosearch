@@ -1,16 +1,14 @@
-"use client";
-
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Logo } from "@/components/brand/logo";
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
-import { useDictionary } from "@/components/providers/locale-provider";
+import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { signOutAction } from "@/lib/actions/auth";
 
 interface DashboardHeaderProps {
   homeHref: string;
-  area: "client" | "lawyer" | "admin";
+  areaLabel: string;
   userName: string;
 }
 
@@ -21,8 +19,8 @@ function initials(name: string): string {
   return `${parts[0]![0]}${parts[parts.length - 1]![0]}`.toUpperCase();
 }
 
-export function DashboardHeader({ homeHref, area, userName }: DashboardHeaderProps) {
-  const dict = useDictionary();
+export async function DashboardHeader({ homeHref, areaLabel, userName }: DashboardHeaderProps) {
+  const t = await getTranslations("header");
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -32,10 +30,10 @@ export function DashboardHeader({ homeHref, area, userName }: DashboardHeaderPro
             <Logo />
           </Link>
           <span className="hidden h-4 w-px bg-border sm:block" aria-hidden />
-          <span className="hidden text-sm text-muted-foreground sm:inline">{dict.areas[area]}</span>
+          <span className="hidden text-sm text-muted-foreground sm:inline">{areaLabel}</span>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          <LanguageSwitcher />
+          <LocaleSwitcher />
           <div className="hidden items-center gap-2.5 sm:flex">
             <Avatar className="size-7">
               <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
@@ -48,7 +46,7 @@ export function DashboardHeader({ homeHref, area, userName }: DashboardHeaderPro
           </div>
           <form action={signOutAction}>
             <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground">
-              {dict.common.logout}
+              {t("signOut")}
             </Button>
           </form>
         </div>

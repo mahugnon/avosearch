@@ -1,8 +1,8 @@
 "use client";
 
 import { ArrowUp, Paperclip, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import { useDictionary, useLocale } from "@/components/providers/locale-provider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -29,28 +29,27 @@ function TypingIndicator() {
 }
 
 export function AnalysisChat() {
-  const dict = useDictionary();
-  const locale = useLocale();
+  const t = useTranslations("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [isThinking, setIsThinking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const userTurnRef = useRef(0);
 
+  const clarifications = [t("clarification1"), t("clarification2"), t("clarification3")];
+
   useEffect(() => {
-    setMessages([{ id: "welcome", role: "assistant", content: dict.chat.welcome }]);
+    setMessages([{ id: "welcome", role: "assistant", content: t("welcome") }]);
     userTurnRef.current = 0;
-  }, [locale, dict.chat.welcome]);
+  }, [t]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, isThinking]);
 
   function buildAssistantReply(userTurn: number): string {
-    if (userTurn < dict.chat.clarifications.length) {
-      return dict.chat.clarifications[userTurn]!;
-    }
-    return dict.chat.triagePreview;
+    if (userTurn < clarifications.length) return clarifications[userTurn]!;
+    return t("triagePreview");
   }
 
   function handleSend() {
@@ -88,13 +87,13 @@ export function AnalysisChat() {
             <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Sparkles className="size-3.5" aria-hidden />
             </div>
-            <h2 className="text-base font-semibold tracking-tight">{dict.chat.title}</h2>
+            <h2 className="text-base font-semibold tracking-tight">{t("title")}</h2>
           </div>
-          <p className="text-sm text-muted-foreground">{dict.chat.subtitle}</p>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
         <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-700">
           <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden />
-          {dict.chat.online}
+          {t("online")}
         </div>
       </header>
 
@@ -135,7 +134,7 @@ export function AnalysisChat() {
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={dict.chat.placeholder}
+            placeholder={t("placeholder")}
             rows={1}
             disabled={isThinking}
             className="min-h-10 flex-1 resize-none border-0 bg-transparent px-2 py-2 shadow-none focus-visible:ring-0"
@@ -146,7 +145,7 @@ export function AnalysisChat() {
             className="size-9 shrink-0 rounded-lg"
             onClick={handleSend}
             disabled={!draft.trim() || isThinking}
-            aria-label={dict.chat.send}
+            aria-label={t("send")}
           >
             <ArrowUp />
           </Button>
@@ -160,7 +159,7 @@ export function AnalysisChat() {
             className="h-8 gap-1.5 text-muted-foreground"
           >
             <Paperclip className="size-3.5" />
-            {dict.chat.attach}
+            {t("attach")}
           </Button>
         </div>
       </footer>

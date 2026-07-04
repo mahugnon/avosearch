@@ -1,10 +1,9 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Logo } from "@/components/brand/logo";
-import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
-import { getDictionary } from "@/lib/i18n/get-dictionary";
-import { getLocale } from "@/lib/i18n/get-locale";
 
 const ROLE_HOME = {
   CLIENT: "/app",
@@ -13,9 +12,8 @@ const ROLE_HOME = {
 } as const;
 
 export async function SiteHeader() {
+  const t = await getTranslations("header");
   const session = await auth();
-  const locale = await getLocale();
-  const dict = getDictionary(locale);
   const homeHref = session ? ROLE_HOME[session.user.role] : null;
 
   return (
@@ -26,28 +24,28 @@ export async function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <Link href="/#comment-ca-marche" className="transition-colors hover:text-foreground">
-            {dict.landing.navHow}
+            {t("howItWorks")}
           </Link>
           <Link href="/#tarifs" className="transition-colors hover:text-foreground">
-            {dict.landing.navPricing}
+            {t("pricing")}
           </Link>
           <Link href="/#faq" className="transition-colors hover:text-foreground">
-            {dict.landing.navFaq}
+            {t("faq")}
           </Link>
         </nav>
         <div className="flex items-center gap-2">
-          <LanguageSwitcher />
+          <LocaleSwitcher />
           {homeHref ? (
             <Button asChild size="sm">
-              <Link href={homeHref}>{dict.common.mySpace}</Link>
+              <Link href={homeHref}>{t("mySpace")}</Link>
             </Button>
           ) : (
             <>
               <Button asChild variant="ghost" size="sm">
-                <Link href="/login">{dict.common.signIn}</Link>
+                <Link href="/login">{t("signIn")}</Link>
               </Button>
               <Button asChild size="sm">
-                <Link href="/register">{dict.common.signUp}</Link>
+                <Link href="/register">{t("signUp")}</Link>
               </Button>
             </>
           )}

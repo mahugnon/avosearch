@@ -1,5 +1,8 @@
 // Default pricing, configurable via env. All amounts in cents, TTC.
 
+import type { AppLocale } from "@/lib/i18n";
+import { intlLocale } from "@/lib/i18n";
+
 function intFromEnv(name: string, fallback: number): number {
   const raw = process.env[name];
   if (!raw) return fallback;
@@ -17,8 +20,8 @@ export const pricing = {
   missionMaxCents: intFromEnv("PRICE_MISSION_MAX_CENTS", 50000),
 };
 
-export function formatEuros(cents: number): string {
-  return new Intl.NumberFormat("fr-FR", {
+export function formatEuros(cents: number, locale: AppLocale = "fr"): string {
+  return new Intl.NumberFormat(intlLocale(locale), {
     style: "currency",
     currency: "EUR",
     minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
