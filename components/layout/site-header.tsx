@@ -10,7 +10,8 @@ const ROLE_HOME = {
 
 export async function SiteHeader() {
   const session = await auth();
-  const homeHref = session ? ROLE_HOME[session.user.role] : null;
+  const role = session?.user?.role;
+  const homeHref = role ? ROLE_HOME[role] : null;
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
