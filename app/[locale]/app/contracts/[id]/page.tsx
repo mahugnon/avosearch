@@ -1,6 +1,8 @@
+import { ContractDraftStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
 import { AnalyzeContract } from "@/components/contracts/analyze-contract";
+import { ContractViewer } from "@/components/contracts/contract-viewer";
 import type { TriageViewData } from "@/components/contracts/triage-result";
 import { runContractTriage, TriageError } from "@/lib/ai/triage";
 import { Button } from "@/components/ui/button";
@@ -23,6 +25,10 @@ export default async function ContractDetailPage({ params, searchParams }: Props
   const { analyze } = await searchParams;
   const { contract } = await requireClientContract(id);
   const t = await getTranslations("contracts");
+
+  if (contract.draftStatus === ContractDraftStatus.IN_PROGRESS) {
+    redirect({ href: "/app", locale });
+  }
 
   let analyzeError: string | null = null;
   let outOfScope: TriageViewData | null = null;
@@ -96,6 +102,14 @@ export default async function ContractDetailPage({ params, searchParams }: Props
           )}
         </div>
       </div>
+
+      {contract.extractedText.trim() && (
+        <ContractViewer
+          title={t("documentPreview")}
+          body={contract.extractedText}
+          contractId={contract.id}
+        />
+      )}
 
       <AnalyzeContract
         contractId={contract.id}

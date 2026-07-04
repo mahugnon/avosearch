@@ -14,7 +14,7 @@ export async function requireClientContract(contractId: string) {
 
   const contract = await prisma.contract.findUnique({
     where: { id: contractId },
-    include: { analysis: true },
+    include: { analysis: true, template: true },
   });
 
   if (!contract || contract.ownerId !== session.user.id) {

@@ -1,7 +1,7 @@
 "use server";
 
 import { randomUUID } from "crypto";
-import { auth } from "@/lib/auth";
+import { ContractDraftStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import {
   extractTextFromBuffer,
@@ -9,6 +9,8 @@ import {
   titleFromFilename,
   titleFromQuestion,
 } from "@/lib/extract/text";
+import { findTemplateForDraftQuestion } from "@/lib/actions/draft";
+import { getClientSession } from "@/lib/auth/client-session";
 import { localizedPath, type AppLocale } from "@/lib/i18n";
 import { storage } from "@/lib/storage";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -22,19 +24,36 @@ export async function createContractAction(
   _prev: CreateContractState,
   formData: FormData
 ): Promise<CreateContractState> {
-  const session = await auth();
   const locale = (await getLocale()) as AppLocale;
   const t = await getTranslations("contracts.errors");
 
-  if (!session || session.user.role !== "CLIENT") {
-    return { error: t("unauthorized") };
+  const session = await getClientSession();
+  if (!session.ok) {
+    return { error: t(session.reason) };
   }
 
   const userQuestion = String(formData.get("userQuestion") ?? "").trim();
   const file = formData.get("file");
+  const hasFile = file instanceof File && file.size > 0;
 
-  if (!userQuestion && !(file instanceof File && file.size > 0)) {
+  if (!userQuestion && !hasFile) {
     return { error: t("missingInput") };
+  }
+
+  const templateMatch = await findTemplateForDraftQuestion(userQuestion, hasFile);
+  if (templateMatch) {
+    const contract = await prisma.contract.create({
+      data: {
+        ownerId: session.userId,
+        title: templateMatch.title,
+        extractedText: "",
+        userQuestion: userQuestion || null,
+        templateId: templateMatch.id,
+        draftAnswers: {},
+        draftStatus: ContractDraftStatus.IN_PROGRESS,
+      },
+    });
+    redirect(localizedPath(`/app/contracts/${contract.id}/draft`, locale));
   }
 
   let extractedText = userQuestion;
@@ -42,7 +61,7 @@ export async function createContractAction(
   let mimeType: string | undefined;
   let title = userQuestion ? titleFromQuestion(userQuestion) : "Contrat";
 
-  if (file instanceof File && file.size > 0) {
+  if (hasFile) {
     if (file.size > MAX_FILE_BYTES) {
       return { error: t("fileTooLarge") };
     }
@@ -60,7 +79,7 @@ export async function createContractAction(
       return { error: t("extractionFailed") };
     }
 
-    const storageKey = `contracts/${session.user.id}/${randomUUID()}-${file.name}`;
+    const storageKey = `contracts/${session.userId}/${randomUUID()}-${file.name}`;
     await storage.save(storageKey, buffer, file.type);
     fileUrl = storageKey;
     mimeType = file.type;
@@ -76,7 +95,7 @@ export async function createContractAction(
 
   const contract = await prisma.contract.create({
     data: {
-      ownerId: session.user.id,
+      ownerId: session.userId,
       title,
       extractedText,
       userQuestion: userQuestion || null,

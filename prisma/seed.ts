@@ -1,5 +1,11 @@
 import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import {
+  NDA_SITE_WEB_BODY,
+  NDA_SITE_WEB_STEPS,
+  PRESTATION_BODY,
+  PRESTATION_STEPS,
+} from "../lib/templates/catalog";
 
 const prisma = new PrismaClient();
 
@@ -77,6 +83,7 @@ async function main() {
   await prisma.modification.deleteMany();
   await prisma.analysis.deleteMany();
   await prisma.contract.deleteMany();
+  await prisma.contractTemplate.deleteMany();
   await prisma.lawyerProfile.deleteMany();
   await prisma.user.deleteMany();
 
@@ -209,6 +216,31 @@ async function main() {
     });
   }
 
+  await prisma.contractTemplate.createMany({
+    data: [
+      {
+        slug: "nda-site-web",
+        title: "Accord de confidentialité (NDA) — site web",
+        description:
+          "Modèle d'accord de confidentialité pour protéger les informations liées à un site web ou une activité en ligne.",
+        domain: "confidentialité / NDA",
+        tags: ["nda", "confidentialité", "site web", "internet", "saas"],
+        body: NDA_SITE_WEB_BODY,
+        steps: NDA_SITE_WEB_STEPS,
+      },
+      {
+        slug: "prestation-services",
+        title: "Contrat de prestation de services",
+        description:
+          "Modèle de contrat entre un client et un prestataire freelance ou TPE.",
+        domain: "prestation de services",
+        tags: ["prestation", "services", "freelance", "développement"],
+        body: PRESTATION_BODY,
+        steps: PRESTATION_STEPS,
+      },
+    ],
+  });
+
   await prisma.contract.create({
     data: {
       ownerId: client1.id,
@@ -264,7 +296,7 @@ async function main() {
   });
 
   console.log("Seed completed:");
-  console.log("  1 admin, 2 clients, 6 lawyers (4 verified, 2 pending), 2 contracts");
+  console.log("  1 admin, 2 clients, 6 lawyers (4 verified, 2 pending), 2 contracts, 2 templates");
   console.log(`  All demo accounts use password: ${DEMO_PASSWORD}`);
 }
 
