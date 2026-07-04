@@ -1,0 +1,76 @@
+CONFIDENTIALITY AGREEMENT - NDA
+
+BETWEEN:
+
+{{PARTY_A_NAME}}, with share capital of {{PARTY_A_CAPITAL}} euros, whose registered office is located at {{PARTY_A_ADDRESS}}, and registered with the Trade and Companies Register of {{PARTY_A_RCS_CITY}} under number {{PARTY_A_RCS_NUMBER}}, represented by {{PARTY_A_REPRESENTATIVE}}, duly authorized for the purposes hereof (hereinafter "{{PARTY_A_SHORT_NAME}}"),
+
+ON THE ONE PART,
+
+AND:
+
+{{PARTY_B_NAME}}, with share capital of {{PARTY_B_CAPITAL}} euros, whose registered office is located at {{PARTY_B_ADDRESS}}, and registered with the Trade and Companies Register of {{PARTY_B_RCS_CITY}} under number {{PARTY_B_RCS_NUMBER}}, represented by {{PARTY_B_REPRESENTATIVE}}, duly authorized for the purposes hereof (hereinafter "{{PARTY_B_SHORT_NAME}}"),
+
+ON THE OTHER PART,
+
+Hereinafter individually referred to as a "Party" and collectively as the "Parties".
+
+Each Party wishes to ensure the strict confidentiality of information communicated to the other Party and has agreed to be bound by this confidentiality agreement (hereinafter the "Confidentiality Agreement") on the terms set out below.
+
+WHEREAS:
+
+{{PARTY_A_SHORT_NAME}} wishes to develop {{PROJECT_DESCRIPTION}} (hereinafter the "Project").
+
+In the course of discussions relating to the Project, it may become desirable or necessary for the Parties to exchange certain technical, commercial or financial information of a confidential nature held by each of them, hereinafter referred to as "Confidential Information" and more precisely defined below.
+
+The Parties wish to set the conditions for the transmission of such Confidential Information and to establish rules relating to its use and protection.
+
+THE PARTIES HAVE AGREED AS FOLLOWS:
+
+1. For the purposes of this agreement, the term "Confidential Information" covers {{CONFIDENTIAL_INFO_DEFINITION}} during the term of this agreement.
+
+Information shall be treated as confidential whether or not it is marked "confidential" or with any similar wording, or whether no such wording appears on notes, studies, analyses or any other document.
+
+2. Each Party, to the extent it is authorized to do so, shall transmit to the other Party only such Confidential Information as the transmitting Party deems necessary for the pursuit of the objective described in the preamble to this agreement.
+
+Nothing in this agreement shall be construed as obliging either Party to transmit Confidential Information to the other Party or to enter into a contractual relationship with the other Party in the future.
+
+3. The Party receiving Confidential Information undertakes, for a period of {{CONFIDENTIALITY_YEARS}} years from the signature of this agreement, that such Confidential Information shall:
+a. be protected and kept strictly confidential and treated with the same degree of care and protection as it accords to its own Confidential Information of similar importance;
+b. not be used, in whole or in part, for any purpose other than that defined in the preamble above;
+c. not be disclosed or made available, directly or indirectly, to any third party or to any persons other than those mentioned in Article 5 below;
+d. not be copied, reproduced or duplicated in whole or in part unless such copying, reproduction or duplication has been authorized in writing by the Party from which they originate.
+
+4. The Party receiving Confidential Information shall not be subject to any restriction on its use or disclosure if it can prove that:
+a. it entered the public domain prior to its disclosure or thereafter, provided that such entry was not attributable to any fault on its part;
+b. it was already known to it, such prior knowledge being demonstrable by appropriate documents in its files;
+c. it was lawfully received from a third party without restriction and without breach of this agreement;
+d. its use or disclosure was authorized in writing by the Party from which it originates; or
+e. it is the result of internal developments undertaken in good faith by members of its staff who had no access to such Confidential Information.
+
+5. Each Party shall be authorized to disclose Confidential Information to members of its staff who need to know {{AUTHORIZED_PERSONNEL}} in connection with the purpose mentioned in the preamble to this agreement.
+
+6. All Confidential Information and copies thereof transmitted by either Party shall remain the property of the Party that disclosed them. The transmission of Confidential Information between the Parties under this agreement shall in no event be construed as granting the receiving Party a license to use or as transferring any property right in such Confidential Information. Accordingly, all intellectual property rights that may attach to Confidential Information shall remain the exclusive property of the disclosing Party.
+
+7. Upon expiry or termination of this agreement, Confidential Information shall either be returned to the Party from which it originated or destroyed, such destruction being confirmed in writing by the Party that received it, at the option of the Party from which such Confidential Information originates.
+
+8. This agreement may be terminated by either Party at any time, without formality, upon {{TERMINATION_NOTICE}} notice given to the other Party.
+
+9. Unless terminated as provided in Article 8 above, this agreement is entered into for a term of {{AGREEMENT_DURATION}} from its effective date, as stated in Article 14 below.
+
+10. Notwithstanding the provisions of paragraphs 7, 8 and 9 above, expiry or termination of this agreement shall not release the Party receiving Confidential Information from its obligation to comply with the provisions of paragraph 3 concerning the use and protection of Confidential Information received before the date of termination or expiry; the obligations contained in those provisions shall remain in force for the period defined in said paragraph.
+
+11. This agreement is governed by French law.
+
+12. Any dispute relating to this agreement shall fall within the jurisdiction of the courts of {{DISPUTE_JURISDICTION}}.
+
+13. The entirety of the provisions hereof constitutes the entire agreement between the Parties with respect to its subject matter and supersedes and cancels all prior statements, negotiations, commitments, oral or written communications, acceptances, understandings and agreements between the Parties relating to the matters covered hereby.
+
+14. This agreement enters into force on the date of signature by the Parties.
+
+Done at {{SIGNATURE_CITY}}, on __________________
+in {{SIGNATURE_COPIES}} original copies.
+
+{{SIGNATURE_PARTY_A_NAME}}                    {{SIGNATURE_PARTY_B_NAME}}
+Date:                                         Date:
+Signature:                                    Signature:
+_______________________                       _______________________

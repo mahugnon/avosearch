@@ -4,10 +4,10 @@ const OUT_OF_SCOPE_PATTERN =
   /p[ée]nal|divorce|succession|garde d'enfant|custody|criminal|family law/i;
 
 const HIGH_STAKES_PATTERN =
-  /caution personnelle|cession|exclusivit[ée]|renonciation|propri[ée]t[ée] intellectuelle|responsabilit[ée].*plafonn|p[ée]nalit[ée]/i;
+  /caution personnelle|personal guarantee|cession|exclusivit[ée]|exclusivity|renonciation|waiver|propri[ée]t[ée] intellectuelle|intellectual property|responsabilit[ée].*plafonn|liability.*cap|p[ée]nalit[ée]|penalt/i;
 
 const REGULATED_ACT_PATTERN =
-  /vente immobili[èe]re|donation|contrat de mariage|acte authentique|notaire obligatoire/i;
+  /vente immobili[èe]re|real estate sale|donation|contrat de mariage|marriage contract|acte authentique|notaire obligatoire|notary required/i;
 
 export function runDemoTriage(input: {
   extractedText: string;
@@ -19,10 +19,10 @@ export function runDemoTriage(input: {
     return {
       triage: "ACTE_REGLEMENTE",
       confidence: 0,
-      domain: "hors périmètre contractuel",
+      domain: "outside contract scope",
       justification:
-        "Ce sujet sort du périmètre contractuel d'AvoSearch. Consultez directement un avocat spécialisé dans le domaine concerné.",
-      flags: ["hors périmètre contractuel"],
+        "This topic is outside AvoSearch's contract scope. Please consult a specialized lawyer directly.",
+      flags: ["outside contract scope"],
       required_pro: "AVOCAT",
     };
   }
@@ -31,37 +31,37 @@ export function runDemoTriage(input: {
     return {
       triage: "ACTE_REGLEMENTE",
       confidence: 0.9,
-      domain: "acte réglementé",
+      domain: "regulated act",
       justification:
-        "Ce type d'acte requiert généralement l'intervention d'un professionnel réglementé (avocat ou notaire). AvoSearch vous oriente sans analyser le fond en mode automatisé.",
-      flags: ["acte nécessitant un professionnel réglementé"],
-      required_pro: /notaire|acte authentique|donation|mariage/i.test(combined)
+        "This type of act generally requires a regulated professional (lawyer or notary). AvoSearch will guide you without automated substantive analysis.",
+      flags: ["act requiring a regulated professional"],
+      required_pro: /notaire|notary|acte authentique|donation|mariage|marriage/i.test(combined)
         ? "NOTAIRE"
         : "AVOCAT",
     };
   }
 
   const flags: string[] = [];
-  if (/d[ée]p[ôo]t de garantie.*6|six \(6\) mois/i.test(combined)) {
-    flags.push("dépôt de garantie élevé (6 mois)");
+  if (/d[ée]p[ôo]t de garantie.*6|security deposit.*6|six \(6\) months/i.test(combined)) {
+    flags.push("high security deposit (6 months)");
   }
-  if (/renonciation.*r[ée]siliation triennale/i.test(combined)) {
-    flags.push("renonciation à la résiliation triennale");
+  if (/renonciation.*r[ée]siliation triennale|waiver.*triennial|triennial termination/i.test(combined)) {
+    flags.push("waiver of triennial termination");
   }
-  if (/cession.*agrement|agrement.*cession/i.test(combined)) {
-    flags.push("cession soumise à agrément");
+  if (/cession.*agrement|agrement.*cession|assignment.*consent|consent.*assignment/i.test(combined)) {
+    flags.push("assignment subject to approval");
   }
-  if (/propri[ée]t[ée].*prestataire|prestataire.*propri[ée]t[ée]/i.test(combined)) {
-    flags.push("propriété intellectuelle conservée par le prestataire");
+  if (/propri[ée]t[ée].*prestataire|prestataire.*propri[ée]t[ée]|provider.*intellectual|intellectual.*provider/i.test(combined)) {
+    flags.push("intellectual property retained by provider");
   }
-  if (/responsabilit[ée].*10 %|plafonn[ée].*10/i.test(combined)) {
-    flags.push("plafond de responsabilité très bas");
+  if (/responsabilit[ée].*10 %|plafonn[ée].*10|liability.*10 %|capped at 10/i.test(combined)) {
+    flags.push("very low liability cap");
   }
-  if (/p[ée]nalit[ée].*15 %|15 %.*retard/i.test(combined)) {
-    flags.push("pénalités de retard élevées");
+  if (/p[ée]nalit[ée].*15 %|15 %.*retard|penalty.*15 %|15 %.*late/i.test(combined)) {
+    flags.push("high late payment penalties");
   }
-  if (/non-sollicitation|non concurrence/i.test(combined)) {
-    flags.push("clause de non-sollicitation ou non-concurrence");
+  if (/non-sollicitation|non concurrence|non-solicitation|non-compete/i.test(combined)) {
+    flags.push("non-solicitation or non-compete clause");
   }
 
   const highStakes = HIGH_STAKES_PATTERN.test(combined) || flags.length >= 3;
@@ -72,8 +72,8 @@ export function runDemoTriage(input: {
       confidence: 0.85,
       domain: detectDomain(combined),
       justification:
-        "Plusieurs clauses méritent attention et l'enjeu du contrat justifie l'accompagnement d'un avocat pour renégocier ou sécuriser vos intérêts.",
-      flags: flags.length > 0 ? flags : ["clauses déséquilibrées ou atypiques"],
+        "Several clauses deserve attention and the contract stakes justify lawyer support to renegotiate or protect your interests.",
+      flags: flags.length > 0 ? flags : ["unbalanced or atypical clauses"],
       required_pro: "AVOCAT",
     };
   }
@@ -83,18 +83,22 @@ export function runDemoTriage(input: {
     confidence: 0.78,
     domain: detectDomain(combined),
     justification:
-      "Il s'agit d'un contrat relativement standard. Des ajustements ciblés peuvent être proposés en suivi de modifications, sous réserve de votre situation.",
-    flags: flags.length > 0 ? flags : ["quelques points à vérifier"],
+      "This is a relatively standard contract. Targeted adjustments may be proposed in follow-up modifications, depending on your situation.",
+    flags: flags.length > 0 ? flags : ["a few points to verify"],
     required_pro: null,
   };
 }
 
 function detectDomain(text: string): string {
-  if (/bail|locataire|preneur|loyer/i.test(text)) return "bail commercial";
-  if (/prestation|prestataire|d[ée]veloppement|services/i.test(text)) {
-    return "prestation de services";
+  if (/bail|locataire|preneur|loyer|commercial lease|landlord|tenant|rent/i.test(text)) {
+    return "commercial lease";
   }
-  if (/cgv|conditions g[ée]n[ée]rales/i.test(text)) return "conditions générales de vente";
-  if (/partenariat|nda|confidentialit[ée]/i.test(text)) return "contrat de partenariat";
-  return "contrat";
+  if (/prestation|prestataire|d[ée]veloppement|services agreement|provider|freelance/i.test(text)) {
+    return "services agreement";
+  }
+  if (/cgv|conditions g[ée]n[ée]rales|terms of sale/i.test(text)) return "terms of sale";
+  if (/partenariat|partnership|nda|confidentialit[ée]|confidentiality/i.test(text)) {
+    return "partnership agreement";
+  }
+  return "contract";
 }

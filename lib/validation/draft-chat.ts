@@ -33,6 +33,17 @@ export function parseDraftTurnJson(raw: string): DraftTurnResponse {
   return draftTurnResponseSchema.parse(extractJson(raw));
 }
 
+export const draftFollowUpResponseSchema = z.object({
+  assistant_message: z.string().min(1).max(3000),
+  updated_body: z.string().max(120_000).optional(),
+});
+
+export type DraftFollowUpResponse = z.infer<typeof draftFollowUpResponseSchema>;
+
+export function parseDraftFollowUpJson(raw: string): DraftFollowUpResponse {
+  return draftFollowUpResponseSchema.parse(extractJson(raw));
+}
+
 export function isDraftChatParseError(error: unknown): boolean {
   return error instanceof z.ZodError || error instanceof SyntaxError;
 }

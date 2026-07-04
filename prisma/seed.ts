@@ -1,81 +1,133 @@
 import { PrismaClient, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import {
-  NDA_SITE_WEB_BODY,
-  NDA_SITE_WEB_DRAFT_GUIDE,
-  PRESTATION_BODY,
-  PRESTATION_DRAFT_GUIDE,
-} from "../lib/templates/catalog";
+import { promises as fs } from "fs";
+import path from "path";
+import { ALLOWED_MIME_TYPES } from "../lib/extract/text";
+import { extractPlaceholdersFromBuffer } from "../lib/templates/load";
+import { storage } from "../lib/storage";
 
 const prisma = new PrismaClient();
 
 const DEMO_PASSWORD = "demo1234";
 
+const SEED_TEMPLATES_DIR = path.join(process.cwd(), "seeds/templates");
+
+const SEED_TEMPLATES = [
+  {
+    slug: "nda-bilateral",
+    title: "Confidentiality agreement (NDA) — bilateral",
+    description:
+      "Professional bilateral NDA between two companies, with source file and variables filled in conversation.",
+    domain: "confidentiality / NDA",
+    tags: ["nda", "confidentiality", "bilateral", "company", "project", "demo"],
+    fileName: "nda-bilateral.txt",
+    draftGuide: `Bilateral NDA between two companies. Collect Party A then Party B details, project description, confidentiality terms, then signature block. Demo: TechVision SAS (Paris) and Innovate Lab SARL (Lyon).`,
+  },
+  {
+    slug: "nda-site-web",
+    title: "Confidentiality agreement (NDA) — website",
+    description: "NDA template to protect information related to a website or online activity.",
+    domain: "confidentiality / NDA",
+    tags: ["nda", "confidentiality", "website", "internet", "saas"],
+    fileName: "nda-site-web.txt",
+    draftGuide: "Website NDA — collect the parties, URL, and term.",
+  },
+  {
+    slug: "prestation-services",
+    title: "Services agreement",
+    description: "Template agreement between a client and a freelancer or small business.",
+    domain: "services",
+    tags: ["services", "freelance", "development", "consulting"],
+    fileName: "prestation-services.txt",
+    draftGuide: "Services agreement — client, provider, description, price and term.",
+  },
+] as const;
+
+async function seedTemplateFile(input: (typeof SEED_TEMPLATES)[number]) {
+  const buffer = await fs.readFile(path.join(SEED_TEMPLATES_DIR, input.fileName));
+  const fileKey = `templates/${input.slug}/${input.fileName}`;
+  const { placeholders } = await extractPlaceholdersFromBuffer(buffer, ALLOWED_MIME_TYPES.txt);
+  await storage.save(fileKey, buffer);
+
+  return {
+    slug: input.slug,
+    title: input.title,
+    description: input.description,
+    domain: input.domain,
+    tags: [...input.tags],
+    draftGuide: input.draftGuide,
+    fileKey,
+    fileName: input.fileName,
+    mimeType: ALLOWED_MIME_TYPES.txt,
+    placeholders,
+  };
+}
+
 function lawyerPhoto(seed: string) {
   return `https://api.dicebear.com/9.x/personas/png?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
 }
 
-const BAIL_COMMERCIAL_TEXT = `BAIL COMMERCIAL
+const BAIL_COMMERCIAL_TEXT = `COMMERCIAL LEASE
 
-Entre les soussignés :
-La SCI Exemple Immobilier, dont le siège social est situé 10 rue de la Démonstration, 75011 Paris, représentée par M. Bailleur Fictif, ci-après dénommée « le Bailleur »,
-et
-La SARL Boutique Démo, dont le siège social est situé 12 rue de la Démonstration, 75011 Paris, représentée par Mme Preneuse Fictive, ci-après dénommée « le Preneur ».
+Between:
+Demo Property SCI, whose registered office is located at 10 Demo Street, 75011 Paris, represented by Mr. Demo Landlord, hereinafter the "Landlord",
+and
+Demo Boutique SARL, whose registered office is located at 12 Demo Street, 75011 Paris, represented by Ms. Demo Tenant, hereinafter the "Tenant".
 
-Article 1 — Désignation
-Le Bailleur donne à bail au Preneur un local commercial d'une surface d'environ 45 m² situé au rez-de-chaussée du 12 rue de la Démonstration, 75011 Paris.
+Article 1 — Premises
+The Landlord leases to the Tenant commercial premises of approximately 45 sqm located on the ground floor of 12 Demo Street, 75011 Paris.
 
-Article 2 — Durée
-Le présent bail est consenti pour une durée de neuf (9) années entières et consécutives à compter du 1er septembre 2026. Le Preneur renonce expressément à sa faculté de résiliation triennale.
+Article 2 — Term
+This lease is granted for nine (9) full consecutive years starting 1 September 2026. The Tenant expressly waives the right to terminate the lease at the end of each three-year period.
 
-Article 3 — Loyer
-Le loyer annuel est fixé à la somme de 24 000 euros hors taxes et hors charges, payable trimestriellement d'avance. Le loyer sera indexé chaque année sur l'indice des loyers commerciaux (ILC), sans que cette indexation puisse jouer à la baisse.
+Article 3 — Rent
+Annual rent is set at EUR 24,000 excluding tax and service charges, payable quarterly in advance. Rent shall be indexed each year based on the commercial rent index (ILC), without any downward adjustment.
 
-Article 4 — Dépôt de garantie
-Le Preneur verse ce jour un dépôt de garantie égal à six (6) mois de loyer hors taxes, non productif d'intérêts.
+Article 4 — Security deposit
+The Tenant pays today a security deposit equal to six (6) months' rent excluding tax, non-interest bearing.
 
-Article 5 — Charges et travaux
-Le Preneur supportera l'intégralité des charges, impôts, taxes et redevances liés au local, y compris la taxe foncière et les grosses réparations relevant de l'article 606 du Code civil.
+Article 5 — Charges and works
+The Tenant shall bear all charges, taxes, levies and fees relating to the premises, including property tax and major repairs under Article 606 of the French Civil Code.
 
-Article 6 — Destination
-Les locaux sont destinés exclusivement à une activité de vente de prêt-à-porter. Toute activité connexe ou complémentaire est interdite sans l'accord écrit préalable du Bailleur.
+Article 6 — Use
+The premises are exclusively for retail clothing sales. Any related or ancillary activity is prohibited without the Landlord's prior written consent.
 
-Article 7 — Cession et sous-location
-Toute cession du droit au bail est soumise à l'agrément préalable et discrétionnaire du Bailleur. La sous-location, totale ou partielle, est strictement interdite.
+Article 7 — Assignment and subletting
+Any assignment of the lease requires the Landlord's prior and discretionary approval. Subletting, in whole or in part, is strictly prohibited.
 
-Article 8 — Clause résolutoire
-À défaut de paiement d'un seul terme de loyer à son échéance, et huit (8) jours après un simple commandement de payer demeuré infructueux, le bail sera résilié de plein droit.`;
+Article 8 — Forfeiture clause
+Failure to pay any rent installment when due, and eight (8) days after a formal demand to pay remains unsuccessful, shall result in automatic termination of the lease.`;
 
-const PRESTATION_TEXT = `CONTRAT DE PRESTATION DE SERVICES
+const PRESTATION_TEXT = `SERVICES AGREEMENT
 
-Entre :
-La SASU Studio Démo Web, immatriculée au RCS de Lyon sous le numéro 000 000 000, représentée par M. Prestataire Fictif, ci-après « le Prestataire »,
-et
-La SARL Client Exemple, immatriculée au RCS de Lyon sous le numéro 111 111 111, représentée par Mme Cliente Fictive, ci-après « le Client ».
+Between:
+Demo Web Studio SASU, registered with the Lyon Trade Register under number 000 000 000, represented by Mr. Demo Provider, hereinafter the "Provider",
+and
+Example Client SARL, registered with the Lyon Trade Register under number 111 111 111, represented by Ms. Demo Client, hereinafter the "Client".
 
-Article 1 — Objet
-Le Prestataire s'engage à concevoir et développer pour le Client un site internet de commerce électronique, conformément au cahier des charges annexé au présent contrat.
+Article 1 — Purpose
+The Provider agrees to design and develop an e-commerce website for the Client in accordance with the specifications annexed to this agreement.
 
-Article 2 — Durée et délais
-Le contrat prend effet à sa signature pour une durée de six (6) mois. Les délais de livraison sont donnés à titre purement indicatif et ne sauraient engager le Prestataire.
+Article 2 — Term and deadlines
+This agreement takes effect upon signature for six (6) months. Delivery timelines are indicative only and do not bind the Provider.
 
-Article 3 — Prix et paiement
-Le prix global et forfaitaire est fixé à 18 000 euros hors taxes, payable comme suit : 50 % à la commande, 50 % à la livraison. Tout retard de paiement entraînera une pénalité égale à 15 % du montant total du contrat par mois de retard.
+Article 3 — Price and payment
+The fixed price is EUR 18,000 excluding tax, payable as follows: 50% on order, 50% on delivery. Any late payment shall incur a penalty equal to 15% of the total contract amount per month of delay.
 
-Article 4 — Propriété intellectuelle
-L'ensemble des développements, codes sources, maquettes et créations réalisés dans le cadre du présent contrat demeure la propriété exclusive du Prestataire. Le Client bénéficie d'un simple droit d'usage, non exclusif et non cessible, pour ses besoins internes.
+Article 4 — Intellectual property
+All developments, source code, designs and creations made under this agreement remain the exclusive property of the Provider. The Client receives only a non-exclusive, non-transferable right of use for internal needs.
 
-Article 5 — Responsabilité
-La responsabilité du Prestataire, toutes causes confondues, est plafonnée à 10 % des sommes effectivement versées par le Client. Le Prestataire ne pourra en aucun cas être tenu responsable des dommages indirects, pertes de données ou pertes d'exploitation.
+Article 5 — Liability
+The Provider's liability, for any cause whatsoever, is capped at 10% of amounts actually paid by the Client. The Provider shall not be liable for indirect damages, data loss or loss of business.
 
-Article 6 — Résiliation
-Le Client ne pourra résilier le contrat qu'en cas de faute lourde du Prestataire, après mise en demeure restée sans effet pendant soixante (60) jours. En cas de résiliation, les sommes versées restent acquises au Prestataire.
+Article 6 — Termination
+The Client may terminate only for gross misconduct by the Provider, after a formal notice remains without effect for sixty (60) days. Amounts paid remain due to the Provider upon termination.
 
-Article 7 — Non-sollicitation
-Le Client s'interdit, pendant la durée du contrat et pendant trois (3) années suivant son terme, d'embaucher ou de solliciter directement ou indirectement tout collaborateur du Prestataire, sous peine d'une indemnité égale à douze (12) mois de salaire brut du collaborateur concerné.
+Article 7 — Non-solicitation
+The Client shall not, during the term and for three (3) years thereafter, hire or solicit any employee of the Provider, under penalty of an indemnity equal to twelve (12) months' gross salary of the employee concerned.
 
-Article 8 — Droit applicable
-Le présent contrat est soumis au droit français. Tout litige relève de la compétence exclusive du tribunal de commerce de Lyon.`;
+Article 8 — Governing law
+This agreement is governed by French law. Any dispute shall fall within the exclusive jurisdiction of the Lyon Commercial Court.`;
 
 async function main() {
   console.log("Seeding database...");
@@ -97,7 +149,7 @@ async function main() {
     data: {
       email: "admin@avosearch.test",
       passwordHash,
-      name: "Admin Démo",
+      name: "Demo Admin",
       role: Role.ADMIN,
     },
   });
@@ -123,11 +175,11 @@ async function main() {
   const lawyers = [
     {
       email: "avocat1@avosearch.test",
-      name: "Me Exemple Un",
+      name: "Demo Lawyer One",
       barreau: "Paris",
       city: "Paris",
-      specialties: ["Baux commerciaux", "Droit commercial"],
-      bio: "Avocat fictif du cabinet Démo & Associés. Intervient sur les baux commerciaux et les contrats de distribution. Profil de démonstration.",
+      specialties: ["Commercial leases", "Commercial law"],
+      bio: "Fictional lawyer at Demo & Partners. Works on commercial leases and distribution agreements. Demo profile only.",
       validationPriceCents: 7900,
       hourlyRateCents: 18000,
       flatFees: { RELECTURE: 25000, REDACTION: 40000, NEGOCIATION: 50000 },
@@ -139,11 +191,11 @@ async function main() {
     },
     {
       email: "avocat2@avosearch.test",
-      name: "Me Exemple Deux",
+      name: "Demo Lawyer Two",
       barreau: "Lyon",
       city: "Lyon",
-      specialties: ["Droit des sociétés", "Prestation de services"],
-      bio: "Avocate fictive du cabinet Démo & Associés. Accompagne les TPE et freelances sur leurs contrats du quotidien. Profil de démonstration.",
+      specialties: ["Corporate law", "Services agreements"],
+      bio: "Fictional lawyer at Demo & Partners. Advises small businesses and freelancers on day-to-day contracts. Demo profile only.",
       validationPriceCents: 6900,
       hourlyRateCents: 16000,
       flatFees: { RELECTURE: 20000, REDACTION: 35000, NEGOCIATION: 45000 },
@@ -155,11 +207,11 @@ async function main() {
     },
     {
       email: "avocat3@avosearch.test",
-      name: "Me Exemple Trois",
+      name: "Demo Lawyer Three",
       barreau: "Bordeaux",
       city: "Bordeaux",
-      specialties: ["Droit du travail", "Contrats de freelance"],
-      bio: "Avocat fictif. Spécialisé dans les relations contractuelles entre indépendants et donneurs d'ordre. Profil de démonstration.",
+      specialties: ["Employment law", "Freelance contracts"],
+      bio: "Fictional lawyer specializing in contractual relationships between independents and clients. Demo profile only.",
       validationPriceCents: 7500,
       hourlyRateCents: 17000,
       flatFees: { RELECTURE: 22000, REDACTION: 38000, NEGOCIATION: 48000 },
@@ -171,11 +223,11 @@ async function main() {
     },
     {
       email: "avocat4@avosearch.test",
-      name: "Me Exemple Quatre",
+      name: "Demo Lawyer Four",
       barreau: "Lille",
       city: "Lille",
-      specialties: ["Propriété intellectuelle", "Numérique"],
-      bio: "Avocate fictive. Contrats IT, licences logicielles et prestations numériques. Profil de démonstration.",
+      specialties: ["Intellectual property", "Technology"],
+      bio: "Fictional lawyer. IT contracts, software licenses and digital services. Demo profile only.",
       validationPriceCents: 8900,
       hourlyRateCents: 20000,
       flatFees: { RELECTURE: 28000, REDACTION: 42000, NEGOCIATION: 52000 },
@@ -187,11 +239,11 @@ async function main() {
     },
     {
       email: "avocat5@avosearch.test",
-      name: "Me Exemple Cinq",
+      name: "Demo Lawyer Five",
       barreau: "Marseille",
       city: "Marseille",
-      specialties: ["Droit commercial", "Droit de la consommation"],
-      bio: "Avocat fictif en attente de vérification par l'équipe AvoSearch. Profil de démonstration.",
+      specialties: ["Commercial law", "Consumer law"],
+      bio: "Fictional lawyer pending verification by the AvoSearch team. Demo profile only.",
       validationPriceCents: 5900,
       hourlyRateCents: 14000,
       flatFees: { RELECTURE: 18000, REDACTION: 30000, NEGOCIATION: 40000 },
@@ -202,11 +254,11 @@ async function main() {
     },
     {
       email: "avocat6@avosearch.test",
-      name: "Me Exemple Six",
+      name: "Demo Lawyer Six",
       barreau: "Nantes",
       city: "Nantes",
-      specialties: ["Baux commerciaux", "Droit immobilier contractuel"],
-      bio: "Avocate fictive en attente de vérification par l'équipe AvoSearch. Profil de démonstration.",
+      specialties: ["Commercial leases", "Real estate contracts"],
+      bio: "Fictional lawyer pending verification by the AvoSearch team. Demo profile only.",
       validationPriceCents: 6500,
       hourlyRateCents: 15000,
       flatFees: { RELECTURE: 21000, REDACTION: 36000, NEGOCIATION: 46000 },
@@ -230,50 +282,28 @@ async function main() {
     });
   }
 
-  await prisma.contractTemplate.createMany({
-    data: [
-      {
-        slug: "nda-site-web",
-        title: "Accord de confidentialité (NDA) — site web",
-        description:
-          "Modèle d'accord de confidentialité pour protéger les informations liées à un site web ou une activité en ligne.",
-        domain: "confidentialité / NDA",
-        tags: ["nda", "confidentialité", "site web", "internet", "saas"],
-        body: NDA_SITE_WEB_BODY,
-        draftGuide: NDA_SITE_WEB_DRAFT_GUIDE,
-      },
-      {
-        slug: "prestation-services",
-        title: "Contrat de prestation de services",
-        description:
-          "Modèle de contrat entre un client et un prestataire freelance ou TPE.",
-        domain: "prestation de services",
-        tags: ["prestation", "services", "freelance", "développement"],
-        body: PRESTATION_BODY,
-        draftGuide: PRESTATION_DRAFT_GUIDE,
-      },
-    ],
-  });
+  const templateRows = await Promise.all(SEED_TEMPLATES.map(seedTemplateFile));
+  await prisma.contractTemplate.createMany({ data: templateRows });
 
   await prisma.contract.create({
     data: {
       ownerId: client1.id,
-      title: "Bail commercial — boutique Paris 11e",
+      title: "Commercial lease — Paris 11th boutique",
       extractedText: BAIL_COMMERCIAL_TEXT,
       userQuestion:
-        "On me propose ce bail pour ma première boutique. Certaines clauses me semblent dures (dépôt de garantie, travaux, cession) : est-ce normal ?",
+        "I'm being offered this lease for my first shop. Some clauses seem harsh (security deposit, works, assignment): is that normal?",
       analysis: {
         create: {
           triage: "IA_SUFFIT",
           confidence: 0.82,
-          domain: "bail commercial",
+          domain: "commercial lease",
           justification:
-            "Il s'agit d'un bail commercial standard avec quelques clauses exigeantes (dépôt de garantie élevé, renonciation à la résiliation triennale, cession restreinte). Des ajustements ciblés peuvent être envisagés en suivi de modifications, sous réserve de votre situation.",
+            "This is a standard commercial lease with a few demanding clauses (high security deposit, waiver of triennial termination, restricted assignment). Targeted adjustments may be considered in follow-up modifications, depending on your situation.",
           flags: [
-            "dépôt de garantie de 6 mois",
-            "renonciation à la résiliation triennale",
-            "cession soumise à agrément discrétionnaire",
-            "charges incluant grosses réparations",
+            "6-month security deposit",
+            "waiver of triennial termination",
+            "assignment subject to discretionary approval",
+            "charges including major repairs",
           ],
           requiredPro: null,
           model: "seed",
@@ -285,22 +315,22 @@ async function main() {
   await prisma.contract.create({
     data: {
       ownerId: client1.id,
-      title: "Contrat de prestation de services — développement web",
+      title: "Services agreement — web development",
       extractedText: PRESTATION_TEXT,
       userQuestion:
-        "Je suis la cliente : le prestataire garde la propriété du code et limite fortement sa responsabilité. Que faut-il renégocier ?",
+        "I'm the client: the provider keeps ownership of the code and limits liability heavily. What should I renegotiate?",
       analysis: {
         create: {
           triage: "AVOCAT_RECOMMANDE",
           confidence: 0.88,
-          domain: "prestation de services / propriété intellectuelle",
+          domain: "services / intellectual property",
           justification:
-            "Le contrat présente une asymétrie notable : cession de propriété intellectuelle au profit du prestataire, plafond de responsabilité très bas et pénalités de retard élevées. L'enjeu justifie l'accompagnement d'un avocat pour renégocier les clauses essentielles.",
+            "The agreement shows notable asymmetry: intellectual property retained by the provider, very low liability cap and high late payment penalties. The stakes justify lawyer support to renegotiate key clauses.",
           flags: [
-            "propriété intellectuelle conservée par le prestataire",
-            "responsabilité plafonnée à 10 %",
-            "pénalités de retard de 15 % par mois",
-            "clause de non-sollicitation de 3 ans",
+            "intellectual property retained by provider",
+            "liability capped at 10%",
+            "15% late payment penalty per month",
+            "3-year non-solicitation clause",
           ],
           requiredPro: "AVOCAT",
           model: "seed",
@@ -310,7 +340,7 @@ async function main() {
   });
 
   console.log("Seed completed:");
-  console.log("  1 admin, 2 clients, 6 lawyers (4 verified, 2 pending), 2 contracts, 2 templates");
+  console.log("  1 admin, 2 clients, 6 lawyers (4 verified, 2 pending), 2 contracts, 3 templates");
   console.log(`  All demo accounts use password: ${DEMO_PASSWORD}`);
 }
 

@@ -85,27 +85,43 @@ export function buildReviewUserMessage(input: {
   return parts.filter(Boolean).join("\n");
 }
 
-export const DRAFT_START_SYSTEM_PROMPT = `Tu es un assistant de rédaction contractuelle pour AvoSearch.
-Tu n'es PAS un avocat. Tu guides l'utilisateur pour remplir un modèle de contrat via une conversation naturelle.
+import type { AppLocale } from "@/lib/i18n";
 
-Tu reçois la liste des modèles (slug, titre, variables {{PLACEHOLDER}} à collecter, consignes rédaction).
-- Si l'utilisateur veut rédiger/créer un contrat, choisis le modèle le plus adapté.
-- Si la demande ne concerne pas la rédaction (analyse seule, question générale), mets is_draft_intent à false.
+function draftReplyLanguage(locale: AppLocale): string {
+  return locale === "en"
+    ? "Write assistant_message in plain English."
+    : "Rédige assistant_message en français simple.";
+}
 
-Quand is_draft_intent est true :
-- Choisis template_slug parmi les slugs proposés (ou null si aucun ne convient).
-- assistant_message : accueil + première question pour commencer à collecter les variables du modèle.
-- Pose UNE seule question claire, en français simple.
+export function draftStartSystemPrompt(locale: AppLocale): string {
+  return `You are a contract drafting assistant for AvoSearch.
+You are NOT a lawyer. You guide the user to fill a contract template through a natural conversation.
 
-Réponds UNIQUEMENT en JSON valide :
+You receive the template list (slug, title, file excerpt, {{PLACEHOLDER}} variables, optional admin notes).
+- Read the template excerpt to understand structure and the logical order of information to collect.
+- If the user wants to draft/create a contract, pick the best matching template.
+- If the request is not about drafting (analysis only, general question), set is_draft_intent to false.
+
+When is_draft_intent is true:
+- Pick template_slug from the offered slugs (or null if none fits).
+- assistant_message: brief welcome + first question to start collecting template variables, in document order.
+- Ask ONE clear question only.
+- ${draftReplyLanguage(locale)}
+- Use everyday wording in assistant_message (e.g. "disclosing party name"), not raw variable ids.
+
+Reply ONLY with valid JSON:
 {
   "is_draft_intent": true,
-  "template_slug": "slug-du-modele" | null,
+  "template_slug": "template-slug" | null,
   "assistant_message": "..."
 }`;
+}
+
+export const DRAFT_START_SYSTEM_PROMPT = draftStartSystemPrompt("fr");
 
 export function buildDraftStartUserMessage(input: {
   userMessage: string;
+  locale: AppLocale;
   templates: Array<{
     slug: string;
     title: string;
@@ -113,6 +129,7 @@ export function buildDraftStartUserMessage(input: {
     tags: string[];
     placeholders: string[];
     draftGuide?: string | null;
+    templateExcerpt?: string;
   }>;
 }): string {
   const catalog = input.templates
@@ -125,41 +142,53 @@ export function buildDraftStartUserMessage(input: {
         `  variables: ${t.placeholders.join(", ") || "(aucune)"}`,
       ];
       if (t.draftGuide?.trim()) lines.push(`  consignes: ${t.draftGuide.trim()}`);
+      if (t.templateExcerpt?.trim()) {
+        lines.push(`  extrait du modèle:\n${t.templateExcerpt.trim().slice(0, 4000)}`);
+      }
       return lines.join("\n");
     })
     .join("\n\n");
 
   return [
-    "Message utilisateur :",
+    `Interface language: ${input.locale}`,
+    "",
+    "User message:",
     input.userMessage,
     "",
-    "Modèles disponibles :",
+    "Available templates:",
     catalog,
   ].join("\n");
 }
 
-export const DRAFT_TURN_SYSTEM_PROMPT = `Tu es un assistant de rédaction contractuelle pour AvoSearch.
-Tu guides l'utilisateur pour remplir un modèle dont le corps contient des variables {{NOM_VARIABLE}}.
+export function draftTurnSystemPrompt(locale: AppLocale): string {
+  return `You are a contract drafting assistant for AvoSearch.
+You guide the user to fill a template whose body contains {{VARIABLE_NAME}} placeholders.
 
-À chaque message utilisateur :
-1. Analyse ce qu'il a dit et mets à jour collected : paires { "NOM_VARIABLE": "valeur" } pour toutes les infos nouvelles ou corrigées.
-2. Rédige assistant_message : remerciement bref + la prochaine question (UNE seule), en français simple.
-3. complete = true uniquement quand TOUTES les variables requises sont renseignées.
+On each user message:
+1. Parse what they said and update collected: { "VARIABLE_NAME": "value" } for all new or corrected info.
+2. Write assistant_message: brief thanks + the next question (ONE only). ${draftReplyLanguage(locale)}
+3. complete = true only when ALL required variables are filled.
 
-Règles :
-- Les clés de collected doivent correspondre exactement aux variables du modèle (ex. DISCLOSING_PARTY_NAME).
-- Valeurs prêtes à insérer dans le contrat (dates lisibles, montants sans commentaire superflu).
-- Ne pose pas plusieurs questions à la fois sauf si deux infos sont indissociables.
-- complete=false tant qu'il manque des variables.
+Rules:
+- Use the template excerpt to ask questions in logical document order.
+- collected keys must match template variables exactly (e.g. DISCLOSING_PARTY_NAME).
+- Values must be ready to insert in the contract (readable dates, amounts without extra commentary).
+- Do not ask multiple questions at once unless two fields are inseparable.
+- Use everyday wording in assistant_message, not raw variable ids.
+- complete=false while any variable is missing.
 
-Réponds UNIQUEMENT en JSON valide :
+Reply ONLY with valid JSON:
 {
-  "collected": { "VARIABLE": "valeur" },
+  "collected": { "VARIABLE": "value" },
   "assistant_message": "...",
   "complete": false
 }`;
+}
+
+export const DRAFT_TURN_SYSTEM_PROMPT = draftTurnSystemPrompt("fr");
 
 export function buildDraftTurnUserMessage(input: {
+  locale: AppLocale;
   templateTitle: string;
   draftGuide?: string | null;
   templateExcerpt: string;
@@ -175,25 +204,69 @@ export function buildDraftTurnUserMessage(input: {
     .join("\n");
 
   return [
-    `Modèle : ${input.templateTitle}`,
-    input.draftGuide?.trim() ? `Consignes admin : ${input.draftGuide.trim()}` : "",
+    `Interface language: ${input.locale}`,
+    `Template: ${input.templateTitle}`,
+    input.draftGuide?.trim() ? `Admin notes: ${input.draftGuide.trim()}` : "",
     "",
-    "Variables à remplir :",
-    input.placeholders.join(", ") || "(aucune)",
+    "Variables to fill:",
+    input.placeholders.join(", ") || "(none)",
     "",
-    "Variables encore manquantes :",
-    input.missing.join(", ") || "(aucune — vous pouvez mettre complete à true)",
+    "Still missing:",
+    input.missing.join(", ") || "(none — you may set complete to true)",
     "",
-    "Réponses déjà collectées :",
-    answered || "(aucune)",
+    "Already collected:",
+    answered || "(none)",
     "",
-    "Extrait du modèle :",
-    input.templateExcerpt.slice(0, 2000),
+    "Template excerpt:",
+    input.templateExcerpt.slice(0, 4000),
     "",
-    "Historique récent :",
-    input.history.slice(-8).join("\n") || "(vide)",
+    "Recent history:",
+    input.history.slice(-8).join("\n") || "(empty)",
     "",
-    "Dernier message utilisateur :",
+    "Latest user message:",
+    input.userMessage,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+export function draftFollowUpSystemPrompt(locale: AppLocale): string {
+  return `You are an AvoSearch assistant. The contract has already been generated from a template.
+You are NOT a lawyer. You answer questions, explain clauses in plain language, and apply user-requested edits.
+
+Rules:
+- assistant_message: conversational reply. ${draftReplyLanguage(locale)}
+- If the user requests a concrete text change, provide updated_body with the full revised contract.
+- Otherwise omit updated_body.
+- Do not promise legal compliance.
+
+Reply ONLY with valid JSON:
+{
+  "assistant_message": "...",
+  "updated_body": "..." 
+}`;
+}
+
+export const DRAFT_FOLLOWUP_SYSTEM_PROMPT = draftFollowUpSystemPrompt("fr");
+
+export function buildDraftFollowUpUserMessage(input: {
+  locale?: AppLocale;
+  contractTitle: string;
+  contractBody: string;
+  userMessage: string;
+  history: string[];
+}): string {
+  return [
+    input.locale ? `Interface language: ${input.locale}` : "",
+    `Contract: ${input.contractTitle}`,
+    "",
+    "Current text:",
+    input.contractBody.slice(0, 12_000),
+    "",
+    "Recent history:",
+    input.history.slice(-8).join("\n") || "(empty)",
+    "",
+    "User message:",
     input.userMessage,
   ]
     .filter(Boolean)

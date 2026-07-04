@@ -66,14 +66,14 @@ model ContractTemplate {
   title       String
   description String
   domain      String
-  tags        String[]
-  /// Inline body for seed/demo templates; production templates use fileKey + storage.
-  body        String?
-  fileKey     String?
-  fileName    String?
-  mimeType    String?
+  tags         String[]
+  fileKey      String?
+  fileName     String?
+  mimeType     String?
+  /// Placeholder keys detected from the template file at upload (e.g. PARTY_A_NAME).
+  placeholders String[]
   /// Optional hints for the LLM when collecting {{PLACEHOLDER}} values in chat.
-  draftGuide  String?
+  draftGuide   String?
   active      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

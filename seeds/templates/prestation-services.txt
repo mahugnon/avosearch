@@ -1,0 +1,12 @@
+SERVICES AGREEMENT
+
+Between:
+{{CLIENT_NAME}}, hereinafter the "Client",
+
+And:
+{{PROVIDER_NAME}}, hereinafter the "Provider",
+
+Article 1 — Purpose
+{{SERVICE_DESCRIPTION}}
+
+Document generated from an AvoSearch template — document assistance only, not legal advice.

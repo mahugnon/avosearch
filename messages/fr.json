@@ -191,6 +191,7 @@
     "welcome": "Bonjour. Décrivez ce que vous souhaitez faire — par exemple : « je souhaite rédiger un contrat NDA pour mon site web ». Je vous poserai les questions nécessaires, une par une.",
     "placeholder": "Ex. : je souhaite rédiger un contrat NDA…",
     "placeholderDone": "Posez une autre question ou lancez l'analyse depuis l'aperçu…",
+    "placeholderAfterDone": "Posez une question sur le contrat ou demandez une modification…",
     "send": "Envoyer",
     "attach": "Joindre un contrat (bientôt)",
     "emptyMessage": "Écrivez un message pour continuer.",
@@ -199,6 +200,7 @@
     "sessionLost": "Session de rédaction introuvable. Recommencez en décrivant votre besoin.",
     "templateLoadFailed": "Impossible de charger le modèle de contrat. Contactez le support.",
     "missingFields": "Il manque encore des informations. Répondez à la question ci-dessus.",
+    "contractReady": "Votre contrat est prêt dans l'aperçu à droite. Vous pouvez continuer à poser des questions ou demander des ajustements ici. Quand vous êtes satisfait, cliquez sur « Demander un avocat » pour une validation professionnelle.",
     "errors": {
       "unauthorized": "Connectez-vous en tant que client pour rédiger un contrat.",
       "sessionExpired": "Session expirée — reconnectez-vous.",
@@ -653,7 +655,8 @@
       "subtitle": "Fichiers PDF, DOCX ou TXT stockés hors base de données. Les métadonnées et champs guidés restent en base.",
       "add": "Ajouter un modèle",
       "empty": "Aucun modèle pour l'instant.",
-      "inlineBody": "Texte intégré (seed)",
+      "noFile": "Aucun fichier",
+      "download": "Télécharger",
       "edit": "Modifier",
       "delete": "Supprimer",
       "activate": "Activer",
@@ -679,7 +682,9 @@
           "draftGuide": "Consignes pour l'IA",
           "draftGuideHint": "Instructions optionnelles pour guider la conversation de rédaction. Les variables {{NOM}} sont détectées automatiquement dans le fichier modèle.",
           "file": "Fichier modèle",
-          "fileHint": "PDF, DOCX ou TXT — le texte est extrait à la génération."
+          "fileHint": "PDF, DOCX ou TXT — utilisez des variables {{NOM_VARIABLE}}. Le texte est extrait à la génération.",
+          "placeholders": "Variables détectées",
+          "placeholdersHint": "Détectées automatiquement depuis le fichier à l'upload."
         },
         "title": "Titre",
         "slug": "Identifiant (slug)",
@@ -690,6 +695,7 @@
         "tagsHint": "Séparés par des virgules — utilisés pour le matching avec la demande client.",
         "fileReplace": "Remplacer le fichier (optionnel)",
         "currentFile": "Fichier actuel",
+        "placeholdersEmpty": "Uploadez ou remplacez le fichier pour détecter les variables.",
         "active": "Modèle actif (visible pour les clients)",
         "draftGuidePlaceholder": "Ex. : commencez par la partie divulgatrice, puis le destinataire, puis l'URL du site…",
         "create": "Créer le modèle",
@@ -734,6 +740,7 @@
         "file_required": "Un fichier modèle est requis.",
         "file_too_large": "Fichier trop volumineux (max. 10 Mo).",
         "file_type_invalid": "Format non supporté — PDF, DOCX ou TXT uniquement.",
+        "no_placeholders": "Aucune variable {{VARIABLE}} trouvée dans le fichier.",
         "not_found": "Modèle introuvable."
       }
     }

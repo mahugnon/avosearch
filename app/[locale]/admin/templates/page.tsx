@@ -72,8 +72,17 @@ export default async function AdminTemplatesPage() {
                     <p className="text-xs text-muted-foreground">{template.slug}</p>
                   </TableCell>
                   <TableCell className="text-sm">{template.domain}</TableCell>
-                  <TableCell className="max-w-40 truncate text-sm text-muted-foreground">
-                    {template.fileName ?? t("inlineBody")}
+                  <TableCell className="max-w-48 text-sm text-muted-foreground">
+                    {template.fileName ? (
+                      <a
+                        href={`/api/admin/templates/${template.id}/file`}
+                        className="truncate underline-offset-4 hover:underline"
+                      >
+                        {template.fileName}
+                      </a>
+                    ) : (
+                      t("noFile")
+                    )}
                   </TableCell>
                   <TableCell className="max-w-48 text-xs text-muted-foreground">
                     {template.tags.join(", ")}

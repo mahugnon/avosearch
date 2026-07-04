@@ -4,12 +4,13 @@ import {
   type AllowedMimeType,
 } from "@/lib/extract/text";
 import { storage } from "@/lib/storage";
+import { extractPlaceholderKeys } from "@/lib/templates/placeholders";
 
 export type TemplateSource = {
-  body: string | null;
   fileKey: string | null;
   fileName: string | null;
   mimeType: string | null;
+  placeholders?: string[];
 };
 
 export function mimeFromFilename(filename: string): AllowedMimeType | null {
@@ -28,15 +29,29 @@ export function resolveTemplateMime(mimeType: string | null, fileName: string | 
 }
 
 export async function loadTemplateBody(template: TemplateSource): Promise<string> {
-  if (template.fileKey) {
-    const buffer = await storage.read(template.fileKey);
-    const mime = resolveTemplateMime(template.mimeType, template.fileName);
-    return extractTextFromBuffer(buffer, mime);
+  if (!template.fileKey) {
+    throw new Error("TEMPLATE_FILE_MISSING");
   }
 
-  if (template.body?.trim()) {
-    return template.body;
-  }
+  const buffer = await storage.read(template.fileKey);
+  const mime = resolveTemplateMime(template.mimeType, template.fileName);
+  return extractTextFromBuffer(buffer, mime);
+}
 
-  throw new Error("TEMPLATE_BODY_MISSING");
+export async function extractPlaceholdersFromBuffer(
+  buffer: Buffer,
+  mimeType: AllowedMimeType
+): Promise<{ text: string; placeholders: string[] }> {
+  const text = await extractTextFromBuffer(buffer, mimeType);
+  return { text, placeholders: extractPlaceholderKeys(text) };
+}
+
+export function resolveTemplatePlaceholders(
+  template: TemplateSource,
+  extractedText: string
+): string[] {
+  if (template.placeholders && template.placeholders.length > 0) {
+    return template.placeholders;
+  }
+  return extractPlaceholderKeys(extractedText);
 }

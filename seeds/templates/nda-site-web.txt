@@ -1,0 +1,12 @@
+CONFIDENTIALITY AGREEMENT (NDA)
+
+Between:
+{{DISCLOSING_PARTY_NAME}}, {{DISCLOSING_PARTY_FORM}}, whose registered office is located at {{DISCLOSING_PARTY_ADDRESS}}, hereinafter the "Disclosing Party",
+
+And:
+{{RECIPIENT_NAME}}, hereinafter the "Recipient",
+
+Article 4 — Term
+This agreement enters into force on {{EFFECTIVE_DATE}} and remains in effect for {{DURATION_YEARS}} year(s).
+
+Document generated from an AvoSearch template — document assistance only, not legal advice.

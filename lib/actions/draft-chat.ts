@@ -3,16 +3,15 @@
 import { ContractDraftStatus, type ContractTemplate } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getClientSession } from "@/lib/auth/client-session";
-import { runDraftStartWithLlm, runDraftTurnWithLlm } from "@/lib/ai/draft-chat-llm";
+import { runDraftFollowUpWithLlm, runDraftStartWithLlm, runDraftTurnWithLlm } from "@/lib/ai/draft-chat-llm";
 import { isAiConfigured } from "@/lib/ai/llm";
 import {
-  buildCompletionMessage,
-  detectLawyerValidationIntent,
-} from "@/lib/templates/draft-chat";
-import { loadTemplateBody } from "@/lib/templates/load";
+  loadTemplateBody,
+  resolveTemplatePlaceholders,
+  type TemplateSource,
+} from "@/lib/templates/load";
 import {
   applyPlaceholderDefaults,
-  extractPlaceholderKeys,
   missingPlaceholders,
 } from "@/lib/templates/placeholders";
 import {
@@ -20,7 +19,8 @@ import {
   renderTemplateBody,
   validateDraftAnswers,
 } from "@/lib/templates/render";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import type { AppLocale } from "@/lib/i18n";
 
 export type DraftChatResult = {
   contractId?: string;
@@ -30,6 +30,8 @@ export type DraftChatResult = {
   contractTitle?: string;
   error?: string;
 };
+
+const TEMPLATE_CATALOG_EXCERPT_CHARS = 4000;
 
 async function loadDraftContract(contractId: string, userId: string) {
   return prisma.contract.findFirst({
@@ -43,33 +45,48 @@ async function loadDraftContract(contractId: string, userId: string) {
   });
 }
 
-async function resolveTemplateBody(template: ContractTemplate): Promise<string> {
-  if (template.body?.trim()) return template.body;
+async function loadCompletedContract(contractId: string, userId: string) {
+  return prisma.contract.findFirst({
+    where: {
+      id: contractId,
+      ownerId: userId,
+      draftStatus: ContractDraftStatus.COMPLETED,
+      templateId: { not: null },
+    },
+    include: { template: true },
+  });
+}
+
+async function resolveTemplateBody(template: TemplateSource): Promise<string> {
   return loadTemplateBody(template);
 }
 
 async function buildTemplateCatalog(
   templates: Array<
-    Pick<ContractTemplate, "slug" | "title" | "domain" | "tags" | "body" | "draftGuide" | "fileKey">
+    Pick<
+      ContractTemplate,
+      "slug" | "title" | "domain" | "tags" | "draftGuide" | "fileKey" | "fileName" | "mimeType" | "placeholders"
+    >
   >
 ) {
   return Promise.all(
     templates.map(async (template) => {
-      let body = template.body ?? "";
-      if (!body.trim() && template.fileKey) {
-        try {
-          body = await loadTemplateBody(template as ContractTemplate);
-        } catch {
-          body = "";
-        }
+      let templateExcerpt = "";
+      try {
+        const body = await loadTemplateBody(template);
+        templateExcerpt = body.slice(0, TEMPLATE_CATALOG_EXCERPT_CHARS);
+      } catch {
+        templateExcerpt = "";
       }
+
       return {
         slug: template.slug,
         title: template.title,
         domain: template.domain,
         tags: template.tags,
-        placeholders: extractPlaceholderKeys(body),
+        placeholders: template.placeholders,
         draftGuide: template.draftGuide,
+        templateExcerpt,
       };
     })
   );
@@ -78,9 +95,7 @@ async function buildTemplateCatalog(
 async function completeDraftContract(
   contractId: string,
   contract: NonNullable<Awaited<ReturnType<typeof loadDraftContract>>>,
-  answers: Record<string, string>,
-  history: string[],
-  lastMessage: string
+  answers: Record<string, string>
 ): Promise<DraftChatResult> {
   const t = await getTranslations("chat");
   let templateBody: string;
@@ -97,7 +112,6 @@ async function completeDraftContract(
   }
 
   const contractBody = renderTemplateBody(templateBody, normalized);
-  const wantsLawyer = detectLawyerValidationIntent([...history, lastMessage].join("\n"));
 
   await prisma.contract.update({
     where: { id: contractId },
@@ -110,7 +124,7 @@ async function completeDraftContract(
 
   return {
     contractId,
-    assistantMessage: buildCompletionMessage(wantsLawyer),
+    assistantMessage: t("contractReady"),
     completed: true,
     contractBody,
     contractTitle: contract.title,
@@ -123,6 +137,7 @@ export async function draftChatAction(input: {
   history?: string[];
 }): Promise<DraftChatResult> {
   const t = await getTranslations("chat");
+  const locale = (await getLocale()) as AppLocale;
   const session = await getClientSession();
   if (!session.ok) {
     return { assistantMessage: "", error: session.reason };
@@ -149,14 +164,16 @@ export async function draftChatAction(input: {
       title: true,
       tags: true,
       domain: true,
-      body: true,
       draftGuide: true,
       fileKey: true,
+      fileName: true,
+      mimeType: true,
+      placeholders: true,
     },
   });
 
   const catalog = await buildTemplateCatalog(templates);
-  const llmStart = await runDraftStartWithLlm({ userMessage: message, templates: catalog });
+  const llmStart = await runDraftStartWithLlm({ locale, userMessage: message, templates: catalog });
 
   if (!llmStart) {
     return { assistantMessage: t("errors.generic") };
@@ -196,7 +213,13 @@ async function continueDraftChat(
   message: string,
   history: string[]
 ): Promise<DraftChatResult> {
+  const completed = await loadCompletedContract(contractId, userId);
+  if (completed) {
+    return continueCompletedDraftChat(completed, message, history);
+  }
+
   const t = await getTranslations("chat");
+  const locale = (await getLocale()) as AppLocale;
   const contract = await loadDraftContract(contractId, userId);
 
   if (!contract?.template) {
@@ -210,11 +233,12 @@ async function continueDraftChat(
     return { contractId, assistantMessage: t("errors.templateLoadFailed") };
   }
 
-  const placeholders = extractPlaceholderKeys(templateBody);
+  const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
   let answers = parseDraftAnswers(contract.draftAnswers);
   const missingBefore = missingPlaceholders(placeholders, answers);
 
   const llmTurn = await runDraftTurnWithLlm({
+    locale,
     templateTitle: contract.template.title,
     draftGuide: contract.template.draftGuide,
     templateExcerpt: templateBody,
@@ -239,11 +263,11 @@ async function continueDraftChat(
   const allFilled = missingAfter.length === 0;
 
   if (llmTurn.result.complete && allFilled) {
-    return completeDraftContract(contractId, contract, answers, history, message);
+    return completeDraftContract(contractId, contract, answers);
   }
 
   if (allFilled) {
-    return completeDraftContract(contractId, contract, answers, history, message);
+    return completeDraftContract(contractId, contract, answers);
   }
 
   return {
@@ -253,10 +277,49 @@ async function continueDraftChat(
   };
 }
 
+async function continueCompletedDraftChat(
+  contract: NonNullable<Awaited<ReturnType<typeof loadCompletedContract>>>,
+  message: string,
+  history: string[]
+): Promise<DraftChatResult> {
+  const t = await getTranslations("chat");
+  const locale = (await getLocale()) as AppLocale;
+
+  const llm = await runDraftFollowUpWithLlm({
+    locale,
+    contractTitle: contract.title,
+    contractBody: contract.extractedText,
+    userMessage: message,
+    history,
+  });
+
+  if (!llm) {
+    return { contractId: contract.id, assistantMessage: t("errors.generic") };
+  }
+
+  let contractBody = contract.extractedText;
+  if (llm.result.updated_body?.trim()) {
+    contractBody = llm.result.updated_body.trim();
+    await prisma.contract.update({
+      where: { id: contract.id },
+      data: { extractedText: contractBody },
+    });
+  }
+
+  return {
+    contractId: contract.id,
+    assistantMessage: llm.result.assistant_message,
+    completed: true,
+    contractBody,
+    contractTitle: contract.title,
+  };
+}
+
 export async function resumeDraftChatAction(contractId: string): Promise<DraftChatResult | null> {
   const session = await getClientSession();
   if (!session.ok || !isAiConfigured()) return null;
 
+  const locale = (await getLocale()) as AppLocale;
   const contract = await loadDraftContract(contractId, session.userId);
   if (!contract?.template) return null;
 
@@ -267,19 +330,25 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
     return null;
   }
 
-  const placeholders = extractPlaceholderKeys(templateBody);
+  const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
   const answers = parseDraftAnswers(contract.draftAnswers);
   const missing = missingPlaceholders(placeholders, answers);
   if (missing.length === 0) return null;
 
+  const resumePrompt =
+    locale === "en"
+      ? "Resume the conversation and ask the next question."
+      : "Reprends la conversation et pose la prochaine question.";
+
   const llmTurn = await runDraftTurnWithLlm({
+    locale,
     templateTitle: contract.template.title,
     draftGuide: contract.template.draftGuide,
     templateExcerpt: templateBody,
     placeholders,
     missing,
     answers,
-    userMessage: "Reprends la conversation et pose la prochaine question.",
+    userMessage: resumePrompt,
     history: [],
   });
 

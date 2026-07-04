@@ -191,6 +191,7 @@
     "welcome": "Hello. Tell me what you need — for example: \"I want to draft an NDA for my website.\" I'll ask only what's necessary, one question at a time.",
     "placeholder": "E.g.: I want to draft an NDA contract…",
     "placeholderDone": "Ask another question or start analysis from the preview…",
+    "placeholderAfterDone": "Ask about the contract or request a change…",
     "send": "Send",
     "attach": "Attach a contract (coming soon)",
     "emptyMessage": "Write a message to continue.",
@@ -199,6 +200,7 @@
     "sessionLost": "Draft session not found. Start again by describing your need.",
     "templateLoadFailed": "Could not load the contract template. Please contact support.",
     "missingFields": "Some information is still missing. Answer the question above.",
+    "contractReady": "Your contract is ready in the preview on the right. You can keep asking questions or request changes here. When you're satisfied, click \"Request lawyer review\" for professional validation.",
     "errors": {
       "unauthorized": "Sign in as a client to draft a contract.",
       "sessionExpired": "Session expired — please sign in again.",
@@ -653,13 +655,14 @@
       "subtitle": "PDF, DOCX or TXT files stored outside the database. Metadata and guided fields stay in the DB.",
       "add": "Add template",
       "empty": "No templates yet.",
-      "inlineBody": "Inline text (seed)",
+      "noFile": "No file",
+      "download": "Download",
       "edit": "Edit",
       "delete": "Delete",
       "activate": "Activate",
       "deactivate": "Deactivate",
       "newTitle": "New template",
-      "newSubtitle": "Upload a document with placeholder variables (e.g. DISCLOSING_PARTY_NAME) and define guided questions.",
+      "newSubtitle": "Upload a document with {{VARIABLE}} placeholders — the AI guides drafting in conversation.",
       "editTitle": "Edit template",
       "editSubtitle": "Update metadata or replace the source file.",
       "columns": {
@@ -679,7 +682,9 @@
           "draftGuide": "AI drafting instructions",
           "draftGuideHint": "Optional hints for the drafting conversation. {{VARIABLE}} placeholders are auto-detected from the template file.",
           "file": "Template file",
-          "fileHint": "PDF, DOCX or TXT — text is extracted when generating the contract."
+          "fileHint": "PDF, DOCX or TXT — use {{VARIABLE_NAME}} placeholders. Text is extracted when generating the contract.",
+          "placeholders": "Detected placeholders",
+          "placeholdersHint": "Auto-detected from the template file at upload."
         },
         "title": "Title",
         "slug": "Slug",
@@ -690,6 +695,7 @@
         "tagsHint": "Comma-separated — used to match client requests.",
         "fileReplace": "Replace file (optional)",
         "currentFile": "Current file",
+        "placeholdersEmpty": "Upload or replace the file to detect placeholders.",
         "active": "Active template (visible to clients)",
         "draftGuidePlaceholder": "E.g. start with the disclosing party, then recipient, then website URL…",
         "create": "Create template",
@@ -734,6 +740,7 @@
         "file_required": "A template file is required.",
         "file_too_large": "File too large (max 10 MB).",
         "file_type_invalid": "Unsupported format — PDF, DOCX or TXT only.",
+        "no_placeholders": "No {{VARIABLE}} placeholders found in the file.",
         "not_found": "Template not found."
       }
     }

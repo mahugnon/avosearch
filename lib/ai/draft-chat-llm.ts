@@ -1,19 +1,25 @@
+import type { AppLocale } from "@/lib/i18n";
 import {
+  buildDraftFollowUpUserMessage,
   buildDraftStartUserMessage,
   buildDraftTurnUserMessage,
-  DRAFT_START_SYSTEM_PROMPT,
-  DRAFT_TURN_SYSTEM_PROMPT,
+  draftFollowUpSystemPrompt,
+  draftStartSystemPrompt,
+  draftTurnSystemPrompt,
 } from "@/lib/ai/prompts";
 import { callLlmChat, isAiConfigured, isLlmAuthError } from "@/lib/ai/llm";
 import {
   isDraftChatParseError,
+  parseDraftFollowUpJson,
   parseDraftStartJson,
   parseDraftTurnJson,
+  type DraftFollowUpResponse,
   type DraftStartResponse,
   type DraftTurnResponse,
 } from "@/lib/validation/draft-chat";
 
 export async function runDraftStartWithLlm(input: {
+  locale: AppLocale;
   userMessage: string;
   templates: Array<{
     slug: string;
@@ -22,13 +28,14 @@ export async function runDraftStartWithLlm(input: {
     tags: string[];
     placeholders: string[];
     draftGuide?: string | null;
+    templateExcerpt?: string;
   }>;
 }): Promise<{ result: DraftStartResponse; model: string } | null> {
   if (!isAiConfigured()) return null;
 
   try {
     const { text, model } = await callLlmChat({
-      system: DRAFT_START_SYSTEM_PROMPT,
+      system: draftStartSystemPrompt(input.locale),
       user: buildDraftStartUserMessage(input),
       maxTokens: 1024,
     });
@@ -46,6 +53,7 @@ export async function runDraftStartWithLlm(input: {
 }
 
 export async function runDraftTurnWithLlm(input: {
+  locale: AppLocale;
   templateTitle: string;
   draftGuide?: string | null;
   templateExcerpt: string;
@@ -59,7 +67,7 @@ export async function runDraftTurnWithLlm(input: {
 
   try {
     const { text, model } = await callLlmChat({
-      system: DRAFT_TURN_SYSTEM_PROMPT,
+      system: draftTurnSystemPrompt(input.locale),
       user: buildDraftTurnUserMessage(input),
       maxTokens: 1536,
     });
@@ -75,6 +83,34 @@ export async function runDraftTurnWithLlm(input: {
       console.warn("[draft-chat] LLM auth error on turn");
     } else if (!isDraftChatParseError(error)) {
       console.error("[draft-chat] turn failed", error);
+    }
+    return null;
+  }
+}
+
+export async function runDraftFollowUpWithLlm(input: {
+  locale: AppLocale;
+  contractTitle: string;
+  contractBody: string;
+  userMessage: string;
+  history: string[];
+}): Promise<{ result: DraftFollowUpResponse; model: string } | null> {
+  if (!isAiConfigured()) return null;
+
+  try {
+    const { text, model } = await callLlmChat({
+      system: draftFollowUpSystemPrompt(input.locale),
+      user: buildDraftFollowUpUserMessage(input),
+      maxTokens: 4096,
+    });
+    const result = parseDraftFollowUpJson(text);
+    console.log("[draft-chat] follow-up", { model, hasUpdate: Boolean(result.updated_body) });
+    return { result, model };
+  } catch (error) {
+    if (isLlmAuthError(error)) {
+      console.warn("[draft-chat] LLM auth error on follow-up");
+    } else if (!isDraftChatParseError(error)) {
+      console.error("[draft-chat] follow-up failed", error);
     }
     return null;
   }

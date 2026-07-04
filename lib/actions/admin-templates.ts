@@ -8,7 +8,10 @@ import {
 } from "@/lib/extract/text";
 import { localizedPath, type AppLocale } from "@/lib/i18n";
 import { storage } from "@/lib/storage";
-import { mimeFromFilename } from "@/lib/templates/load";
+import {
+  extractPlaceholdersFromBuffer,
+  mimeFromFilename,
+} from "@/lib/templates/load";
 import {
   parseTagsInput,
   templateMetadataSchema,
@@ -118,6 +121,11 @@ export async function createTemplateAction(
   if (!fileResult.buffer) return { error: "file_required" };
 
   const fileKey = templateStorageKey(data.slug, fileResult.fileName);
+  const extracted = await extractPlaceholdersFromBuffer(fileResult.buffer, fileResult.mimeType);
+  if (extracted.placeholders.length === 0) {
+    return { error: "no_placeholders" };
+  }
+
   await storage.save(fileKey, fileResult.buffer);
 
   await prisma.contractTemplate.create({
@@ -132,6 +140,7 @@ export async function createTemplateAction(
       fileKey,
       fileName: fileResult.fileName,
       mimeType: fileResult.mimeType,
+      placeholders: extracted.placeholders,
     },
   });
 
@@ -171,8 +180,14 @@ export async function updateTemplateAction(
   let fileKey = current.fileKey;
   let fileName = current.fileName;
   let mimeType = current.mimeType;
+  let placeholders = current.placeholders;
 
   if (fileResult.buffer) {
+    const extracted = await extractPlaceholdersFromBuffer(fileResult.buffer, fileResult.mimeType);
+    if (extracted.placeholders.length === 0) {
+      return { error: "no_placeholders" };
+    }
+
     const newKey = templateStorageKey(data.slug, fileResult.fileName);
     await storage.save(newKey, fileResult.buffer);
     if (current.fileKey) {
@@ -181,6 +196,7 @@ export async function updateTemplateAction(
     fileKey = newKey;
     fileName = fileResult.fileName;
     mimeType = fileResult.mimeType;
+    placeholders = extracted.placeholders;
   }
 
   await prisma.contractTemplate.update({
@@ -196,6 +212,7 @@ export async function updateTemplateAction(
       fileKey,
       fileName,
       mimeType,
+      placeholders,
     },
   });
 

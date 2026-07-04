@@ -48,9 +48,7 @@ export async function completeDraftAction(contractId: string): Promise<DraftActi
 
   let templateBody: string;
   try {
-    templateBody = contract.template!.body?.trim()
-      ? contract.template!.body!
-      : await loadTemplateBody(contract.template!);
+    templateBody = await loadTemplateBody(contract.template!);
   } catch {
     return { error: "template_load_failed" };
   }

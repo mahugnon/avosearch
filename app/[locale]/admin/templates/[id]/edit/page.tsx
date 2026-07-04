@@ -29,6 +29,7 @@ export default async function EditTemplatePage({ params }: Props) {
         action={boundUpdate}
         mode="edit"
         initial={{
+          id: template.id,
           slug: template.slug,
           title: template.title,
           description: template.description,
@@ -37,6 +38,7 @@ export default async function EditTemplatePage({ params }: Props) {
           draftGuide: template.draftGuide,
           active: template.active,
           fileName: template.fileName,
+          placeholders: template.placeholders,
         }}
       />
     </div>

@@ -78,9 +78,11 @@ export function AnalysisChat() {
           setContractId(result.contractId);
         }
 
-        if (result.completed && result.contractBody) {
+        if (result.contractBody) {
           setContractBody(result.contractBody);
-          setContractTitle(result.contractTitle);
+          if (result.contractTitle) {
+            setContractTitle(result.contractTitle);
+          }
         }
 
         if (result.assistantMessage) {
@@ -173,7 +175,7 @@ export function AnalysisChat() {
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={contractBody ? t("placeholderDone") : t("placeholder")}
+              placeholder={contractBody ? t("placeholderAfterDone") : t("placeholder")}
               rows={1}
               disabled={isThinking}
               className="min-h-10 flex-1 resize-none border-0 bg-transparent px-2 py-2 shadow-none focus-visible:ring-0"

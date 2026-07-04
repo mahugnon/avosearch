@@ -1,10 +1,10 @@
 const DRAFT_INTENT_PATTERN =
-  /\b(r[ée]dig|redig|cr[ée][ea]?r|mod[èe]le|g[ée]n[ée]rer|pr[ée]parer|besoin d['']|souhaite|voudrais|voudrait)\b.*\b(contrat|accord|nda|confidentialit[ée])/i;
+  /\b(r[ée]dig|redig|cr[ée][ea]?r|mod[èe]le|g[ée]n[ée]rer|pr[ée]parer|besoin d['']|souhaite|voudrais|voudrait|draft|write|create|generate|prepare|need|want|would like)\b.*\b(contrat|accord|nda|confidentialit[ée]|contract|agreement|confidential)/i;
 
-const DRAFT_INTENT_SHORT = /\b(r[ée]dig|redig|cr[ée][ea]?r|souhaite)\b.*\bnda\b/i;
+const DRAFT_INTENT_SHORT = /\b(r[ée]dig|redig|cr[ée][ea]?r|souhaite|draft|write|create|want)\b.*\bnda\b/i;
 
 const DRAFT_INTENT_ALT =
-  /\b(nda|confidentialit[ée]|accord de confidentialit[ée])\b.*\b(site|web|internet|saaS|application)\b/i;
+  /\b(nda|confidentialit[ée]|accord de confidentialit[ée]|confidentiality agreement)\b.*\b(site|web|internet|saaS|application|website)\b/i;
 
 export function isDraftIntent(question: string, hasFile: boolean): boolean {
   if (hasFile) return false;
@@ -24,9 +24,47 @@ type TemplateCandidate = {
 };
 
 const KEYWORD_WEIGHTS: Record<string, string[]> = {
-  "nda-site-web": ["nda", "confidentialité", "confidentialite", "secret", "site web", "site", "web", "internet", "saas", "application"],
-  "prestation-services": ["prestation", "services", "freelance", "développement", "developpement", "consultant"],
-  "bail-commercial": ["bail", "commercial", "local", "boutique", "loyer", "locataire"],
+  "nda-bilateral": [
+    "nda",
+    "confidentiality",
+    "confidentialité",
+    "confidentialite",
+    "agreement",
+    "accord",
+    "bilateral",
+    "company",
+    "société",
+    "societe",
+    "project",
+    "projet",
+    "partnership",
+    "partenariat",
+  ],
+  "nda-site-web": [
+    "nda",
+    "confidentiality",
+    "confidentialité",
+    "confidentialite",
+    "secret",
+    "website",
+    "site web",
+    "site",
+    "web",
+    "internet",
+    "saas",
+    "application",
+  ],
+  "prestation-services": [
+    "services",
+    "prestation",
+    "freelance",
+    "development",
+    "développement",
+    "developpement",
+    "consulting",
+    "consultant",
+  ],
+  "bail-commercial": ["lease", "bail", "commercial", "retail", "boutique", "rent", "tenant", "loyer", "locataire"],
 };
 
 export function scoreTemplateMatch(question: string, template: TemplateCandidate): number {

@@ -14,6 +14,7 @@ import { slugifyTitle } from "@/lib/validation/template-admin";
 type Props = {
   action: (prev: TemplateFormState, formData: FormData) => Promise<TemplateFormState>;
   initial?: {
+    id?: string;
     slug: string;
     title: string;
     description: string;
@@ -22,12 +23,14 @@ type Props = {
     draftGuide?: string | null;
     active: boolean;
     fileName?: string | null;
+    placeholders?: string[];
   };
   mode: "create" | "edit";
 };
 
 export function TemplateForm({ action, initial, mode }: Props) {
   const t = useTranslations("admin.templates.form");
+  const ta = useTranslations("admin.templates");
   const te = useTranslations("admin.templates.errors");
   const [state, formAction, pending] = useActionState(action, {});
   const [slug, setSlug] = useState(initial?.slug ?? "");
@@ -152,11 +155,21 @@ export function TemplateForm({ action, initial, mode }: Props) {
           <CardTitle>{t("sections.file")}</CardTitle>
           <CardDescription>{t("sections.fileHint")}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-4">
           {initial?.fileName && (
-            <p className="text-sm text-muted-foreground">
-              {t("currentFile")}: <span className="font-medium">{initial.fileName}</span>
-            </p>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <span>
+                {t("currentFile")}: <span className="font-medium">{initial.fileName}</span>
+              </span>
+              {initial.id && (
+                <a
+                  href={`/api/admin/templates/${initial.id}/file`}
+                  className="font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  {ta("download")}
+                </a>
+              )}
+            </div>
           )}
           <Input
             id="file"
@@ -167,6 +180,24 @@ export function TemplateForm({ action, initial, mode }: Props) {
           />
         </CardContent>
       </Card>
+
+      {mode === "edit" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("sections.placeholders")}</CardTitle>
+            <CardDescription>{t("sections.placeholdersHint")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {initial?.placeholders && initial.placeholders.length > 0 ? (
+              <p className="font-mono text-xs leading-relaxed text-muted-foreground">
+                {initial.placeholders.join(", ")}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">{t("placeholdersEmpty")}</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={pending}>

@@ -91,7 +91,9 @@ Fonctionnalités prêtes côté code ; validation juridique et clés live resten
 | **E-mail** | SMTP optionnel (`lib/email/send.ts`) ; notifications mission, paiement, message, livraison, vérif avocat |
 | **PDF contrat** | `GET /api/contracts/[id]/export` + bouton dans le viewer |
 | **PJ messagerie** | Upload dans le chat mission (`/api/missions/attachments/[key]`) |
-| **Modèles admin** | Upload PDF/DOCX/TXT + métadonnées → `/admin/templates` (fichiers dans `./storage/templates/`) |
+| **Modèles admin** | Upload PDF/DOCX/TXT avec variables `{{NOM_VARIABLE}}` → `/admin/templates` (fichiers dans `./storage/templates/`, métadonnées + placeholders en base) |
+
+Les modèles de démo sont versionnés dans `seeds/templates/` (TXT). Le seed les copie vers le storage : `pnpm db:seed`.
 
 ### Checklist avant go-live
 
