@@ -26,6 +26,8 @@ pnpm dev                  # http://localhost:3000
 
 Si le seed n'a pas été lancé automatiquement par la migration : `pnpm db:seed`.
 
+> **Mode démo IA** : sans `NVIDIA_API_KEY` valide dans `.env`, le triage bascule sur une heuristique locale de démonstration (mention « Mode démo » sous le résultat). Avec une clé [build.nvidia.com](https://build.nvidia.com/), l'analyse passe par le modèle Nemotron configuré via `NVIDIA_MODEL`.
+
 > **Port Postgres** : la base Docker écoute sur le port hôte **5433** (5432 est souvent occupé par un Postgres local). L'URL de `.env.example` est déjà configurée en conséquence.
 
 ## Comptes de démonstration
@@ -63,8 +65,9 @@ lib/
   actions/          # server actions (auth)
   validation/       # schémas Zod (auth, triage)
   extract/          # extraction PDF / DOCX / TXT
-  ai/               # client NVIDIA NIM, prompts, triage
+  ai/               # client NVIDIA NIM, prompts, triage, guardrails, mode démo
   contracts/        # helpers d'accès aux contrats
+  templates/        # modèles de rédaction guidée (catalogue seedé)
 prisma/
   schema.prisma     # modèle de données complet
   seed.ts           # données de démonstration

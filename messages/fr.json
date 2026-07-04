@@ -482,7 +482,8 @@
         "required": "Ce champ est obligatoire pour continuer.",
         "missingFields": "Certaines informations manquent. Complétez toutes les étapes."
       }
-    }
+    },
+    "triageHorsPerimetre": "Hors périmètre"
   },
   "barrister": {
     "areaLabel": "Espace avocat",

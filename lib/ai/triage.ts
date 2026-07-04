@@ -57,7 +57,13 @@ export async function runContractTriage(input: {
       lastRaw = text;
       const parsed = parseTriageJson(text);
       const result = applyTriageGuardrails(parsed);
-      console.log("[triage] parsed", { model, parsed, result });
+      console.log("[triage] decision", {
+        model,
+        triage: result.triage,
+        confidence: result.confidence,
+        outOfScope: result.outOfScope,
+        guardrailNotes: result.guardrailNotes,
+      });
       return { result, model };
     } catch (error) {
       lastError = error;

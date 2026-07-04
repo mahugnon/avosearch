@@ -79,11 +79,8 @@ async function callNvidiaChat(messages: ChatMessage[], maxTokens: number): Promi
     throw new LlmRequestError("Empty NVIDIA response", 502);
   }
 
-  console.log("[llm] response", {
-    model: NVIDIA_MODEL,
-    usage: payload.usage,
-    content,
-  });
+  // Never log the content itself: it derives from user contracts
+  console.log("[llm] response", { model: NVIDIA_MODEL, usage: payload.usage });
 
   return content;
 }

@@ -12,10 +12,7 @@ export async function POST(_request: Request, context: RouteContext) {
   }
 
   const { id } = await context.params;
-  const contract = await prisma.contract.findUnique({
-    where: { id },
-    include: { analysis: true },
-  });
+  const contract = await prisma.contract.findUnique({ where: { id } });
 
   if (!contract || contract.ownerId !== session.user.id) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -27,35 +24,33 @@ export async function POST(_request: Request, context: RouteContext) {
       userQuestion: contract.userQuestion,
     });
 
-    if (result.outOfScope) {
-      if (contract.analysis) {
-        await prisma.analysis.delete({ where: { contractId: contract.id } });
-      }
+    // Every analysis is persisted for traceability, including out-of-scope
+    // orientations (no substantive analysis, but the decision is recorded).
+    const data = {
+      triage: result.triage,
+      confidence: result.confidence,
+      domain: result.domain,
+      justification: result.justification,
+      flags: result.flags,
+      requiredPro: result.requiredPro,
+      outOfScope: result.outOfScope,
+      guardrailNotes: result.guardrailNotes,
+      model,
+    };
+    const analysis = await prisma.analysis.upsert({
+      where: { contractId: contract.id },
+      update: data,
+      create: { contractId: contract.id, ...data },
+    });
+
+    if (analysis.outOfScope) {
       return NextResponse.json({
         outOfScope: true,
-        domain: result.domain,
-        justification: result.justification,
-        requiredPro: result.requiredPro,
+        domain: analysis.domain,
+        justification: analysis.justification,
+        requiredPro: analysis.requiredPro,
       });
     }
-
-    const analysis = await prisma.$transaction(async (tx) => {
-      if (contract.analysis) {
-        await tx.analysis.delete({ where: { contractId: contract.id } });
-      }
-      return tx.analysis.create({
-        data: {
-          contractId: contract.id,
-          triage: result.triage,
-          confidence: result.confidence,
-          domain: result.domain,
-          justification: result.justification,
-          flags: result.flags,
-          requiredPro: result.requiredPro,
-          model,
-        },
-      });
-    });
 
     return NextResponse.json({
       outOfScope: false,
@@ -67,7 +62,7 @@ export async function POST(_request: Request, context: RouteContext) {
         justification: analysis.justification,
         flags: analysis.flags,
         requiredPro: analysis.requiredPro,
-        guardrailNotes: result.guardrailNotes,
+        guardrailNotes: analysis.guardrailNotes,
         demoMode: model === "demo-heuristic",
       },
     });

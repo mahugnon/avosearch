@@ -482,7 +482,8 @@
         "required": "This field is required to continue.",
         "missingFields": "Some information is missing. Complete all steps."
       }
-    }
+    },
+    "triageHorsPerimetre": "Out of scope"
   },
   "barrister": {
     "areaLabel": "Barrister dashboard",
