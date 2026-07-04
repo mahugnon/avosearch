@@ -10,6 +10,7 @@ interface DashboardHeaderProps {
   homeHref: string;
   areaLabel: string;
   userName: string;
+  profileHref?: string;
 }
 
 function initials(name: string): string {
@@ -19,7 +20,12 @@ function initials(name: string): string {
   return `${parts[0]![0]}${parts[parts.length - 1]![0]}`.toUpperCase();
 }
 
-export async function DashboardHeader({ homeHref, areaLabel, userName }: DashboardHeaderProps) {
+export async function DashboardHeader({
+  homeHref,
+  areaLabel,
+  userName,
+  profileHref,
+}: DashboardHeaderProps) {
   const t = await getTranslations("header");
 
   return (
@@ -39,16 +45,32 @@ export async function DashboardHeader({ homeHref, areaLabel, userName }: Dashboa
               <Link href="/app/settings">{t("settings")}</Link>
             </Button>
           )}
-          <div className="hidden items-center gap-2.5 sm:flex">
-            <Avatar className="size-7">
-              <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
-                {initials(userName)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="max-w-[10rem] truncate text-sm text-muted-foreground">
-              {userName}
-            </span>
-          </div>
+          {profileHref ? (
+            <Link
+              href={profileHref}
+              className="flex items-center gap-2.5 rounded-lg px-1 py-0.5 transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Avatar className="size-7">
+                <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
+                  {initials(userName)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="max-w-[10rem] truncate text-sm text-muted-foreground max-sm:sr-only">
+                {userName}
+              </span>
+            </Link>
+          ) : (
+            <div className="hidden items-center gap-2.5 sm:flex">
+              <Avatar className="size-7">
+                <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
+                  {initials(userName)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="max-w-[10rem] truncate text-sm text-muted-foreground">
+                {userName}
+              </span>
+            </div>
+          )}
           <form action={signOutAction}>
             <Button type="submit" variant="ghost" size="sm" className="text-muted-foreground">
               {t("signOut")}

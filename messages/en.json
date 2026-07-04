@@ -231,6 +231,14 @@
     "triageActe": "Regulated act",
     "draftInProgress": "Draft in progress",
     "documentPreview": "Document preview",
+    "viewer": {
+      "aiFieldsLegend": "{count, plural, one {# AI-filled field} other {# AI-filled fields}}",
+      "validate": "Validate",
+      "validated": "Validated",
+      "validationProgress": "{done} / {total} validated",
+      "allValidated": "All fields validated",
+      "allValidatedHint": "Validation complete for this document. Persistence is handled via lawyer missions."
+    },
     "errors": {
       "unauthorized": "You must be signed in as a client.",
       "missingInput": "Upload a file or describe your contractual question.",
@@ -414,6 +422,19 @@
     "responseTime": "Advertised response time",
     "responseTimeHours": "{hours} h",
     "specialties": "Specialties",
+    "profile": {
+      "title": "My profile",
+      "subtitle": "Information shown on your lawyer profile.",
+      "back": "← Back to dashboard",
+      "bio": "Bio",
+      "rating": "Client rating"
+    },
+    "review": {
+      "backToDashboard": "← Back to dashboard",
+      "clientLabel": "Client: {name}",
+      "intro": "Highlighted passages were filled by AI from the template. Validate each field before closing the review.",
+      "documentPreview": "Document preview"
+    },
     "missions": {
       "title": "My missions",
       "back": "← Dashboard",

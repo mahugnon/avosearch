@@ -231,6 +231,14 @@
     "triageActe": "Acte réglementé",
     "draftInProgress": "Rédaction en cours",
     "documentPreview": "Aperçu du document",
+    "viewer": {
+      "aiFieldsLegend": "{count, plural, one {# champ rempli par l'IA} other {# champs remplis par l'IA}}",
+      "validate": "Valider",
+      "validated": "Validé",
+      "validationProgress": "{done} / {total} validés",
+      "allValidated": "Tous les champs sont validés",
+      "allValidatedHint": "Validation terminée pour ce document. La persistance serveur est gérée via les missions avocat."
+    },
     "errors": {
       "unauthorized": "Vous devez être connecté en tant que client.",
       "missingInput": "Déposez un fichier ou décrivez votre question contractuelle.",
@@ -414,6 +422,19 @@
     "responseTime": "Délai de réponse annoncé",
     "responseTimeHours": "{hours} h",
     "specialties": "Spécialités",
+    "profile": {
+      "title": "Mon profil",
+      "subtitle": "Informations visibles sur votre profil avocat.",
+      "back": "← Retour au tableau de bord",
+      "bio": "Présentation",
+      "rating": "Note clients"
+    },
+    "review": {
+      "backToDashboard": "← Retour au tableau de bord",
+      "clientLabel": "Client : {name}",
+      "intro": "Les passages surlignés ont été remplis par l'IA à partir du modèle. Validez chaque champ avant de clôturer la relecture.",
+      "documentPreview": "Aperçu du document"
+    },
     "missions": {
       "title": "Mes missions",
       "back": "← Tableau de bord",

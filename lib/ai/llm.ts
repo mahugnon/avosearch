@@ -93,17 +93,23 @@ export async function callLlmChat(input: {
   user: string;
   maxTokens?: number;
 }): Promise<{ text: string; model: string }> {
+  return callLlmChatMessages({
+    messages: [
+      { role: "system", content: input.system },
+      { role: "user", content: input.user },
+    ],
+    maxTokens: input.maxTokens,
+  });
+}
+
+export async function callLlmChatMessages(input: {
+  messages: ChatMessage[];
+  maxTokens?: number;
+}): Promise<{ text: string; model: string }> {
   if (!isNvidiaConfigured()) {
     throw new LlmRequestError("NVIDIA_API_KEY is not configured", 503);
   }
 
-  const text = await callNvidiaChat(
-    [
-      { role: "system", content: input.system },
-      { role: "user", content: input.user },
-    ],
-    input.maxTokens ?? 1024
-  );
-
+  const text = await callNvidiaChat(input.messages, input.maxTokens ?? 1024);
   return { text, model: NVIDIA_MODEL };
 }

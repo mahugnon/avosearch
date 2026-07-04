@@ -8,6 +8,8 @@ import { runContractTriage, TriageError } from "@/lib/ai/triage";
 import { Button } from "@/components/ui/button";
 import { requireClientContract } from "@/lib/contracts/access";
 import { prisma } from "@/lib/db";
+import { loadTemplateBody } from "@/lib/templates/load";
+import { getContractHighlightData } from "@/lib/templates/highlight";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -89,6 +91,27 @@ export default async function ContractDetailPage({ params, searchParams }: Props
         }
       : null);
 
+  const highlight = await (async () => {
+    if (!contract.template) return null;
+    let templateBody = contract.template.body?.trim() ?? "";
+    if (!templateBody) {
+      try {
+        templateBody = await loadTemplateBody({
+          body: contract.template.body,
+          fileKey: contract.template.fileKey ?? null,
+          fileName: contract.template.fileName ?? null,
+          mimeType: contract.template.mimeType ?? null,
+        });
+      } catch {
+        return null;
+      }
+    }
+    return getContractHighlightData({
+      templateBody,
+      draftAnswers: contract.draftAnswers,
+    });
+  })();
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -108,6 +131,7 @@ export default async function ContractDetailPage({ params, searchParams }: Props
           title={t("documentPreview")}
           body={contract.extractedText}
           contractId={contract.id}
+          highlight={highlight}
         />
       )}
 

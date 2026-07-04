@@ -3,20 +3,35 @@
 import { Download, Copy, ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import {
+  HighlightedContractBody,
+  type ContractViewerMode,
+} from "@/components/contracts/highlighted-contract-body";
+import { ContractDocumentFromBody } from "@/components/contracts/contract-document";
 import { RequestLawyerButton } from "@/components/contracts/request-lawyer-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { ContractHighlightData } from "@/lib/templates/highlight";
 
 type Props = {
   title: string;
   body: string;
   contractId?: string;
   className?: string;
-  /** After draft completion, show lawyer opinion as primary action. */
+  highlight?: ContractHighlightData | null;
+  mode?: ContractViewerMode;
   showLawyerRequest?: boolean;
 };
 
-export function ContractViewer({ title, body, contractId, className, showLawyerRequest }: Props) {
+export function ContractViewer({
+  title,
+  body,
+  contractId,
+  className,
+  highlight,
+  mode = "client",
+  showLawyerRequest,
+}: Props) {
   const t = useTranslations("chat.viewer");
 
   async function handleCopy() {
@@ -60,7 +75,7 @@ export function ContractViewer({ title, body, contractId, className, showLawyerR
                 <Download className="size-3.5" />
                 {t("pdf")}
               </Button>
-              {!showLawyerRequest && (
+              {!showLawyerRequest && mode === "client" && (
                 <Button asChild variant="outline" size="sm" className="h-8 gap-1.5">
                   <Link href={`/app/contracts/${contractId}?analyze=1`}>
                     <ExternalLink className="size-3.5" />
@@ -72,10 +87,12 @@ export function ContractViewer({ title, body, contractId, className, showLawyerR
           )}
         </div>
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto bg-muted/20 px-4 py-4 sm:px-5">
-        <pre className="whitespace-pre-wrap font-mono text-[0.8125rem] leading-relaxed text-foreground/90">
-          {body}
-        </pre>
+      <div className="min-h-0 flex-1 overflow-y-auto bg-neutral-100/60 px-3 py-5 sm:px-5 sm:py-6">
+        {highlight ? (
+          <HighlightedContractBody highlight={highlight} mode={mode} />
+        ) : (
+          <ContractDocumentFromBody body={body} mode={mode} />
+        )}
       </div>
       <footer className="border-t border-border/60 px-4 py-2.5 sm:px-5">
         <p className="text-xs text-muted-foreground">{t("disclaimer")}</p>
