@@ -1,0 +1,186 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CLIENT
+  LAWYER
+  ADMIN
+}
+
+enum TriageResult {
+  IA_SUFFIT
+  AVOCAT_RECOMMANDE
+  ACTE_REGLEMENTE
+}
+
+enum RequiredPro {
+  AVOCAT
+  NOTAIRE
+}
+
+enum ModStatus {
+  PROPOSEE
+  ACCEPTEE_CLIENT
+  REJETEE_CLIENT
+  AMENDEE_AVOCAT
+  VALIDEE_AVOCAT
+  REJETEE_AVOCAT
+}
+
+enum MissionType {
+  VALIDATION
+  RELECTURE
+  REDACTION
+  NEGOCIATION
+}
+
+enum MissionStatus {
+  PROPOSEE
+  ACCEPTEE
+  EN_COURS
+  LIVREE
+  TERMINEE
+  ANNULEE
+}
+
+enum RiskLevel {
+  FAIBLE
+  MOYEN
+  ELEVE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(CLIENT)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  lawyerProfile  LawyerProfile?
+  contracts      Contract[]
+  clientMissions Mission[]      @relation("ClientMissions")
+  lawyerMissions Mission[]      @relation("LawyerMissions")
+  messages       Message[]
+}
+
+model LawyerProfile {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  barreau              String
+  city                 String
+  specialties          String[]
+  bio                  String
+  validationPriceCents Int
+  // Flat fees per MissionType, in cents: { "RELECTURE": 25000, ... }
+  flatFees             Json
+  responseTimeHours    Int
+  verified             Boolean  @default(false)
+  available            Boolean  @default(true)
+  rating               Float?
+  ratingCount          Int      @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model Contract {
+  id            String    @id @default(cuid())
+  ownerId       String
+  owner         User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title         String
+  fileUrl       String?
+  mimeType      String?
+  extractedText String
+  userQuestion  String?
+  // Timestamp of the explicit "documentary aid, not legal advice" consent
+  aiConsentAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  analysis Analysis?
+  missions Mission[]
+}
+
+model Analysis {
+  id            String       @id @default(cuid())
+  contractId    String       @unique
+  contract      Contract     @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  triage        TriageResult
+  confidence    Float
+  domain        String
+  justification String
+  flags         String[]
+  requiredPro   RequiredPro?
+  model         String
+  createdAt     DateTime     @default(now())
+
+  modifications Modification[]
+}
+
+model Modification {
+  id              String    @id @default(cuid())
+  analysisId      String
+  analysis        Analysis  @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  order           Int
+  originalExcerpt String
+  proposedText    String
+  rationale       String
+  riskLevel       RiskLevel
+  status          ModStatus @default(PROPOSEE)
+  // Text as amended by the lawyer (AMENDEE_AVOCAT)
+  amendedText     String?
+  lawyerComment   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([analysisId, order])
+}
+
+model Mission {
+  id          String        @id @default(cuid())
+  type        MissionType
+  contractId  String
+  contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      User          @relation("ClientMissions", fields: [clientId], references: [id], onDelete: Cascade)
+  lawyerId    String?
+  lawyer      User?         @relation("LawyerMissions", fields: [lawyerId], references: [id], onDelete: SetNull)
+  priceCents  Int
+  status      MissionStatus @default(PROPOSEE)
+  deadline    DateTime?
+  deliveredAt DateTime?
+  // Lawyer's final global note on a VALIDATION mission
+  globalNote  String?
+  validatedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  messages Message[]
+  review   Review?
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  missionId String
+  mission   Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  missionId String   @unique
+  mission   Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+}
