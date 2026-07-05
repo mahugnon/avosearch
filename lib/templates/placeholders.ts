@@ -1,6 +1,10 @@
 const PLACEHOLDER_PATTERN = /\{\{([A-Z0-9_]+)\}\}/g;
 
-/** Filled automatically — not asked one-by-one in chat. */
+// Filled automatically — not asked one-by-one in chat.
+// CONFIDENTIALITY_YEARS, AGREEMENT_DURATION and TERMINATION_NOTICE are
+// intentionally collected (as radio questions, see lib/templates/field-meta.ts)
+// so the NDA flow reads clearly; applyPlaceholderDefaults still backfills them
+// if a draft completes without an explicit answer.
 const DERIVED_PLACEHOLDER_KEYS = new Set([
   "PARTY_A_SHORT_NAME",
   "PARTY_B_SHORT_NAME",
@@ -8,9 +12,6 @@ const DERIVED_PLACEHOLDER_KEYS = new Set([
   "SIGNATURE_PARTY_B_NAME",
   "EFFECTIVE_DATE",
   "DURATION_YEARS",
-  "CONFIDENTIALITY_YEARS",
-  "AGREEMENT_DURATION",
-  "TERMINATION_NOTICE",
   "SIGNATURE_COPIES",
   "SIGNATURE_CITY",
   "DISPUTE_JURISDICTION",

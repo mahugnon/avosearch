@@ -371,6 +371,9 @@ export function AnalysisChat() {
               <ChatFieldCard
                 label={awaitingField.label}
                 fieldKey={awaitingField.key}
+                hint={awaitingField.hint}
+                type={awaitingField.type}
+                options={awaitingField.options}
                 disabled={isThinking}
                 onSubmit={(value, key) => void sendMessage(value, key)}
               />

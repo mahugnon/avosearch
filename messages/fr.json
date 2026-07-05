@@ -248,9 +248,10 @@
     "field": {
       "submit": "Valider",
       "placeholder": "Votre réponse…",
-      "nextQuestion": "Merci ! Pouvez-vous indiquer {label} ?",
-      "resumeQuestion": "Reprenons. Pouvez-vous indiquer {label} ?",
-      "retryQuestion": "Je n'ai pas bien compris. Pouvez-vous indiquer {label} ?"
+      "nextQuestion": "Merci ! {label}",
+      "resumeQuestion": "Reprenons. {label}",
+      "retryQuestion": "Je n’ai pas bien compris. {label}",
+      "optionsHint": "Choisissez une option"
     },
     "mode": {
       "label": "Mode d'affichage",

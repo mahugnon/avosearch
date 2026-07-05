@@ -248,9 +248,10 @@
     "field": {
       "submit": "Save",
       "placeholder": "Your answer…",
-      "nextQuestion": "Thanks! Could you tell me the {label}?",
-      "resumeQuestion": "Let's continue. Could you tell me the {label}?",
-      "retryQuestion": "I didn't catch that. Could you tell me the {label}?"
+      "nextQuestion": "Thanks! {label}",
+      "resumeQuestion": "Let’s continue. {label}",
+      "retryQuestion": "I didn’t quite catch that. {label}",
+      "optionsHint": "Choose an option"
     },
     "mode": {
       "label": "Display mode",

@@ -24,9 +24,9 @@ export default async function LandingPage() {
           <span className="section-mark absolute -top-24 right-0 select-none text-[22rem] sm:text-[30rem]">
             §
           </span>
-          <div className="relative mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
-            <p className="rule-kicker eyebrow">{t("heroBadge")}</p>
-            <h1 className="mt-9 max-w-4xl font-display text-5xl leading-[1.05] sm:text-7xl">
+          <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-24 text-center sm:py-32">
+            <p className="rule-kicker eyebrow justify-center">{t("heroBadge")}</p>
+            <h1 className="mt-9 font-display text-5xl leading-[1.05] sm:text-7xl">
               {t.rich("heroTitle", {
                 em: (chunks) => <em className="text-primary not-italic">{chunks}</em>,
               })}
@@ -34,7 +34,7 @@ export default async function LandingPage() {
             <p className="mt-10 max-w-xl text-lg leading-relaxed text-muted-foreground">
               {t("heroDescription")}
             </p>
-            <div className="mt-11 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-11 flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" className="h-14 px-9 text-base">
                 <Link href="/register">
                   {t("analyzeContract")} <span aria-hidden>→</span>

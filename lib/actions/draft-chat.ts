@@ -14,9 +14,13 @@ import {
 import {
   applyPlaceholderDefaults,
   collectableMissingPlaceholders,
-  humanizePlaceholder,
   isDraftReadyToComplete,
 } from "@/lib/templates/placeholders";
+import {
+  resolveFieldMeta,
+  type FieldInputType,
+  type FieldOption,
+} from "@/lib/templates/field-meta";
 import {
   parseDraftAnswers,
   renderTemplateBody,
@@ -28,7 +32,11 @@ import type { AppLocale } from "@/lib/i18n";
 
 export type AwaitingField = {
   key: string;
+  /** Clear, localized question shown to the user. */
   label: string;
+  hint?: string;
+  type?: FieldInputType;
+  options?: FieldOption[];
 };
 
 export type DraftPreview = {
@@ -60,10 +68,19 @@ function isContractRelatedMessage(message: string): boolean {
   );
 }
 
-function awaitingFieldFromMissing(missing: string[]): AwaitingField | undefined {
+function awaitingFieldFromMissing(
+  missing: string[],
+  locale: AppLocale
+): AwaitingField | undefined {
   const key = missing[0];
   if (!key) return undefined;
-  return { key, label: humanizePlaceholder(key) };
+  const meta = resolveFieldMeta(key, locale);
+  return { key, label: meta.label, hint: meta.hint, type: meta.type, options: meta.options };
+}
+
+/** The clear, localized question for a given placeholder key. */
+function fieldQuestion(key: string, locale: AppLocale): string {
+  return resolveFieldMeta(key, locale).label;
 }
 
 function missingForCollection(
@@ -315,7 +332,7 @@ export async function draftChatAction(input: {
   try {
     const templateBody = await resolveTemplateBody(template);
     const placeholders = resolveTemplatePlaceholders(template, templateBody);
-    awaitingField = awaitingFieldFromMissing(missingForCollection(placeholders, {}));
+    awaitingField = awaitingFieldFromMissing(missingForCollection(placeholders, {}), locale);
     draftPreview = await buildDraftPreview({
       ...contract,
       template,
@@ -344,6 +361,7 @@ async function applyDirectFieldAnswer(
   value: string
 ): Promise<DraftChatResult> {
   const t = await getTranslations("chat");
+  const locale = (await getLocale()) as AppLocale;
   const nextAnswers = { ...answers, [fieldKey]: value.trim() };
 
   let draftPreview: DraftPreview | undefined;
@@ -353,7 +371,7 @@ async function applyDirectFieldAnswer(
     return {
       contractId,
       assistantMessage: t("errors.generic"),
-      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers)),
+      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers), locale),
     };
   }
 
@@ -365,9 +383,9 @@ async function applyDirectFieldAnswer(
   const nextKey = missingAfter[0]!;
   return {
     contractId,
-    assistantMessage: t("field.nextQuestion", { label: humanizePlaceholder(nextKey) }),
+    assistantMessage: t("field.nextQuestion", { label: fieldQuestion(nextKey, locale) }),
     completed: false,
-    awaitingField: awaitingFieldFromMissing(missingAfter),
+    awaitingField: awaitingFieldFromMissing(missingAfter, locale),
     draftPreview,
     contractTitle: contract.title,
   };
@@ -433,8 +451,8 @@ async function continueDraftChat(
       const draftPreview = await buildDraftPreview(contract);
       return {
         contractId,
-        assistantMessage: t("field.retryQuestion", { label: humanizePlaceholder(currentKey) }),
-        awaitingField: awaitingFieldFromMissing(missingBefore),
+        assistantMessage: t("field.retryQuestion", { label: fieldQuestion(currentKey, locale) }),
+        awaitingField: awaitingFieldFromMissing(missingBefore, locale),
         draftPreview,
         contractTitle: contract.title,
       };
@@ -442,7 +460,7 @@ async function continueDraftChat(
     return {
       contractId,
       assistantMessage: t("errors.generic"),
-      awaitingField: awaitingFieldFromMissing(missingBefore),
+      awaitingField: awaitingFieldFromMissing(missingBefore, locale),
     };
   }
 
@@ -455,7 +473,7 @@ async function continueDraftChat(
     return {
       contractId,
       assistantMessage: t("errors.generic"),
-      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers)),
+      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers), locale),
     };
   }
 
@@ -468,7 +486,7 @@ async function continueDraftChat(
     contractId,
     assistantMessage: llmTurn.result.assistant_message,
     completed: false,
-    awaitingField: awaitingFieldFromMissing(missingAfter),
+    awaitingField: awaitingFieldFromMissing(missingAfter, locale),
     draftPreview,
     contractTitle: contract.title,
   };
@@ -556,6 +574,7 @@ async function sessionStateForInProgressContract(
     return null;
   }
 
+  const locale = (await getLocale()) as AppLocale;
   const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
   const answers = parseDraftAnswers(contract.draftAnswers);
   const missing = missingForCollection(placeholders, answers);
@@ -566,7 +585,7 @@ async function sessionStateForInProgressContract(
     contractTitle: contract.title,
     completed: false,
     draftPreview,
-    awaitingField: awaitingFieldFromMissing(missing),
+    awaitingField: awaitingFieldFromMissing(missing, locale),
   };
 }
 
@@ -618,7 +637,7 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
   if (missing.length === 0) return null;
 
   const draftPreview = await buildDraftPreview(contract);
-  const awaitingField = awaitingFieldFromMissing(missing);
+  const awaitingField = awaitingFieldFromMissing(missing, locale);
 
   const resumePrompt =
     locale === "en"
@@ -643,7 +662,7 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
     const t = await getTranslations("chat");
     return {
       contractId: contract.id,
-      assistantMessage: t("field.resumeQuestion", { label: humanizePlaceholder(nextKey) }),
+      assistantMessage: t("field.resumeQuestion", { label: fieldQuestion(nextKey, locale) }),
       completed: false,
       awaitingField,
       draftPreview,
