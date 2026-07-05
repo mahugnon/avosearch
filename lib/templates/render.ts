@@ -19,7 +19,8 @@ export function validateDraftAnswers(
   answers: Record<string, string>
 ): { ok: true } | { ok: false; missing: string[] } {
   const placeholders = extractPlaceholderKeys(body);
-  const missing = missingPlaceholders(placeholders, answers);
+  const normalized = applyPlaceholderDefaults(answers);
+  const missing = missingPlaceholders(placeholders, normalized);
   if (missing.length > 0) {
     return { ok: false, missing };
   }

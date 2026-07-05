@@ -246,7 +246,10 @@
     },
     "field": {
       "submit": "Valider",
-      "placeholder": "Votre réponse…"
+      "placeholder": "Votre réponse…",
+      "nextQuestion": "Merci ! Pouvez-vous indiquer {label} ?",
+      "resumeQuestion": "Reprenons. Pouvez-vous indiquer {label} ?",
+      "retryQuestion": "Je n'ai pas bien compris. Pouvez-vous indiquer {label} ?"
     },
     "mode": {
       "label": "Mode d'affichage",

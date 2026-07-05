@@ -3,7 +3,7 @@
 import { ArrowUp, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { draftChatAction, type AwaitingField } from "@/lib/actions/draft-chat";
+import { draftChatAction, getDraftSessionStateAction, type AwaitingField } from "@/lib/actions/draft-chat";
 import { ContractViewer } from "@/components/contracts/contract-viewer";
 import { ChatFieldCard } from "@/components/app/chat-field-card";
 import { ChatHistoryPanel } from "@/components/app/chat-history-panel";
@@ -96,6 +96,34 @@ export function AnalysisChat() {
     setError(null);
   }, []);
 
+  const hydrateDraftSession = useCallback(async (id: string) => {
+    try {
+      const state = await getDraftSessionStateAction(id);
+      if (!state) return;
+
+      setContractId(state.contractId);
+      setContractTitle(state.contractTitle);
+
+      if (state.completed && state.contractBody) {
+        setContractBody(state.contractBody);
+        setDraftInProgress(false);
+        setPanelMode("preview");
+        setAwaitingField(undefined);
+        return;
+      }
+
+      if (state.draftPreview) {
+        setContractBody(state.draftPreview.body);
+        setDraftInProgress(true);
+        setPanelMode("edit");
+      }
+
+      setAwaitingField(state.awaitingField);
+    } catch {
+      // Keep local thread state if hydration fails.
+    }
+  }, []);
+
   const loadThread = useCallback(
     (thread: ChatThread) => {
       setActiveThreadId(thread.id);
@@ -109,8 +137,12 @@ export function AnalysisChat() {
       setPanelMode("edit");
       setAwaitingField(undefined);
       setError(null);
+
+      if (thread.contractId) {
+        void hydrateDraftSession(thread.contractId);
+      }
     },
-    []
+    [hydrateDraftSession]
   );
 
   useEffect(() => {
@@ -134,7 +166,7 @@ export function AnalysisChat() {
   }, [messages, isThinking, barristerInquiry, awaitingField]);
 
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, fieldKey?: string) => {
       if (!text.trim() || isThinking) return;
 
       setError(null);
@@ -153,10 +185,16 @@ export function AnalysisChat() {
           contractId,
           message: text,
           history: userHistoryRef.current,
+          fieldKey,
         });
 
         if (result.error) {
           setError(t(`errors.${result.error}` as "errors.unauthorized"));
+        } else if (
+          result.assistantMessage === t("errors.generic") &&
+          !result.awaitingField
+        ) {
+          setError(t("errors.generic"));
         }
 
         if (result.contractId) {
@@ -192,7 +230,7 @@ export function AnalysisChat() {
         }
 
         let finalMessages = nextMessages;
-        if (result.assistantMessage) {
+        if (result.assistantMessage && result.assistantMessage !== t("errors.generic")) {
           finalMessages = [
             ...nextMessages,
             { id: crypto.randomUUID(), role: "assistant", content: result.assistantMessage },
@@ -328,8 +366,9 @@ export function AnalysisChat() {
             {showFieldCard && awaitingField && (
               <ChatFieldCard
                 label={awaitingField.label}
+                fieldKey={awaitingField.key}
                 disabled={isThinking}
-                onSubmit={(value) => void sendMessage(value)}
+                onSubmit={(value, key) => void sendMessage(value, key)}
               />
             )}
 

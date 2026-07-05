@@ -9,18 +9,19 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   label: string;
-  onSubmit: (value: string) => void;
+  fieldKey: string;
+  onSubmit: (value: string, fieldKey: string) => void;
   disabled?: boolean;
 };
 
-export function ChatFieldCard({ label, onSubmit, disabled }: Props) {
+export function ChatFieldCard({ label, fieldKey, onSubmit, disabled }: Props) {
   const t = useTranslations("chat.field");
   const [value, setValue] = useState("");
 
   function handleSubmit() {
     const trimmed = value.trim();
     if (!trimmed || disabled) return;
-    onSubmit(trimmed);
+    onSubmit(trimmed, fieldKey);
     setValue("");
   }
 

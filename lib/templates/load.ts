@@ -50,8 +50,10 @@ export function resolveTemplatePlaceholders(
   template: TemplateSource,
   extractedText: string
 ): string[] {
-  if (template.placeholders && template.placeholders.length > 0) {
-    return template.placeholders;
+  const fromBody = extractPlaceholderKeys(extractedText);
+  if (fromBody.length > 0) {
+    const extra = (template.placeholders ?? []).filter((key) => !fromBody.includes(key));
+    return [...fromBody, ...extra];
   }
-  return extractPlaceholderKeys(extractedText);
+  return template.placeholders ?? [];
 }

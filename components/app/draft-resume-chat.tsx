@@ -98,7 +98,7 @@ export function DraftResumeChat({
   }, [contractId, t, userQuestion]);
 
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, fieldKey?: string) => {
       if (!text.trim() || isThinking) return;
 
       setError(null);
@@ -117,10 +117,16 @@ export function DraftResumeChat({
           contractId,
           message: text,
           history: userHistoryRef.current,
+          fieldKey,
         });
 
         if (result.error) {
           setError(t(`errors.${result.error}` as "errors.unauthorized"));
+        } else if (
+          result.assistantMessage === t("errors.generic") &&
+          !result.awaitingField
+        ) {
+          setError(t("errors.generic"));
         }
 
         if (result.draftPreview) {
@@ -140,7 +146,7 @@ export function DraftResumeChat({
           setAwaitingField(result.awaitingField);
         }
 
-        if (result.assistantMessage) {
+        if (result.assistantMessage && result.assistantMessage !== t("errors.generic")) {
           setMessages([
             ...nextMessages,
             { id: crypto.randomUUID(), role: "assistant", content: result.assistantMessage },
@@ -235,8 +241,9 @@ export function DraftResumeChat({
           {showFieldCard && awaitingField && (
             <ChatFieldCard
               label={awaitingField.label}
+              fieldKey={awaitingField.key}
               disabled={isThinking || isResuming}
-              onSubmit={(value) => void sendMessage(value)}
+              onSubmit={(value, key) => void sendMessage(value, key)}
             />
           )}
         </div>

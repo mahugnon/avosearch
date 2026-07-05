@@ -13,8 +13,9 @@ import {
 } from "@/lib/templates/load";
 import {
   applyPlaceholderDefaults,
+  collectableMissingPlaceholders,
   humanizePlaceholder,
-  missingPlaceholders,
+  isDraftReadyToComplete,
 } from "@/lib/templates/placeholders";
 import {
   parseDraftAnswers,
@@ -63,6 +64,13 @@ function awaitingFieldFromMissing(missing: string[]): AwaitingField | undefined 
   const key = missing[0];
   if (!key) return undefined;
   return { key, label: humanizePlaceholder(key) };
+}
+
+function missingForCollection(
+  placeholders: string[],
+  answers: Record<string, string>
+): string[] {
+  return collectableMissingPlaceholders(placeholders, answers);
 }
 
 async function buildDraftPreview(contract: DraftContractWithTemplate): Promise<DraftPreview | undefined> {
@@ -227,6 +235,7 @@ export async function draftChatAction(input: {
   contractId?: string;
   message: string;
   history?: string[];
+  fieldKey?: string;
 }): Promise<DraftChatResult> {
   const t = await getTranslations("chat");
   const locale = (await getLocale()) as AppLocale;
@@ -245,7 +254,13 @@ export async function draftChatAction(input: {
   }
 
   if (input.contractId) {
-    return continueDraftChat(input.contractId, session.userId, message, input.history ?? []);
+    return continueDraftChat(
+      input.contractId,
+      session.userId,
+      message,
+      input.history ?? [],
+      input.fieldKey
+    );
   }
 
   const templates = await prisma.contractTemplate.findMany({
@@ -300,7 +315,7 @@ export async function draftChatAction(input: {
   try {
     const templateBody = await resolveTemplateBody(template);
     const placeholders = resolveTemplatePlaceholders(template, templateBody);
-    awaitingField = awaitingFieldFromMissing(missingPlaceholders(placeholders, {}));
+    awaitingField = awaitingFieldFromMissing(missingForCollection(placeholders, {}));
     draftPreview = await buildDraftPreview({
       ...contract,
       template,
@@ -320,11 +335,50 @@ export async function draftChatAction(input: {
   };
 }
 
+async function applyDirectFieldAnswer(
+  contractId: string,
+  contract: DraftContractWithTemplate,
+  placeholders: string[],
+  answers: Record<string, string>,
+  fieldKey: string,
+  value: string
+): Promise<DraftChatResult> {
+  const t = await getTranslations("chat");
+  const nextAnswers = { ...answers, [fieldKey]: value.trim() };
+
+  let draftPreview: DraftPreview | undefined;
+  try {
+    draftPreview = await persistDraftAnswers(contractId, contract, nextAnswers);
+  } catch {
+    return {
+      contractId,
+      assistantMessage: t("errors.generic"),
+      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers)),
+    };
+  }
+
+  const missingAfter = missingForCollection(placeholders, nextAnswers);
+  if (isDraftReadyToComplete(placeholders, nextAnswers)) {
+    return completeDraftContract(contractId, contract, nextAnswers);
+  }
+
+  const nextKey = missingAfter[0]!;
+  return {
+    contractId,
+    assistantMessage: t("field.nextQuestion", { label: humanizePlaceholder(nextKey) }),
+    completed: false,
+    awaitingField: awaitingFieldFromMissing(missingAfter),
+    draftPreview,
+    contractTitle: contract.title,
+  };
+}
+
 async function continueDraftChat(
   contractId: string,
   userId: string,
   message: string,
-  history: string[]
+  history: string[],
+  fieldKey?: string
 ): Promise<DraftChatResult> {
   const completed = await loadCompletedContract(contractId, userId);
   if (completed) {
@@ -348,7 +402,18 @@ async function continueDraftChat(
 
   const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
   let answers = parseDraftAnswers(contract.draftAnswers);
-  const missingBefore = missingPlaceholders(placeholders, answers);
+  const missingBefore = missingForCollection(placeholders, answers);
+
+  if (fieldKey && missingBefore.includes(fieldKey)) {
+    return applyDirectFieldAnswer(
+      contractId,
+      contract,
+      placeholders,
+      answers,
+      fieldKey,
+      message
+    );
+  }
 
   const llmTurn = await runDraftTurnWithLlm({
     locale,
@@ -363,20 +428,39 @@ async function continueDraftChat(
   });
 
   if (!llmTurn) {
-    return { contractId, assistantMessage: t("errors.generic") };
+    const currentKey = missingBefore[0];
+    if (currentKey) {
+      const draftPreview = await buildDraftPreview(contract);
+      return {
+        contractId,
+        assistantMessage: t("field.retryQuestion", { label: humanizePlaceholder(currentKey) }),
+        awaitingField: awaitingFieldFromMissing(missingBefore),
+        draftPreview,
+        contractTitle: contract.title,
+      };
+    }
+    return {
+      contractId,
+      assistantMessage: t("errors.generic"),
+      awaitingField: awaitingFieldFromMissing(missingBefore),
+    };
   }
 
   answers = { ...answers, ...llmTurn.result.collected };
-  const draftPreview = await persistDraftAnswers(contractId, contract, answers);
 
-  const missingAfter = missingPlaceholders(placeholders, answers);
-  const allFilled = missingAfter.length === 0;
-
-  if (llmTurn.result.complete && allFilled) {
-    return completeDraftContract(contractId, contract, answers);
+  let draftPreview: DraftPreview | undefined;
+  try {
+    draftPreview = await persistDraftAnswers(contractId, contract, answers);
+  } catch {
+    return {
+      contractId,
+      assistantMessage: t("errors.generic"),
+      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers)),
+    };
   }
 
-  if (allFilled) {
+  const missingAfter = missingForCollection(placeholders, answers);
+  if (isDraftReadyToComplete(placeholders, answers)) {
     return completeDraftContract(contractId, contract, answers);
   }
 
@@ -451,6 +535,68 @@ async function continueCompletedDraftChat(
   };
 }
 
+export type DraftSessionState = {
+  contractId: string;
+  contractTitle: string;
+  completed: boolean;
+  draftPreview?: DraftPreview;
+  awaitingField?: AwaitingField;
+  contractBody?: string;
+};
+
+async function sessionStateForInProgressContract(
+  contract: DraftContractWithTemplate
+): Promise<DraftSessionState | null> {
+  if (!contract.template) return null;
+
+  let templateBody: string;
+  try {
+    templateBody = await resolveTemplateBody(contract.template);
+  } catch {
+    return null;
+  }
+
+  const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
+  const answers = parseDraftAnswers(contract.draftAnswers);
+  const missing = missingForCollection(placeholders, answers);
+  const draftPreview = await buildDraftPreview(contract);
+
+  return {
+    contractId: contract.id,
+    contractTitle: contract.title,
+    completed: false,
+    draftPreview,
+    awaitingField: awaitingFieldFromMissing(missing),
+  };
+}
+
+export async function getDraftSessionStateAction(
+  contractId: string
+): Promise<DraftSessionState | null> {
+  const session = await getClientSession();
+  if (!session.ok) return null;
+
+  const inProgress = await loadDraftContract(contractId, session.userId);
+  if (inProgress) {
+    return sessionStateForInProgressContract(inProgress);
+  }
+
+  const completed = await loadCompletedContract(contractId, session.userId);
+  if (!completed) return null;
+
+  return {
+    contractId: completed.id,
+    contractTitle: completed.title,
+    completed: true,
+    contractBody: completed.extractedText,
+    draftPreview: {
+      body: completed.extractedText,
+      title: completed.title,
+      inProgress: false,
+    },
+  };
+}
+
 export async function resumeDraftChatAction(contractId: string): Promise<DraftChatResult | null> {
   const session = await getClientSession();
   if (!session.ok || !isAiConfigured()) return null;
@@ -468,7 +614,7 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
 
   const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
   const answers = parseDraftAnswers(contract.draftAnswers);
-  const missing = missingPlaceholders(placeholders, answers);
+  const missing = missingForCollection(placeholders, answers);
   if (missing.length === 0) return null;
 
   const draftPreview = await buildDraftPreview(contract);
@@ -491,7 +637,19 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
     history: [],
   });
 
-  if (!llmTurn) return null;
+  if (!llmTurn) {
+    const nextKey = missing[0];
+    if (!nextKey) return null;
+    const t = await getTranslations("chat");
+    return {
+      contractId: contract.id,
+      assistantMessage: t("field.resumeQuestion", { label: humanizePlaceholder(nextKey) }),
+      completed: false,
+      awaitingField,
+      draftPreview,
+      contractTitle: contract.title,
+    };
+  }
 
   return {
     contractId: contract.id,

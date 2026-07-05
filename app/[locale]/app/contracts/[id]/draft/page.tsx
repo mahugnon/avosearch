@@ -7,7 +7,7 @@ import { requireClientContract } from "@/lib/contracts/access";
 import { renderDraftPreview, getDraftPreviewHighlight } from "@/lib/templates/draft-preview";
 import {
   humanizePlaceholder,
-  missingPlaceholders,
+  collectableMissingPlaceholders,
 } from "@/lib/templates/placeholders";
 import { loadTemplateBody, resolveTemplatePlaceholders } from "@/lib/templates/load";
 import { parseDraftAnswers } from "@/lib/templates/render";
@@ -43,7 +43,7 @@ export default async function ContractDraftPage({ params }: Props) {
   const templateBody = await loadTemplateBody(contract.template);
   const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
   const answers = parseDraftAnswers(contract.draftAnswers);
-  const missing = missingPlaceholders(placeholders, answers);
+  const missing = collectableMissingPlaceholders(placeholders, answers);
   const initialAwaitingField = missing[0]
     ? { key: missing[0], label: humanizePlaceholder(missing[0]) }
     : undefined;
