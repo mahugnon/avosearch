@@ -1,8 +1,7 @@
 "use client";
 
-import { Download, Copy, ExternalLink } from "lucide-react";
+import { Download, Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import {
   HighlightedContractBody,
   type ContractViewerMode,
@@ -21,6 +20,7 @@ type Props = {
   highlight?: ContractHighlightData | null;
   mode?: ContractViewerMode;
   showLawyerRequest?: boolean;
+  draftPreview?: boolean;
 };
 
 export function ContractViewer({
@@ -31,6 +31,7 @@ export function ContractViewer({
   highlight,
   mode = "client",
   showLawyerRequest,
+  draftPreview,
 }: Props) {
   const t = useTranslations("chat.viewer");
 
@@ -53,7 +54,7 @@ export function ContractViewer({
       <header className="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3 sm:px-5">
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            {t("label")}
+            {draftPreview ? t("draftLabel") : t("label")}
           </p>
           <h3 className="truncate text-sm font-semibold">{title}</h3>
         </div>
@@ -62,7 +63,7 @@ export function ContractViewer({
             <Copy className="size-3.5" />
             {t("copy")}
           </Button>
-          {contractId && (
+          {contractId && !draftPreview && (
             <>
               {showLawyerRequest && <RequestLawyerButton contractId={contractId} />}
               <Button
@@ -75,14 +76,6 @@ export function ContractViewer({
                 <Download className="size-3.5" />
                 {t("pdf")}
               </Button>
-              {!showLawyerRequest && mode === "client" && (
-                <Button asChild variant="outline" size="sm" className="h-8 gap-1.5">
-                  <Link href={`/app/contracts/${contractId}?analyze=1`}>
-                    <ExternalLink className="size-3.5" />
-                    {t("analyze")}
-                  </Link>
-                </Button>
-              )}
             </>
           )}
         </div>

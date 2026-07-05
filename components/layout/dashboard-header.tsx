@@ -11,6 +11,7 @@ interface DashboardHeaderProps {
   areaLabel: string;
   userName: string;
   profileHref?: string;
+  showClientNav?: boolean;
 }
 
 function initials(name: string): string {
@@ -25,8 +26,10 @@ export async function DashboardHeader({
   areaLabel,
   userName,
   profileHref,
+  showClientNav = false,
 }: DashboardHeaderProps) {
   const t = await getTranslations("header");
+  const tc = await getTranslations("client");
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -36,14 +39,30 @@ export async function DashboardHeader({
             <Logo />
           </Link>
           <span className="hidden h-4 w-px bg-border sm:block" aria-hidden />
-          <span className="hidden text-sm text-muted-foreground sm:inline">{areaLabel}</span>
+          {showClientNav ? (
+            <nav className="hidden items-center gap-1 sm:flex" aria-label={areaLabel}>
+              <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+                <Link href="/app">{tc("nav.home")}</Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+                <Link href="/app/contracts">{tc("nav.contracts")}</Link>
+              </Button>
+            </nav>
+          ) : (
+            <span className="hidden text-sm text-muted-foreground sm:inline">{areaLabel}</span>
+          )}
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <LocaleSwitcher />
           {homeHref === "/app" && (
-            <Button asChild variant="ghost" size="sm" className="hidden text-muted-foreground sm:inline-flex">
-              <Link href="/app/settings">{t("settings")}</Link>
-            </Button>
+            <>
+              <Button asChild variant="ghost" size="sm" className="hidden text-muted-foreground sm:inline-flex">
+                <Link href="/app/orders">{tc("nav.orders")}</Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="hidden text-muted-foreground sm:inline-flex">
+                <Link href="/app/settings">{t("settings")}</Link>
+              </Button>
+            </>
           )}
           {profileHref ? (
             <Link

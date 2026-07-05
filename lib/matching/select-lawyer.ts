@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { llmScoreMap, runLawyerMatchWithLlm } from "@/lib/ai/lawyer-match";
+import { contractMatchingContext } from "@/lib/contracts/document";
 
 export type LawyerSelectionBreakdown = {
   specialty: number;
@@ -109,25 +110,26 @@ function rankHeuristic(
 export async function rankLawyersForContract(contractId: string, limit = 5): Promise<RankedLawyer[]> {
   const contract = await prisma.contract.findUnique({
     where: { id: contractId },
-    include: { analysis: true },
+    include: { analysis: true, template: { select: { domain: true } } },
   });
 
-  if (!contract?.analysis) return [];
+  if (!contract) return [];
+
+  const contextText = contractMatchingContext(contract);
+  if (!contextText) return [];
 
   const lawyers = await fetchEligibleLawyers();
   if (lawyers.length === 0) return [];
 
-  const haystack = buildHaystack(
-    contract.analysis.domain,
-    contract.analysis.flags,
-    contract.extractedText
-  );
+  const domain = contract.analysis?.domain ?? contract.template?.domain ?? contract.title;
+  const flags = contract.analysis?.flags ?? [];
+  const haystack = buildHaystack(domain, flags, contextText);
 
   const llmMatch = await runLawyerMatchWithLlm({
-    domain: contract.analysis.domain,
-    flags: contract.analysis.flags,
+    domain,
+    flags,
     userQuestion: contract.userQuestion,
-    contractExcerpt: contract.extractedText,
+    contractExcerpt: contextText,
     lawyers,
   });
 

@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
+import { LawyerReviewedBadge } from "@/components/contracts/lawyer-reviewed-badge";
 import {
   Table,
   TableBody,
@@ -14,6 +15,7 @@ import { formatEuros } from "@/lib/config";
 import type { AppLocale } from "@/lib/i18n";
 import { intlLocale } from "@/lib/i18n";
 import { getDeadlineUrgency } from "@/lib/lawyer/dashboard-data";
+import { isLawyerReviewDelivered } from "@/lib/contracts/lawyer-review";
 import type { MissionListRow } from "@/lib/lawyer/missions-list";
 
 interface LawyerMissionsTableProps {
@@ -40,7 +42,9 @@ export async function LawyerMissionsTable({
         <p className="text-sm font-medium">
           {hasAnyMissions ? t("emptyFiltered") : t("empty")}
         </p>
-        {hasAnyMissions && (
+        {!hasAnyMissions ? (
+          <p className="mt-1 text-sm text-muted-foreground">{t("emptyHint")}</p>
+        ) : (
           <p className="mt-1 text-sm text-muted-foreground">{t("emptyFilteredHint")}</p>
         )}
       </div>
@@ -90,6 +94,9 @@ export async function LawyerMissionsTable({
                 <TableCell>
                   <div className="flex flex-wrap items-center gap-1.5">
                     <Badge variant="outline">{t(`status.${mission.status}`)}</Badge>
+                    {isLawyerReviewDelivered(mission.status) && (
+                      <LawyerReviewedBadge label={t("reviewedBadge")} className="text-xs" />
+                    )}
                     {urgency === "overdue" && (
                       <Badge variant="destructive" className="text-xs">
                         {t("table.deadlineOverdue")}

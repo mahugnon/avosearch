@@ -1,6 +1,8 @@
 import { MissionStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { ContractViewer } from "@/components/contracts/contract-viewer";
+import { LawyerReviewedBy } from "@/components/contracts/lawyer-reviewed-by";
 import { ReviewPanel } from "@/components/contracts/review-panel";
 import { MissionChat } from "@/components/missions/mission-chat";
 import { MissionReviewForm } from "@/components/missions/mission-review-form";
@@ -9,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatEuros } from "@/lib/config";
+import { isLawyerReviewDelivered } from "@/lib/contracts/lawyer-review";
+import type { ContractReviewLawyer } from "@/lib/contracts/lawyer-review";
 import { getLocale } from "next-intl/server";
 import type { AppLocale } from "@/lib/i18n";
 import { notFound, redirect } from "next/navigation";
@@ -25,6 +29,8 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
   const { paid, cancel } = await searchParams;
   const session = await auth();
   const t = await getTranslations("missions");
+  const tc = await getTranslations("contracts");
+  const to = await getTranslations("client.orders");
   const locale = (await getLocale()) as AppLocale;
 
   if (!session || session.user.role !== "CLIENT") {
@@ -35,7 +41,9 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
     where: { id, clientId: session.user.id },
     include: {
       contract: { include: { analysis: { include: { modifications: { orderBy: { order: "asc" } } } } } },
-      lawyer: { select: { name: true } },
+      lawyer: {
+        include: { lawyerProfile: true },
+      },
       messages: {
         include: { sender: { select: { id: true, name: true, role: true } } },
         orderBy: { createdAt: "asc" },
@@ -59,15 +67,36 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
       lawyerComment: m.lawyerComment,
     })) ?? [];
 
+  const lawyerReviewed = isLawyerReviewDelivered(mission.status);
+  const hasContractText = mission.contract.extractedText.trim().length > 0;
+
+  const reviewLawyer: ContractReviewLawyer | null =
+    lawyerReviewed && mission.lawyer?.lawyerProfile
+      ? {
+          userId: mission.lawyer.id,
+          name: mission.lawyer.name,
+          photoUrl: mission.lawyer.lawyerProfile.photoUrl,
+          barreau: mission.lawyer.lawyerProfile.barreau,
+          city: mission.lawyer.lawyerProfile.city,
+          specialties: mission.lawyer.lawyerProfile.specialties,
+          bio: mission.lawyer.lawyerProfile.bio,
+          validationPriceCents: mission.lawyer.lawyerProfile.validationPriceCents,
+          responseTimeHours: mission.lawyer.lawyerProfile.responseTimeHours,
+          rating: mission.lawyer.lawyerProfile.rating,
+          ratingCount: mission.lawyer.lawyerProfile.ratingCount,
+        }
+      : null;
+
   return (
     <div className="space-y-8">
       <div>
         <Button asChild variant="ghost" size="sm" className="-ml-2 mb-2">
-          <Link href="/app">{t("back")}</Link>
+          <Link href="/app/orders">{to("back")}</Link>
         </Button>
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">{mission.contract.title}</h1>
           <Badge variant="outline">{t(`status.${mission.status}`)}</Badge>
+          {reviewLawyer && <LawyerReviewedBy lawyer={reviewLawyer} locale={locale} size="md" />}
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
           {t("lawyer")}: {mission.lawyer?.name ?? "—"} ·{" "}
@@ -75,6 +104,13 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
             ? t("finalPrice", { price: formatEuros(mission.finalPriceCents, locale) })
             : t("estimatedPrice", { price: formatEuros(mission.priceCents, locale) })}
         </p>
+        {hasContractText && (
+          <p className="mt-2">
+            <Button asChild variant="link" size="sm" className="h-auto px-0">
+              <Link href={`/app/contracts/${mission.contractId}`}>{t("openContract")}</Link>
+            </Button>
+          </p>
+        )}
         {mission.autoAssigned && (
           <p className="mt-1 text-xs text-muted-foreground">{t("autoAssigned")}</p>
         )}
@@ -92,6 +128,14 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
 
       {paid && mission.status !== MissionStatus.PROPOSEE && (
         <p className="text-sm text-emerald-700">{t("paymentSuccess")}</p>
+      )}
+
+      {hasContractText && (
+        <ContractViewer
+          title={t("contractDocument")}
+          body={mission.contract.extractedText}
+          contractId={mission.contractId}
+        />
       )}
 
       {modifications.length > 0 && (

@@ -11,22 +11,39 @@ type Props = {
   highlight: ContractHighlightData;
   mode?: ContractViewerMode;
   className?: string;
+  validatedIds?: Set<string>;
+  onValidate?: (fieldId: string) => void;
+  focusedFieldId?: string | null;
+  inlineFieldActions?: boolean;
+  showLegend?: boolean;
 };
 
 export function HighlightedContractBody({
   highlight,
   mode = "client",
   className,
+  validatedIds: controlledValidatedIds,
+  onValidate: controlledOnValidate,
+  focusedFieldId,
+  inlineFieldActions = true,
+  showLegend,
 }: Props) {
-  const [validatedIds, setValidatedIds] = useState<Set<string>>(new Set());
+  const [internalValidatedIds, setInternalValidatedIds] = useState<Set<string>>(new Set());
+  const validatedIds = controlledValidatedIds ?? internalValidatedIds;
 
   const segments = useMemo(
-    () => buildContractSegments(highlight.templateBody, highlight.answers, highlight.fields),
+    () =>
+      highlight.segments ??
+      buildContractSegments(highlight.templateBody, highlight.answers, highlight.fields),
     [highlight]
   );
 
   function handleValidate(fieldId: string) {
-    setValidatedIds((prev) => new Set(prev).add(fieldId));
+    if (controlledOnValidate) {
+      controlledOnValidate(fieldId);
+      return;
+    }
+    setInternalValidatedIds((prev) => new Set(prev).add(fieldId));
   }
 
   return (
@@ -35,6 +52,9 @@ export function HighlightedContractBody({
       mode={mode}
       validatedIds={validatedIds}
       onValidate={handleValidate}
+      focusedFieldId={focusedFieldId}
+      inlineFieldActions={inlineFieldActions}
+      showLegend={showLegend}
       className={className}
     />
   );

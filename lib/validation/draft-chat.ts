@@ -35,7 +35,10 @@ export function parseDraftTurnJson(raw: string): DraftTurnResponse {
 
 export const draftFollowUpResponseSchema = z.object({
   assistant_message: z.string().min(1).max(3000),
-  updated_body: z.string().max(120_000).optional(),
+  collected: z
+    .record(z.string(), z.string())
+    .optional()
+    .default({}),
 });
 
 export type DraftFollowUpResponse = z.infer<typeof draftFollowUpResponseSchema>;

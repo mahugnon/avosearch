@@ -36,6 +36,9 @@ export function missionBoardColumn(status: MissionStatus): BoardColumnKey | null
 export function getVisibleBoardColumns(
   status: MissionStatusFilter
 ): BoardColumnKey[] {
+  if (status === "active") {
+    return [MissionStatus.ACCEPTEE, MissionStatus.EN_COURS];
+  }
   if (status === "all") return BOARD_COLUMNS;
   if (status === "done") return ["done"];
   if (

@@ -68,7 +68,7 @@ export async function completeDraftAction(contractId: string): Promise<DraftActi
     },
   });
 
-  redirect(localizedPath(`/app/contracts/${contractId}?analyze=1`, locale));
+  redirect(localizedPath(`/app/contracts/${contractId}`, locale));
 }
 
 export async function findTemplateForDraftQuestion(question: string, hasFile: boolean) {

@@ -204,6 +204,26 @@
   .typing-dot:nth-child(3) {
     animation-delay: 0.3s;
   }
+
+  .logo-loader-circle {
+    animation: logo-pulse 1.1s ease-in-out infinite;
+  }
+
+  .logo-loader-circle--blue {
+    animation-delay: 0.22s;
+  }
+}
+
+@keyframes logo-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
 }
 
 @keyframes typing-bounce {

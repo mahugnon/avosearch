@@ -1,19 +1,27 @@
-import { ContractDraftStatus } from "@prisma/client";
+import { ContractDraftStatus, MissionStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
-import { Link, redirect } from "@/i18n/navigation";
-import { AnalyzeContract } from "@/components/contracts/analyze-contract";
+import { Link } from "@/i18n/navigation";
+import { Pencil } from "lucide-react";
+import { ContractLawyerSubmitSection } from "@/components/contracts/contract-lawyer-submit-section";
 import { ContractViewer } from "@/components/contracts/contract-viewer";
-import type { TriageViewData } from "@/components/contracts/triage-result";
-import { runContractTriage, TriageError } from "@/lib/ai/triage";
+import { LawyerReviewedBy } from "@/components/contracts/lawyer-reviewed-by";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { requireClientContract } from "@/lib/contracts/access";
+import {
+  getClientDeliveredMissionForContract,
+  getReviewLawyerForContract,
+} from "@/lib/contracts/lawyer-review";
+import { hasViewableDocument, isListableClientContract } from "@/lib/contracts/document";
 import { prisma } from "@/lib/db";
 import { loadTemplateBody } from "@/lib/templates/load";
-import { getContractHighlightData } from "@/lib/templates/highlight";
+import { highlightFromRenderedContract, getContractHighlightData } from "@/lib/templates/highlight";
+import { renderDraftPreview, getDraftPreviewHighlight } from "@/lib/templates/draft-preview";
+import { localizedPath, type AppLocale } from "@/lib/i18n";
+import { redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ analyze?: string }>;
 };
 
 export async function generateMetadata({ params }: Props) {
@@ -22,89 +30,100 @@ export async function generateMetadata({ params }: Props) {
   return { title: contract.title };
 }
 
-export default async function ContractDetailPage({ params, searchParams }: Props) {
-  const { id, locale } = await params;
-  const { analyze } = await searchParams;
+export default async function ContractDetailPage({ params }: Props) {
+  const { id, locale: localeParam } = await params;
+  const locale = localeParam as AppLocale;
   const { contract } = await requireClientContract(id);
   const t = await getTranslations("contracts");
+  const tClient = await getTranslations("client");
 
-  if (contract.draftStatus === ContractDraftStatus.IN_PROGRESS) {
-    redirect({ href: "/app", locale });
+  if (
+    contract.draftStatus === ContractDraftStatus.IN_PROGRESS &&
+    contract.template
+  ) {
+    const previewBody = await renderDraftPreview({
+      template: contract.template,
+      draftAnswers: contract.draftAnswers,
+    });
+    const highlight = await getDraftPreviewHighlight({
+      template: contract.template,
+      draftAnswers: contract.draftAnswers,
+    });
+
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <Button asChild variant="ghost" size="sm" className="-ml-2 mb-2">
+              <Link href="/app/contracts">{t("backToContracts")}</Link>
+            </Button>
+            <h1 className="text-2xl font-semibold tracking-tight">{contract.title}</h1>
+            <div className="mt-2">
+              <Badge variant="outline">{t("draftInProgress")}</Badge>
+            </div>
+          </div>
+          <Button asChild className="gap-1.5 shrink-0">
+            <Link href={`/app/contracts/${id}/draft`}>
+              <Pencil className="size-4" aria-hidden />
+              {tClient("contracts.editDraft")}
+            </Link>
+          </Button>
+        </div>
+
+        <ContractViewer
+          title={contract.title}
+          body={previewBody}
+          contractId={contract.id}
+          highlight={highlight}
+          draftPreview
+        />
+      </div>
+    );
   }
 
-  let analyzeError: string | null = null;
-  let outOfScope: TriageViewData | null = null;
+  const deliveredMission = await getClientDeliveredMissionForContract(id, contract.ownerId);
+  const reviewLawyer = await getReviewLawyerForContract(id, contract.ownerId);
 
-  if (analyze === "1" && !contract.analysis) {
-    let shouldRedirect = false;
-
-    try {
-      const { result, model } = await runContractTriage({
-        extractedText: contract.extractedText,
-        userQuestion: contract.userQuestion,
+  const activeMission = deliveredMission
+    ? null
+    : await prisma.mission.findFirst({
+        where: {
+          contractId: id,
+          clientId: contract.ownerId,
+          status: { notIn: [MissionStatus.ANNULEE, MissionStatus.TERMINEE] },
+        },
+        select: { id: true, status: true },
       });
 
-      if (result.outOfScope) {
-        outOfScope = {
-          kind: "outOfScope",
-          domain: result.domain,
-          justification: result.justification,
-          requiredPro: result.requiredPro,
-        };
-      } else {
-        await prisma.analysis.create({
-          data: {
-            contractId: contract.id,
-            triage: result.triage,
-            confidence: result.confidence,
-            domain: result.domain,
-            justification: result.justification,
-            flags: result.flags,
-            requiredPro: result.requiredPro,
-            model,
-          },
-        });
-        shouldRedirect = true;
-      }
-    } catch (error) {
-      analyzeError =
-        error instanceof TriageError ? error.code : "ANALYZE_FAILED";
+  if (!isListableClientContract(contract, { hasDeliveredMission: !!deliveredMission })) {
+    if (activeMission) {
+      redirect(localizedPath(`/app/missions/${activeMission.id}`, locale));
     }
-
-    if (shouldRedirect) {
-      redirect({ href: `/app/contracts/${id}`, locale });
-    }
+    redirect(localizedPath("/app", locale));
   }
 
-  const initialData: TriageViewData | null =
-    outOfScope ??
-    (contract.analysis
-      ? {
-          kind: "analysis",
-          triage: contract.analysis.triage,
-          confidence: contract.analysis.confidence,
-          domain: contract.analysis.domain,
-          justification: contract.analysis.justification,
-          flags: contract.analysis.flags,
-          requiredPro: contract.analysis.requiredPro,
-          demoMode: contract.analysis.model === "demo-heuristic",
-        }
-      : null);
+  const showDocument = hasViewableDocument(contract, !!deliveredMission);
 
   const highlight = await (async () => {
+    if (!showDocument) return null;
+
+    const fromRendered = highlightFromRenderedContract({
+      extractedText: contract.extractedText,
+      draftAnswers: contract.draftAnswers,
+    });
+    if (fromRendered) return fromRendered;
+
     if (!contract.template) return null;
-    let templateBody = contract.template.body?.trim() ?? "";
-    if (!templateBody) {
-      try {
-        templateBody = await loadTemplateBody({
-          body: contract.template.body,
-          fileKey: contract.template.fileKey ?? null,
-          fileName: contract.template.fileName ?? null,
-          mimeType: contract.template.mimeType ?? null,
-        });
-      } catch {
-        return null;
-      }
+    let templateBody: string;
+    try {
+      templateBody = await loadTemplateBody({
+        fileKey: contract.template.fileKey ?? null,
+        fileName: contract.template.fileName ?? null,
+        mimeType: contract.template.mimeType ?? null,
+        placeholders: contract.template.placeholders,
+      });
+    } catch {
+      return null;
     }
     return getContractHighlightData({
       templateBody,
@@ -117,16 +136,19 @@ export default async function ContractDetailPage({ params, searchParams }: Props
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <Button asChild variant="ghost" size="sm" className="-ml-2 mb-2">
-            <Link href="/app">{t("backToDashboard")}</Link>
+            <Link href="/app/contracts">{t("backToContracts")}</Link>
           </Button>
           <h1 className="text-2xl font-semibold tracking-tight">{contract.title}</h1>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {reviewLawyer && <LawyerReviewedBy lawyer={reviewLawyer} locale={locale} size="md" />}
+          </div>
           {contract.userQuestion && (
             <p className="mt-2 text-sm text-muted-foreground">{contract.userQuestion}</p>
           )}
         </div>
       </div>
 
-      {contract.extractedText.trim() && (
+      {showDocument && (
         <ContractViewer
           title={t("documentPreview")}
           body={contract.extractedText}
@@ -135,11 +157,9 @@ export default async function ContractDetailPage({ params, searchParams }: Props
         />
       )}
 
-      <AnalyzeContract
-        contractId={contract.id}
-        initialData={initialData}
-        initialError={analyzeError}
-      />
+      {!deliveredMission && !activeMission && (
+        <ContractLawyerSubmitSection contractId={contract.id} />
+      )}
     </div>
   );
 }

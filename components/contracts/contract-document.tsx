@@ -20,27 +20,36 @@ type FieldRenderProps = {
   node: Extract<InlineNode, { kind: "field" }>;
   mode: ContractViewerMode;
   validated: boolean;
+  focused: boolean;
   onValidate?: (fieldId: string) => void;
+  inlineFieldActions: boolean;
 };
 
-function FieldValue({ node, mode, validated, onValidate }: FieldRenderProps) {
+function FieldValue({
+  node,
+  mode,
+  validated,
+  focused,
+  onValidate,
+  inlineFieldActions,
+}: FieldRenderProps) {
   const t = useTranslations("contracts.viewer");
+
+  const markClass = cn(
+    "rounded-[2px] px-1 py-px font-medium not-italic scroll-mt-24",
+    validated
+      ? "bg-emerald-100/90 text-emerald-950 decoration-emerald-500/70"
+      : "bg-amber-100/90 text-amber-950 decoration-amber-500/80",
+    "underline decoration-2 underline-offset-[3px]",
+    focused && "ring-2 ring-primary/40 ring-offset-1"
+  );
 
   return (
     <span className="group/field relative inline">
-      <mark
-        className={cn(
-          "rounded-[2px] px-1 py-px font-medium not-italic",
-          validated
-            ? "bg-emerald-100/90 text-emerald-950 decoration-emerald-500/70"
-            : "bg-amber-100/90 text-amber-950 decoration-amber-500/80",
-          "underline decoration-2 underline-offset-[3px]"
-        )}
-        title={node.label}
-      >
+      <mark className={markClass} title={node.label} data-field-id={node.fieldId}>
         {node.value}
       </mark>
-      {mode === "lawyer" && (
+      {mode === "lawyer" && inlineFieldActions && (
         <span className="ml-1 inline-flex align-middle font-sans">
           {validated ? (
             <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[0.625rem] font-medium text-emerald-800">
@@ -69,11 +78,15 @@ function InlineContent({
   mode,
   validatedIds,
   onValidate,
+  focusedFieldId,
+  inlineFieldActions,
 }: {
   nodes: InlineNode[];
   mode: ContractViewerMode;
   validatedIds: Set<string>;
   onValidate?: (fieldId: string) => void;
+  focusedFieldId?: string | null;
+  inlineFieldActions: boolean;
 }) {
   return (
     <>
@@ -86,7 +99,9 @@ function InlineContent({
             node={node}
             mode={mode}
             validated={validatedIds.has(node.fieldId)}
+            focused={focusedFieldId === node.fieldId}
             onValidate={onValidate}
+            inlineFieldActions={inlineFieldActions}
           />
         )
       )}
@@ -99,13 +114,17 @@ function DocumentBlockView({
   mode,
   validatedIds,
   onValidate,
+  focusedFieldId,
+  inlineFieldActions,
 }: {
   block: DocumentBlock;
   mode: ContractViewerMode;
   validatedIds: Set<string>;
   onValidate?: (fieldId: string) => void;
+  focusedFieldId?: string | null;
+  inlineFieldActions: boolean;
 }) {
-  const shared = { mode, validatedIds, onValidate };
+  const shared = { mode, validatedIds, onValidate, focusedFieldId, inlineFieldActions };
 
   switch (block.type) {
     case "title":
@@ -205,6 +224,8 @@ type Props = {
   mode?: ContractViewerMode;
   validatedIds?: Set<string>;
   onValidate?: (fieldId: string) => void;
+  focusedFieldId?: string | null;
+  inlineFieldActions?: boolean;
   className?: string;
   showLegend?: boolean;
 };
@@ -214,6 +235,8 @@ export function ContractDocument({
   mode = "client",
   validatedIds = new Set(),
   onValidate,
+  focusedFieldId,
+  inlineFieldActions = true,
   className,
   showLegend = true,
 }: Props) {
@@ -261,6 +284,8 @@ export function ContractDocument({
             mode={mode}
             validatedIds={validatedIds}
             onValidate={onValidate}
+            focusedFieldId={focusedFieldId}
+            inlineFieldActions={inlineFieldActions}
           />
         ))}
       </div>
@@ -279,7 +304,10 @@ export function ContractDocumentFromSegments(props: {
   mode?: ContractViewerMode;
   validatedIds?: Set<string>;
   onValidate?: (fieldId: string) => void;
+  focusedFieldId?: string | null;
+  inlineFieldActions?: boolean;
   className?: string;
+  showLegend?: boolean;
 }) {
   const blocks = useMemo(() => buildDocumentBlocks(props.segments), [props.segments]);
   return (
@@ -288,6 +316,9 @@ export function ContractDocumentFromSegments(props: {
       mode={props.mode}
       validatedIds={props.validatedIds}
       onValidate={props.onValidate}
+      focusedFieldId={props.focusedFieldId}
+      inlineFieldActions={props.inlineFieldActions}
+      showLegend={props.showLegend}
       className={props.className}
     />
   );

@@ -3,7 +3,7 @@
 import { Loader2, Scale } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import {
   confirmLawyerMissionAction,
   getLawyerSelectionAction,
@@ -26,18 +26,28 @@ import { localizedPath } from "@/lib/i18n";
 type Props = {
   contractId: string;
   variant?: "default" | "primary";
+  hideTrigger?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 type Step = "idle" | "searching" | "results" | "error";
 
 const SEARCH_MIN_MS = 1200;
 
-export function LawyerSelectionDialog({ contractId, variant = "primary" }: Props) {
+export function LawyerSelectionDialog({
+  contractId,
+  variant = "primary",
+  hideTrigger = false,
+  open: controlledOpen,
+  onOpenChange,
+}: Props) {
   const t = useTranslations("contracts.lawyerSelection");
   const tViewer = useTranslations("chat.viewer");
   const locale = useLocale() as AppLocale;
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = controlledOpen ?? internalOpen;
   const [step, setStep] = useState<Step>("idle");
   const [lawyers, setLawyers] = useState<LawyerMatchView[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -78,6 +88,17 @@ export function LawyerSelectionDialog({ contractId, variant = "primary" }: Props
     setStep("results");
   }, [contractId, locale, router]);
 
+  function setOpen(nextOpen: boolean) {
+    if (onOpenChange) onOpenChange(nextOpen);
+    else setInternalOpen(nextOpen);
+  }
+
+  useEffect(() => {
+    if (hideTrigger && open && step === "idle") {
+      void loadSelection();
+    }
+  }, [hideTrigger, open, step, loadSelection]);
+
   function handleOpen() {
     setOpen(true);
     void loadSelection();
@@ -106,17 +127,19 @@ export function LawyerSelectionDialog({ contractId, variant = "primary" }: Props
 
   return (
     <>
-      <Button
-        type="button"
-        variant={variant === "primary" ? "default" : "outline"}
-        size="sm"
-        className="h-8 gap-1.5"
-        disabled={pending || (open && step === "searching")}
-        onClick={handleOpen}
-      >
-        <Scale className="size-3.5" />
-        {pending ? tViewer("requestLawyerPending") : tViewer("requestLawyer")}
-      </Button>
+      {!hideTrigger && (
+        <Button
+          type="button"
+          variant={variant === "primary" ? "default" : "outline"}
+          size="sm"
+          className="h-8 gap-1.5"
+          disabled={pending || (open && step === "searching")}
+          onClick={handleOpen}
+        >
+          <Scale className="size-3.5" />
+          {pending ? tViewer("requestLawyerPending") : tViewer("requestLawyer")}
+        </Button>
+      )}
 
       <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg" showCloseButton={!pending}>

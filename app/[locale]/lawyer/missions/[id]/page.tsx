@@ -2,14 +2,19 @@ import { MissionStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { LawyerMissionReview } from "@/components/lawyer/lawyer-mission-review";
+import { LawyerContractEditor } from "@/components/lawyer/lawyer-contract-editor";
+import { ContractViewer } from "@/components/contracts/contract-viewer";
+import { LawyerReviewedBadge } from "@/components/contracts/lawyer-reviewed-badge";
 import { MissionWorkTimer } from "@/components/lawyer/mission-work-timer";
 import { MissionChat } from "@/components/missions/mission-chat";
 import { lawyerAcceptMissionAction } from "@/lib/actions/missions";
+import { loadLawyerContractHighlight } from "@/lib/actions/lawyer-contract";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { localizedPath } from "@/lib/i18n";
+import { isLawyerReviewDelivered } from "@/lib/contracts/lawyer-review";
 import { getLocale } from "next-intl/server";
 import type { AppLocale } from "@/lib/i18n";
 import { notFound, redirect } from "next/navigation";
@@ -22,6 +27,7 @@ export default async function LawyerMissionDetailPage({ params }: Props) {
   const { id } = await params;
   const session = await auth();
   const t = await getTranslations("lawyer.mission");
+  const tc = await getTranslations("contracts");
   const locale = (await getLocale()) as AppLocale;
 
   if (!session || session.user.role !== "LAWYER") {
@@ -31,7 +37,12 @@ export default async function LawyerMissionDetailPage({ params }: Props) {
   const mission = await prisma.mission.findFirst({
     where: { id, lawyerId: session.user.id },
     include: {
-      contract: { include: { analysis: { include: { modifications: { orderBy: { order: "asc" } } } } } },
+      contract: {
+        include: {
+          template: true,
+          analysis: { include: { modifications: { orderBy: { order: "asc" } } } },
+        },
+      },
       client: { select: { name: true } },
       messages: {
         include: { sender: { select: { id: true, name: true, role: true } } },
@@ -41,6 +52,9 @@ export default async function LawyerMissionDetailPage({ params }: Props) {
   });
 
   if (!mission) notFound();
+
+  const lawyerReviewed = isLawyerReviewDelivered(mission.status);
+  const contractHighlight = await loadLawyerContractHighlight(mission.contract);
 
   const modifications =
     mission.contract.analysis?.modifications.map((m) => ({
@@ -69,6 +83,7 @@ export default async function LawyerMissionDetailPage({ params }: Props) {
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">{mission.contract.title}</h1>
           <Badge variant="outline">{t(`status.${mission.status}`)}</Badge>
+          {lawyerReviewed && <LawyerReviewedBadge label={tc("lawyerReviewed")} />}
         </div>
         <p className="mt-1 text-sm text-muted-foreground">{t("client")}: {mission.client.name}</p>
         {mission.autoAssigned && (
@@ -90,24 +105,36 @@ export default async function LawyerMissionDetailPage({ params }: Props) {
             hourlyRateCents={mission.hourlyRateCents ?? 15000}
             minimumCents={mission.priceCents}
           />
-          {!modifications.length && mission.contract.extractedText.trim() && (
-            <div className="rounded-xl border bg-muted/30 p-4">
-              <p className="text-sm font-medium">{t("contractText")}</p>
-              <pre className="mt-2 max-h-64 overflow-y-auto whitespace-pre-wrap font-mono text-xs leading-relaxed">
-                {mission.contract.extractedText}
-              </pre>
-            </div>
+          {mission.contract.extractedText.trim() && (
+            <LawyerContractEditor
+              contractId={mission.contractId}
+              missionId={mission.id}
+              title={t("contractText")}
+              extractedText={mission.contract.extractedText}
+              highlight={contractHighlight}
+            />
           )}
           <LawyerMissionReview
             missionId={mission.id}
-            contractId={mission.contractId}
             modifications={modifications}
           />
         </>
       )}
 
-      {mission.status === MissionStatus.LIVREE && mission.globalNote && (
-        <p className="rounded-xl bg-muted p-4 text-sm whitespace-pre-wrap">{mission.globalNote}</p>
+      {(mission.status === MissionStatus.LIVREE || mission.status === MissionStatus.TERMINEE) && (
+        <>
+          {mission.globalNote && (
+            <p className="rounded-xl bg-muted p-4 text-sm whitespace-pre-wrap">{mission.globalNote}</p>
+          )}
+          {mission.contract.extractedText.trim() && (
+            <ContractViewer
+              title={t("deliveredContract")}
+              body={mission.contract.extractedText}
+              contractId={mission.contractId}
+              mode="lawyer"
+            />
+          )}
+        </>
       )}
 
       <section className="space-y-3">

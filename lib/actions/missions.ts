@@ -7,7 +7,6 @@ import { missionPriceForType } from "@/lib/matching/lawyers";
 import { priceForValidationMission, toLawyerMatchView } from "@/lib/matching/lawyer-view";
 import { rankLawyersForContract } from "@/lib/matching/select-lawyer";
 import { computeTimedPriceCents, elapsedWorkSeconds } from "@/lib/matching/billing";
-import { runContractTriage, TriageError } from "@/lib/ai/triage";
 import { localizedPath, type AppLocale } from "@/lib/i18n";
 import { pricing } from "@/lib/config";
 import { auth } from "@/lib/auth";
@@ -15,38 +14,17 @@ import { notifyMissionDelivered, notifyMissionCreated, notifyMissionPaid } from 
 import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 
-async function ensureContractAnalysis(contractId: string, ownerId: string) {
+import { contractMatchingContext } from "@/lib/contracts/document";
+
+async function requireOwnedContract(contractId: string, ownerId: string) {
   const contract = await prisma.contract.findFirst({
     where: { id: contractId, ownerId },
-    include: { analysis: true },
+    select: { id: true, extractedText: true, userQuestion: true },
   });
-  if (!contract) return { error: "not_found" as const };
-  if (contract.analysis) return { contract, analysis: contract.analysis };
-
-  try {
-    const { result, model } = await runContractTriage({
-      extractedText: contract.extractedText,
-      userQuestion: contract.userQuestion,
-    });
-    if (result.outOfScope) return { error: "out_of_scope" as const };
-
-    const analysis = await prisma.analysis.create({
-      data: {
-        contractId: contract.id,
-        triage: result.triage,
-        confidence: result.confidence,
-        domain: result.domain,
-        justification: result.justification,
-        flags: result.flags,
-        requiredPro: result.requiredPro,
-        model,
-      },
-    });
-    return { contract, analysis };
-  } catch (error) {
-    if (error instanceof TriageError) return { error: "analysis_failed" as const };
-    return { error: "analysis_failed" as const };
+  if (!contract || !contractMatchingContext(contract)) {
+    return { error: "empty_contract" as const };
   }
+  return { contract };
 }
 
 export async function getLawyerSelectionAction(contractId: string) {
@@ -65,8 +43,8 @@ export async function getLawyerSelectionAction(contractId: string) {
     return { existingMissionId: existing.id };
   }
 
-  const ensured = await ensureContractAnalysis(contractId, session.userId);
-  if ("error" in ensured) return { error: ensured.error };
+  const owned = await requireOwnedContract(contractId, session.userId);
+  if ("error" in owned) return { error: owned.error };
 
   const ranked = await rankLawyersForContract(contractId, 5);
   if (ranked.length === 0) return { error: "no_lawyers" as const };
@@ -102,8 +80,8 @@ export async function confirmLawyerMissionAction(contractId: string, lawyerUserI
     redirect(localizedPath(`/app/missions/${existing.id}`, locale));
   }
 
-  const ensured = await ensureContractAnalysis(contractId, session.userId);
-  if ("error" in ensured) {
+  const owned = await requireOwnedContract(contractId, session.userId);
+  if ("error" in owned) {
     redirect(localizedPath(`/app/contracts/${contractId}`, locale));
   }
 
@@ -137,7 +115,7 @@ export async function confirmLawyerMissionAction(contractId: string, lawyerUserI
 
   void notifyMissionCreated(mission.id);
   void notifyMissionPaid(mission.id);
-  redirect(localizedPath(`/app/missions/${mission.id}?paid=1`, locale));
+  redirect(localizedPath(`/app/orders?paid=${mission.id}`, locale));
 }
 
 export async function requestLawyerOpinionAction(contractId: string): Promise<void> {
@@ -171,9 +149,9 @@ export async function createMissionAction(input: {
 
   const contract = await prisma.contract.findFirst({
     where: { id: input.contractId, ownerId: session.userId },
-    include: { analysis: true },
+    select: { id: true, extractedText: true, userQuestion: true },
   });
-  if (!contract?.analysis) return { error: "no_analysis" };
+  if (!contract || !contractMatchingContext(contract)) return { error: "empty_contract" };
 
   const lawyer = await prisma.lawyerProfile.findFirst({
     where: { userId: input.lawyerUserId, verified: true, available: true },

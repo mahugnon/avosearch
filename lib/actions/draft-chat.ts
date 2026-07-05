@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getClientSession } from "@/lib/auth/client-session";
 import { runDraftFollowUpWithLlm, runDraftStartWithLlm, runDraftTurnWithLlm } from "@/lib/ai/draft-chat-llm";
 import { isAiConfigured } from "@/lib/ai/llm";
+import { titleFromQuestion } from "@/lib/extract/text";
 import {
   loadTemplateBody,
   resolveTemplatePlaceholders,
@@ -12,6 +13,7 @@ import {
 } from "@/lib/templates/load";
 import {
   applyPlaceholderDefaults,
+  humanizePlaceholder,
   missingPlaceholders,
 } from "@/lib/templates/placeholders";
 import {
@@ -19,8 +21,20 @@ import {
   renderTemplateBody,
   validateDraftAnswers,
 } from "@/lib/templates/render";
+import { renderDraftPreview } from "@/lib/templates/draft-preview";
 import { getTranslations, getLocale } from "next-intl/server";
 import type { AppLocale } from "@/lib/i18n";
+
+export type AwaitingField = {
+  key: string;
+  label: string;
+};
+
+export type DraftPreview = {
+  body: string;
+  title: string;
+  inProgress: boolean;
+};
 
 export type DraftChatResult = {
   contractId?: string;
@@ -28,10 +42,88 @@ export type DraftChatResult = {
   completed?: boolean;
   contractBody?: string;
   contractTitle?: string;
+  draftPreview?: DraftPreview;
+  suggestLawyer?: boolean;
+  inquiryMessage?: string;
+  awaitingField?: AwaitingField;
   error?: string;
 };
 
+type DraftContractWithTemplate = NonNullable<Awaited<ReturnType<typeof loadDraftContract>>>;
+
 const TEMPLATE_CATALOG_EXCERPT_CHARS = 4000;
+
+function isContractRelatedMessage(message: string): boolean {
+  return /\b(contract|contrat|nda|accord|agreement|employ|employee|salari|prestation|freelance|bail|lease|confidential)\b/i.test(
+    message
+  );
+}
+
+function awaitingFieldFromMissing(missing: string[]): AwaitingField | undefined {
+  const key = missing[0];
+  if (!key) return undefined;
+  return { key, label: humanizePlaceholder(key) };
+}
+
+async function buildDraftPreview(contract: DraftContractWithTemplate): Promise<DraftPreview | undefined> {
+  if (!contract.template) return undefined;
+  try {
+    const body = await renderDraftPreview({
+      template: contract.template,
+      draftAnswers: contract.draftAnswers,
+    });
+    return { body, title: contract.title, inProgress: true };
+  } catch {
+    return undefined;
+  }
+}
+
+async function persistDraftAnswers(
+  contractId: string,
+  contract: DraftContractWithTemplate,
+  answers: Record<string, string>
+): Promise<DraftPreview | undefined> {
+  const draftPreview = await buildDraftPreview({ ...contract, draftAnswers: answers });
+  await prisma.contract.update({
+    where: { id: contractId },
+    data: {
+      draftAnswers: answers,
+      ...(draftPreview ? { extractedText: draftPreview.body } : {}),
+    },
+  });
+  return draftPreview;
+}
+
+async function lawyerInquiryResponse(message: string): Promise<DraftChatResult> {
+  const t = await getTranslations("chat");
+  return {
+    assistantMessage: t("noTemplateMatch"),
+    suggestLawyer: true,
+    inquiryMessage: message,
+  };
+}
+
+export async function createLawyerInquiryContractAction(
+  message: string
+): Promise<{ contractId?: string; error?: string }> {
+  const session = await getClientSession();
+  if (!session.ok) return { error: session.reason };
+
+  const trimmed = message.trim();
+  if (!trimmed) return { error: "empty_message" };
+
+  const contract = await prisma.contract.create({
+    data: {
+      ownerId: session.userId,
+      title: titleFromQuestion(trimmed),
+      extractedText: "",
+      userQuestion: trimmed,
+      draftStatus: null,
+    },
+  });
+
+  return { contractId: contract.id };
+}
 
 async function loadDraftContract(contractId: string, userId: string) {
   return prisma.contract.findFirst({
@@ -180,12 +272,15 @@ export async function draftChatAction(input: {
   }
 
   if (!llmStart.result.is_draft_intent) {
+    if (isContractRelatedMessage(message)) {
+      return lawyerInquiryResponse(message);
+    }
     return { assistantMessage: t("notDraftIntent") };
   }
 
   const template = templates.find((item) => item.slug === llmStart.result.template_slug);
   if (!template) {
-    return { assistantMessage: t("noTemplateMatch") };
+    return lawyerInquiryResponse(message);
   }
 
   const contract = await prisma.contract.create({
@@ -200,10 +295,28 @@ export async function draftChatAction(input: {
     },
   });
 
+  let awaitingField: AwaitingField | undefined;
+  let draftPreview: DraftPreview | undefined;
+  try {
+    const templateBody = await resolveTemplateBody(template);
+    const placeholders = resolveTemplatePlaceholders(template, templateBody);
+    awaitingField = awaitingFieldFromMissing(missingPlaceholders(placeholders, {}));
+    draftPreview = await buildDraftPreview({
+      ...contract,
+      template,
+    } as DraftContractWithTemplate);
+  } catch {
+    awaitingField = undefined;
+    draftPreview = undefined;
+  }
+
   return {
     contractId: contract.id,
     assistantMessage: llmStart.result.assistant_message,
     completed: false,
+    awaitingField,
+    draftPreview,
+    contractTitle: contract.title,
   };
 }
 
@@ -254,10 +367,7 @@ async function continueDraftChat(
   }
 
   answers = { ...answers, ...llmTurn.result.collected };
-  await prisma.contract.update({
-    where: { id: contractId },
-    data: { draftAnswers: answers },
-  });
+  const draftPreview = await persistDraftAnswers(contractId, contract, answers);
 
   const missingAfter = missingPlaceholders(placeholders, answers);
   const allFilled = missingAfter.length === 0;
@@ -274,6 +384,9 @@ async function continueDraftChat(
     contractId,
     assistantMessage: llmTurn.result.assistant_message,
     completed: false,
+    awaitingField: awaitingFieldFromMissing(missingAfter),
+    draftPreview,
+    contractTitle: contract.title,
   };
 }
 
@@ -285,10 +398,26 @@ async function continueCompletedDraftChat(
   const t = await getTranslations("chat");
   const locale = (await getLocale()) as AppLocale;
 
+  if (!contract.template) {
+    return { contractId: contract.id, assistantMessage: t("errors.generic") };
+  }
+
+  let templateBody: string;
+  try {
+    templateBody = await resolveTemplateBody(contract.template);
+  } catch {
+    return { contractId: contract.id, assistantMessage: t("errors.templateLoadFailed") };
+  }
+
+  const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
+  const answers = parseDraftAnswers(contract.draftAnswers);
+
   const llm = await runDraftFollowUpWithLlm({
     locale,
     contractTitle: contract.title,
     contractBody: contract.extractedText,
+    placeholders,
+    answers,
     userMessage: message,
     history,
   });
@@ -298,11 +427,18 @@ async function continueCompletedDraftChat(
   }
 
   let contractBody = contract.extractedText;
-  if (llm.result.updated_body?.trim()) {
-    contractBody = llm.result.updated_body.trim();
+  const collected = llm.result.collected ?? {};
+
+  if (Object.keys(collected).length > 0) {
+    const nextAnswers = applyPlaceholderDefaults({ ...answers, ...collected });
+    contractBody = renderTemplateBody(templateBody, nextAnswers);
+
     await prisma.contract.update({
       where: { id: contract.id },
-      data: { extractedText: contractBody },
+      data: {
+        draftAnswers: nextAnswers,
+        extractedText: contractBody,
+      },
     });
   }
 
@@ -335,6 +471,9 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
   const missing = missingPlaceholders(placeholders, answers);
   if (missing.length === 0) return null;
 
+  const draftPreview = await buildDraftPreview(contract);
+  const awaitingField = awaitingFieldFromMissing(missing);
+
   const resumePrompt =
     locale === "en"
       ? "Resume the conversation and ask the next question."
@@ -358,5 +497,8 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
     contractId: contract.id,
     assistantMessage: llmTurn.result.assistant_message,
     completed: false,
+    awaitingField,
+    draftPreview,
+    contractTitle: contract.title,
   };
 }

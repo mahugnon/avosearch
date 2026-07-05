@@ -8,35 +8,17 @@ import type { ModificationView } from "@/components/contracts/review-panel";
 import { ReviewPanel } from "@/components/contracts/review-panel";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
 
 type Props = {
   missionId: string;
-  contractId: string;
   modifications: ModificationView[];
 };
 
-export function LawyerMissionReview({ missionId, contractId, modifications }: Props) {
+export function LawyerMissionReview({ missionId, modifications }: Props) {
   const t = useTranslations("lawyer.mission");
   const router = useRouter();
   const [note, setNote] = useState("");
   const [pending, startTransition] = useTransition();
-  const [generating, setGenerating] = useState(false);
-  const [mods, setMods] = useState(modifications);
-
-  async function generateReview() {
-    setGenerating(true);
-    try {
-      const res = await fetch(`/api/contracts/${contractId}/review`, { method: "POST" });
-      if (res.ok) {
-        const data = (await res.json()) as { modifications?: ModificationView[] };
-        setMods(data.modifications ?? []);
-        router.refresh();
-      }
-    } finally {
-      setGenerating(false);
-    }
-  }
 
   function validateMod(id: string, action: "VALIDEE_AVOCAT" | "REJETEE_AVOCAT") {
     startTransition(async () => {
@@ -54,25 +36,9 @@ export function LawyerMissionReview({ missionId, contractId, modifications }: Pr
 
   return (
     <div className="space-y-6">
-      {mods.length === 0 && (
-        <div className="flex flex-wrap items-center gap-3">
-          <Button type="button" onClick={() => void generateReview()} disabled={generating || pending}>
-            {generating ? (
-              <>
-                <Loader2 className="mr-2 size-4 animate-spin" />
-                {t("generatingReview")}
-              </>
-            ) : (
-              t("generateReview")
-            )}
-          </Button>
-          <p className="text-xs text-muted-foreground">{t("reviewLawyerOnly")}</p>
-        </div>
-      )}
-
-      <ReviewPanel modifications={mods} readOnly />
+      <ReviewPanel modifications={modifications} readOnly />
       <div className="space-y-3">
-        {mods
+        {modifications
           .filter((m) => m.status === "ACCEPTEE_CLIENT" || m.status === "PROPOSEE")
           .map((mod) => (
             <div key={mod.id} className="flex flex-wrap gap-2 rounded-lg border p-3">

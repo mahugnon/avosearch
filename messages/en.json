@@ -182,7 +182,41 @@
     "documentsCount": "{count, plural, one {# document} other {# documents}}",
     "emptyTitle": "No contracts yet",
     "emptyHint": "Start an analysis above to upload your first document.",
-    "uploadedOn": "Uploaded on {date}"
+    "uploadedOn": "Uploaded on {date}",
+    "viewAllContracts": "All my contracts",
+    "nav": {
+      "home": "Home",
+      "contracts": "My contracts",
+      "orders": "My orders"
+    },
+    "orders": {
+      "title": "My orders",
+      "subtitle": "Lawyer requests you have placed — tracking, payment and delivery.",
+      "back": "← Account settings",
+      "open": "View my orders",
+      "settingsHint": "Track your lawyer requests, payment status and delivered documents.",
+      "empty": "No orders yet",
+      "emptyHint": "When you contact a lawyer from the chat, your order will appear here.",
+      "lawyerLine": "Lawyer: {name}",
+      "lawyerPending": "Lawyer pending",
+      "viewContract": "View delivered contract →",
+      "paymentSuccess": "Payment recorded — your lawyer will take over shortly."
+    },
+    "contracts": {
+      "title": "My contracts",
+      "subtitle": "All your drafted and reviewed documents in one place.",
+      "back": "← Home",
+      "searchPlaceholder": "Search a contract…",
+      "resultCount": "{count, plural, one {# contract} other {# contracts}}",
+      "uploadedOn": "Added on {date}",
+      "empty": "No contracts found",
+      "emptyHint": "Start drafting from the home page or adjust your search.",
+      "editDraft": "Edit",
+      "view": {
+        "cards": "Cards",
+        "list": "List"
+      }
+    }
   },
   "chat": {
     "title": "Drafting & analysis",
@@ -196,11 +230,33 @@
     "attach": "Attach a contract (coming soon)",
     "emptyMessage": "Write a message to continue.",
     "notDraftIntent": "To draft a contract, describe the type (e.g. NDA, services agreement). To analyze an existing document, attach a PDF or DOCX (coming soon here).",
-    "noTemplateMatch": "No matching template found. Specify the contract type (NDA, services…).",
+    "noTemplateMatch": "For now, we can only generate NDAs automatically. Your request doesn't match this type of contract.",
     "sessionLost": "Draft session not found. Start again by describing your need.",
     "templateLoadFailed": "Could not load the contract template. Please contact support.",
     "missingFields": "Some information is still missing. Answer the question above.",
     "contractReady": "Your contract is ready in the preview on the right. You can keep asking questions or request changes here. When you're satisfied, click \"Request lawyer review\" for professional validation.",
+    "lawyerOffer": {
+      "title": "Would you like to contact a lawyer?",
+      "description": "A registered lawyer can draft the custom contract you need.",
+      "yes": "Yes",
+      "no": "No",
+      "creating": "Preparing…",
+      "error": "Could not start the request. Please try again.",
+      "declined": "No problem. If you need an NDA, describe your situation and we'll get started."
+    },
+    "field": {
+      "submit": "Save",
+      "placeholder": "Your answer…"
+    },
+    "mode": {
+      "label": "Display mode",
+      "edit": "Edit",
+      "preview": "Preview"
+    },
+    "history": {
+      "title": "Recent conversations",
+      "new": "New"
+    },
     "errors": {
       "unauthorized": "Sign in as a client to draft a contract.",
       "sessionExpired": "Session expired — please sign in again.",
@@ -210,6 +266,7 @@
     },
     "viewer": {
       "label": "Generated contract",
+      "draftLabel": "Draft preview",
       "copy": "Copy",
       "pdf": "PDF",
       "analyze": "Start analysis",
@@ -227,19 +284,37 @@
     "submit": "Start analysis",
     "submitting": "Uploading…",
     "backToDashboard": "← Back to my contracts",
+    "backToContracts": "← My contracts",
     "awaitingAnalysis": "Awaiting analysis",
     "triageIaSuffit": "Assisted review possible",
     "triageAvocat": "Lawyer recommended",
     "triageActe": "Regulated act",
     "draftInProgress": "Draft in progress",
+    "lawyerReviewed": "Reviewed by a lawyer",
+    "reviewedBy": "Reviewed by {name}",
+    "viewLawyerProfile": "View {name}'s profile",
+    "readyForLawyer": "Ready to submit",
+    "missionInProgress": "Lawyer review in progress",
+    "lawyerFollowUp": "Messages and lawyer's note",
+    "trackLawyerReview": "Track lawyer review",
     "documentPreview": "Document preview",
+    "lawyerSubmit": {
+      "title": "Submit to a lawyer",
+      "description": "Have a registered lawyer review and validate your contract.",
+      "disclaimer": "Document assistance only — not legal advice until validated by your lawyer."
+    },
+    "lawyerProfile": {
+      "title": "Your lawyer",
+      "description": "Profile of the lawyer who reviewed your contract."
+    },
     "viewer": {
       "aiFieldsLegend": "{count, plural, one {# AI-filled field} other {# AI-filled fields}}",
       "validate": "Validate",
       "validated": "Validated",
       "validationProgress": "{done} / {total} validated",
       "allValidated": "All fields validated",
-      "allValidatedHint": "Validation complete for this document. Persistence is handled via lawyer missions."
+      "allValidatedHint": "Validation complete for this document. Persistence is handled via lawyer missions.",
+      "noHighlights": "No template fields detected — use full text edit."
     },
     "errors": {
       "unauthorized": "You must be signed in as a client.",
@@ -386,8 +461,7 @@
       "errors": {
         "no_lawyers": "No lawyers available at the moment.",
         "not_found": "Contract not found.",
-        "out_of_scope": "This contract cannot be processed.",
-        "analysis_failed": "Analysis failed. Please try again.",
+        "empty_contract": "The contract has no text to submit yet.",
         "generic": "Could not find a lawyer. Please try again later."
       }
     },
@@ -427,7 +501,7 @@
     "specialties": "Specialties",
     "nav": {
       "label": "Lawyer navigation",
-      "missions": "Missions",
+      "missions": "Review queue",
       "profile": "Profile"
     },
     "workQueue": {
@@ -464,18 +538,20 @@
       }
     },
     "review": {
-      "backToMissions": "← Missions",
+      "backToMissions": "← Contracts to review",
       "clientLabel": "Client: {name}",
       "intro": "Highlighted passages were filled by AI from the template. Validate each field before closing the review.",
       "documentPreview": "Document preview"
     },
     "missions": {
-      "title": "My missions",
-      "subtitle": "All your missions, from payment to delivery.",
+      "title": "Contracts to review",
+      "subtitle": "Contracts waiting for your review or currently in progress.",
       "back": "← Dashboard",
-      "empty": "No missions yet.",
-      "emptyFiltered": "No missions match your filters.",
+      "empty": "No contracts awaiting review.",
+      "emptyHint": "When a client pays for lawyer review, the contract will appear here.",
+      "emptyFiltered": "No contracts match your filters.",
       "emptyFilteredHint": "Try a different search or reset the filters.",
+      "reviewedBadge": "Reviewed",
       "type": {
         "VALIDATION": "Validation",
         "RELECTURE": "Review",
@@ -494,8 +570,9 @@
           "table": "List"
         },
         "status": {
+          "active": "To process",
           "all": "All",
-          "ACCEPTEE": "To start",
+          "ACCEPTEE": "Awaiting review",
           "EN_COURS": "In progress",
           "done": "Finished",
           "ANNULEE": "Cancelled"
@@ -524,11 +601,11 @@
         "deadlineOverdue": "Overdue"
       },
       "board": {
-        "emptyColumn": "No missions",
-        "actionStart": "Start",
+        "emptyColumn": "No contracts",
+        "actionStart": "Start review",
         "actionOpen": "Open",
         "columns": {
-          "ACCEPTEE": "To start",
+          "ACCEPTEE": "Awaiting review",
           "EN_COURS": "In progress",
           "done": "Finished",
           "ANNULEE": "Cancelled"
@@ -536,7 +613,7 @@
       },
       "status": {
         "PROPOSEE": "Awaiting payment",
-        "ACCEPTEE": "To start",
+        "ACCEPTEE": "Awaiting review",
         "EN_COURS": "In progress",
         "LIVREE": "Awaiting client",
         "TERMINEE": "Closed",
@@ -544,7 +621,7 @@
       }
     },
     "mission": {
-      "back": "← Missions",
+      "back": "← Contracts to review",
       "client": "Client",
       "start": "Start mission",
       "mod": "Change {order}",
@@ -558,6 +635,17 @@
       "chatTitle": "Messaging",
       "autoAssigned": "Mission auto-assigned by specialty, price, responsiveness and client reviews.",
       "contractText": "Contract text to review",
+      "contractEditHint": "Approve client-provided information in the sidebar. Fields are highlighted in the document.",
+      "fieldsTitle": "Client information",
+      "fieldsProgress": "{done} / {total} approved",
+      "approveField": "Approve",
+      "fieldApproved": "Approved",
+      "saveContract": "Save contract",
+      "savingContract": "Saving…",
+      "contractSaved": "Contract saved.",
+      "deliveredContract": "Reviewed contract",
+      "fullEdit": "Edit full text",
+      "structuredEdit": "Highlighted fields",
       "timer": {
         "label": "Work time",
         "projectedPrice": "Estimated price (live)",
@@ -585,6 +673,9 @@
     "paymentSuccess": "Payment recorded — your lawyer will take over shortly.",
     "paymentCancelled": "Payment cancelled.",
     "modificationsTitle": "Proposed changes",
+    "contractDocument": "Your contract",
+    "openContract": "Open in my documents",
+    "viewMission": "View mission",
     "lawyerDelivery": "Lawyer's note",
     "chatTitle": "Message your lawyer",
     "status": {

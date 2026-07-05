@@ -104,5 +104,5 @@ export async function createContractAction(
     },
   });
 
-  redirect(localizedPath(`/app/contracts/${contract.id}?analyze=1`, locale));
+  redirect(localizedPath(`/app/contracts/${contract.id}`, locale));
 }

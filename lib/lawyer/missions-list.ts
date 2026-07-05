@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 export type MissionStatusFilter =
   | MissionStatus
   | "all"
+  | "active"
   | "done";
 
 export type MissionSortKey =
@@ -46,11 +47,17 @@ const SORT_KEYS: MissionSortKey[] = [
 ];
 
 const STATUS_FILTERS: MissionStatusFilter[] = [
+  "active",
   "all",
   MissionStatus.ACCEPTEE,
   MissionStatus.EN_COURS,
   "done",
   MissionStatus.ANNULEE,
+];
+
+const ACTIVE_STATUSES: MissionStatus[] = [
+  MissionStatus.ACCEPTEE,
+  MissionStatus.EN_COURS,
 ];
 
 function statusPriority(status: MissionStatus): number {
@@ -93,11 +100,9 @@ export function parseMissionListFilters(
   params: Record<string, string | string[] | undefined>
 ): MissionListFilters {
   const q = typeof params.q === "string" ? params.q.trim() : "";
-  const rawStatus = typeof params.status === "string" ? params.status : "all";
-  let status: MissionStatusFilter = "all";
-  if (rawStatus === "active") {
-    status = "all";
-  } else if (STATUS_FILTERS.includes(rawStatus as MissionStatusFilter)) {
+  const rawStatus = typeof params.status === "string" ? params.status : "active";
+  let status: MissionStatusFilter = "active";
+  if (STATUS_FILTERS.includes(rawStatus as MissionStatusFilter)) {
     status = rawStatus as MissionStatusFilter;
   } else if (
     rawStatus === MissionStatus.LIVREE ||
@@ -109,8 +114,8 @@ export function parseMissionListFilters(
   const sort = SORT_KEYS.includes(rawSort as MissionSortKey)
     ? (rawSort as MissionSortKey)
     : "createdAt:desc";
-  const rawView = typeof params.view === "string" ? params.view : "board";
-  const view: MissionListView = rawView === "table" ? "table" : "board";
+  const rawView = typeof params.view === "string" ? params.view : "table";
+  const view: MissionListView = rawView === "board" ? "board" : "table";
 
   return { q, status, sort, view };
 }
@@ -121,7 +126,9 @@ export async function getLawyerMissionsList(
 ): Promise<MissionListRow[]> {
   const where: Prisma.MissionWhereInput = { lawyerId };
 
-  if (filters.status === "done") {
+  if (filters.status === "active") {
+    where.status = { in: ACTIVE_STATUSES };
+  } else if (filters.status === "done") {
     where.status = { in: [MissionStatus.LIVREE, MissionStatus.TERMINEE] };
   } else if (filters.status !== "all") {
     where.status = filters.status;

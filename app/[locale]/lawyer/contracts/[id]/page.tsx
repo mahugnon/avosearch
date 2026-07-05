@@ -1,10 +1,11 @@
+import { MissionStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { ContractViewer } from "@/components/contracts/contract-viewer";
+import { LawyerContractEditor } from "@/components/lawyer/lawyer-contract-editor";
 import { Button } from "@/components/ui/button";
 import { requireLawyerContractReview } from "@/lib/contracts/lawyer-access";
-import { loadTemplateBody } from "@/lib/templates/load";
-import { getContractHighlightData } from "@/lib/templates/highlight";
+import { loadLawyerContractHighlight } from "@/lib/actions/lawyer-contract";
+import { prisma } from "@/lib/db";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -18,29 +19,20 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function LawyerContractReviewPage({ params }: Props) {
   const { id } = await params;
-  const { contract } = await requireLawyerContractReview(id);
+  const { contract, session } = await requireLawyerContractReview(id);
   const t = await getTranslations("lawyer.review");
+  const tm = await getTranslations("lawyer.mission");
 
-  const highlight = await (async () => {
-    if (!contract.template) return null;
-    let templateBody = contract.template.body?.trim() ?? "";
-    if (!templateBody) {
-      try {
-        templateBody = await loadTemplateBody({
-          body: contract.template.body,
-          fileKey: contract.template.fileKey ?? null,
-          fileName: contract.template.fileName ?? null,
-          mimeType: contract.template.mimeType ?? null,
-        });
-      } catch {
-        return null;
-      }
-    }
-    return getContractHighlightData({
-      templateBody,
-      draftAnswers: contract.draftAnswers,
-    });
-  })();
+  const mission = await prisma.mission.findFirst({
+    where: {
+      contractId: id,
+      lawyerId: session.user.id,
+      status: { in: [MissionStatus.ACCEPTEE, MissionStatus.EN_COURS] },
+    },
+    select: { id: true },
+  });
+
+  const highlight = await loadLawyerContractHighlight(contract);
 
   return (
     <div className="space-y-6">
@@ -60,11 +52,12 @@ export default async function LawyerContractReviewPage({ params }: Props) {
       <p className="text-sm text-muted-foreground">{t("intro")}</p>
 
       {contract.extractedText.trim() && (
-        <ContractViewer
-          title={t("documentPreview")}
-          body={contract.extractedText}
+        <LawyerContractEditor
+          contractId={contract.id}
+          missionId={mission?.id}
+          title={tm("contractText")}
+          extractedText={contract.extractedText}
           highlight={highlight}
-          mode="lawyer"
         />
       )}
     </div>

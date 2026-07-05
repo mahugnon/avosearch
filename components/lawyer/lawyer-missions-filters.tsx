@@ -22,6 +22,7 @@ import type {
 import { useCallback, useEffect, useState, useTransition } from "react";
 
 const STATUS_OPTIONS: MissionStatusFilter[] = [
+  "active",
   "all",
   MissionStatus.ACCEPTEE,
   MissionStatus.EN_COURS,
@@ -60,9 +61,9 @@ export function LawyerMissionsFilters({
       const params = new URLSearchParams();
 
       if (next.q) params.set("q", next.q);
-      if (next.status !== "all") params.set("status", next.status);
+      if (next.status !== "active") params.set("status", next.status);
       if (next.sort !== "createdAt:desc") params.set("sort", next.sort);
-      if (next.view !== "board") params.set("view", next.view);
+      if (next.view !== "table") params.set("view", next.view);
 
       const query = params.toString();
       startTransition(() => {
@@ -88,7 +89,7 @@ export function LawyerMissionsFilters({
 
   const hasActiveFilters =
     filters.q !== "" ||
-    filters.status !== "all" ||
+    filters.status !== "active" ||
     filters.sort !== "createdAt:desc";
 
   const viewOptions: { value: MissionListView; icon: typeof LayoutGrid; labelKey: "board" | "table" }[] = [
@@ -201,7 +202,7 @@ export function LawyerMissionsFilters({
               type="button"
               onClick={() => {
                 setSearch("");
-                updateParams({ q: "", status: "all", sort: "createdAt:desc", view: filters.view });
+                updateParams({ q: "", status: "active", sort: "createdAt:desc", view: filters.view });
               }}
               className="font-medium text-primary hover:underline"
             >

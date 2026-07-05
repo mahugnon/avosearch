@@ -92,6 +92,8 @@ export async function runDraftFollowUpWithLlm(input: {
   locale: AppLocale;
   contractTitle: string;
   contractBody: string;
+  placeholders: string[];
+  answers: Record<string, string>;
   userMessage: string;
   history: string[];
 }): Promise<{ result: DraftFollowUpResponse; model: string } | null> {
@@ -104,7 +106,10 @@ export async function runDraftFollowUpWithLlm(input: {
       maxTokens: 4096,
     });
     const result = parseDraftFollowUpJson(text);
-    console.log("[draft-chat] follow-up", { model, hasUpdate: Boolean(result.updated_body) });
+    console.log("[draft-chat] follow-up", {
+      model,
+      collectedKeys: Object.keys(result.collected ?? {}),
+    });
     return { result, model };
   } catch (error) {
     if (isLlmAuthError(error)) {

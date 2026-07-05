@@ -2,9 +2,17 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { AccountSettings } from "@/components/settings/account-settings";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default async function SettingsPage() {
   const t = await getTranslations("settings");
+  const tc = await getTranslations("client.orders");
 
   return (
     <div className="space-y-6">
@@ -15,6 +23,19 @@ export default async function SettingsPage() {
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{tc("title")}</CardTitle>
+          <CardDescription>{tc("settingsHint")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button asChild variant="outline">
+            <Link href="/app/orders">{tc("open")}</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
       <AccountSettings />
     </div>
   );

@@ -3,10 +3,12 @@ import { ChevronRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
+import { LawyerReviewedBadge } from "@/components/contracts/lawyer-reviewed-badge";
 import { formatEuros } from "@/lib/config";
 import type { AppLocale } from "@/lib/i18n";
 import { intlLocale } from "@/lib/i18n";
 import { getDeadlineUrgency } from "@/lib/lawyer/dashboard-data";
+import { isLawyerReviewDelivered } from "@/lib/contracts/lawyer-review";
 import type { BoardColumnKey } from "@/lib/lawyer/missions-board";
 import {
   getVisibleBoardColumns,
@@ -40,7 +42,9 @@ export async function LawyerMissionsBoard({
         <p className="text-sm font-medium">
           {hasAnyMissions ? t("emptyFiltered") : t("empty")}
         </p>
-        {hasAnyMissions && (
+        {!hasAnyMissions ? (
+          <p className="mt-1 text-sm text-muted-foreground">{t("emptyHint")}</p>
+        ) : (
           <p className="mt-1 text-sm text-muted-foreground">{t("emptyFilteredHint")}</p>
         )}
       </div>
@@ -90,6 +94,9 @@ export async function LawyerMissionsBoard({
                           <Badge variant="outline" className="text-[10px]">
                             {t(`status.${mission.status}`)}
                           </Badge>
+                          {isLawyerReviewDelivered(mission.status) && (
+                            <LawyerReviewedBadge label={t("reviewedBadge")} className="text-[10px]" />
+                          )}
                           <Badge variant="secondary" className="text-[10px]">
                             {t(`type.${mission.type}`)}
                           </Badge>

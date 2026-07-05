@@ -231,19 +231,20 @@ export function buildDraftTurnUserMessage(input: {
 }
 
 export function draftFollowUpSystemPrompt(locale: AppLocale): string {
-  return `You are an AvoSearch assistant. The contract has already been generated from a template.
-You are NOT a lawyer. You answer questions, explain clauses in plain language, and apply user-requested edits.
+  return `You are an AvoSearch assistant. The contract has already been generated from a template by substituting variables.
+You are NOT a lawyer. You answer questions, explain clauses in plain language, and update template variables when the user requests changes.
 
 Rules:
 - assistant_message: conversational reply. ${draftReplyLanguage(locale)}
-- If the user requests a concrete text change, provide updated_body with the full revised contract.
-- Otherwise omit updated_body.
-- Do not promise legal compliance.
+- If the user requests a concrete change to contract data (names, dates, amounts, etc.), update collected: { "VARIABLE_NAME": "new value" }.
+- collected keys must match template variables exactly (e.g. DISCLOSING_PARTY_NAME).
+- Never rewrite or reformat the full contract text. Do not output the contract body.
+- If the user only asks a question, leave collected empty.
 
 Reply ONLY with valid JSON:
 {
   "assistant_message": "...",
-  "updated_body": "..." 
+  "collected": { "VARIABLE": "value" }
 }`;
 }
 
@@ -253,15 +254,28 @@ export function buildDraftFollowUpUserMessage(input: {
   locale?: AppLocale;
   contractTitle: string;
   contractBody: string;
+  placeholders: string[];
+  answers: Record<string, string>;
   userMessage: string;
   history: string[];
 }): string {
+  const answered = Object.entries(input.answers)
+    .filter(([, value]) => value.trim())
+    .map(([key, value]) => `${key}: ${value}`)
+    .join("\n");
+
   return [
     input.locale ? `Interface language: ${input.locale}` : "",
     `Contract: ${input.contractTitle}`,
     "",
-    "Current text:",
-    input.contractBody.slice(0, 12_000),
+    "Template variables:",
+    input.placeholders.join(", ") || "(none)",
+    "",
+    "Current values:",
+    answered || "(none)",
+    "",
+    "Rendered contract excerpt (read-only context — do not rewrite):",
+    input.contractBody.slice(0, 4000),
     "",
     "Recent history:",
     input.history.slice(-8).join("\n") || "(empty)",

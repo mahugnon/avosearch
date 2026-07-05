@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { LawyerMatchingList } from "@/components/contracts/lawyer-matching";
 import { Button } from "@/components/ui/button";
 import { requireClientContract } from "@/lib/contracts/access";
+import { contractMatchingContext } from "@/lib/contracts/document";
 import { matchLawyersForContract } from "@/lib/matching/lawyers";
 import { notFound } from "next/navigation";
 
@@ -20,7 +21,7 @@ export default async function ContractMatchingPage({ params, searchParams }: Pro
   const { contract } = await requireClientContract(id);
   const t = await getTranslations("contracts.matching");
 
-  if (!contract.analysis) notFound();
+  if (!contractMatchingContext(contract)) notFound();
 
   const profiles = await matchLawyersForContract(id);
   const lawyers = profiles.map((p) => ({
@@ -37,10 +38,7 @@ export default async function ContractMatchingPage({ params, searchParams }: Pro
     score: 0,
   }));
 
-  const missionType =
-    contract.analysis.triage === "AVOCAT_RECOMMANDE"
-      ? MissionType.RELECTURE
-      : MissionType.VALIDATION;
+  const missionType = MissionType.RELECTURE;
 
   return (
     <div className="space-y-6">

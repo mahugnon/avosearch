@@ -182,7 +182,41 @@
     "documentsCount": "{count, plural, one {# document} other {# documents}}",
     "emptyTitle": "Aucun contrat pour le moment",
     "emptyHint": "Lancez une analyse ci-dessus pour déposer votre premier document.",
-    "uploadedOn": "Déposé le {date}"
+    "uploadedOn": "Déposé le {date}",
+    "viewAllContracts": "Tous mes contrats",
+    "nav": {
+      "home": "Accueil",
+      "contracts": "Mes contrats",
+      "orders": "Mes commandes"
+    },
+    "orders": {
+      "title": "Mes commandes",
+      "subtitle": "Vos demandes avocat — suivi, paiement et livraison.",
+      "back": "← Paramètres du compte",
+      "open": "Voir mes commandes",
+      "settingsHint": "Suivez vos demandes avocat, le paiement et les documents livrés.",
+      "empty": "Aucune commande",
+      "emptyHint": "Lorsque vous contactez un avocat depuis le chat, votre commande apparaîtra ici.",
+      "lawyerLine": "Avocat : {name}",
+      "lawyerPending": "Avocat en attente",
+      "viewContract": "Voir le contrat livré →",
+      "paymentSuccess": "Paiement enregistré — l'avocat va prendre en charge votre dossier."
+    },
+    "contracts": {
+      "title": "Mes contrats",
+      "subtitle": "Tous vos documents rédigés et revus au même endroit.",
+      "back": "← Accueil",
+      "searchPlaceholder": "Rechercher un contrat…",
+      "resultCount": "{count, plural, one {# contrat} other {# contrats}}",
+      "uploadedOn": "Ajouté le {date}",
+      "empty": "Aucun contrat trouvé",
+      "emptyHint": "Commencez une rédaction depuis l'accueil ou modifiez votre recherche.",
+      "editDraft": "Modifier",
+      "view": {
+        "cards": "Cartes",
+        "list": "Liste"
+      }
+    }
   },
   "chat": {
     "title": "Rédaction & analyse",
@@ -196,11 +230,33 @@
     "attach": "Joindre un contrat (bientôt)",
     "emptyMessage": "Écrivez un message pour continuer.",
     "notDraftIntent": "Pour rédiger un contrat, décrivez le type souhaité (ex. NDA, prestation de services). Pour analyser un document existant, joignez un fichier PDF ou DOCX (bientôt disponible ici).",
-    "noTemplateMatch": "Je n'ai pas trouvé de modèle correspondant. Précisez le type de contrat (NDA, prestation de services…).",
+    "noTemplateMatch": "Pour l'instant, nous ne pouvons générer automatiquement que des NDA. Votre demande ne correspond pas à ce type de contrat.",
     "sessionLost": "Session de rédaction introuvable. Recommencez en décrivant votre besoin.",
     "templateLoadFailed": "Impossible de charger le modèle de contrat. Contactez le support.",
     "missingFields": "Il manque encore des informations. Répondez à la question ci-dessus.",
     "contractReady": "Votre contrat est prêt dans l'aperçu à droite. Vous pouvez continuer à poser des questions ou demander des ajustements ici. Quand vous êtes satisfait, cliquez sur « Demander un avocat » pour une validation professionnelle.",
+    "lawyerOffer": {
+      "title": "Souhaitez-vous contacter un avocat ?",
+      "description": "Un avocat inscrit peut rédiger le contrat sur mesure dont vous avez besoin.",
+      "yes": "Oui",
+      "no": "Non",
+      "creating": "Préparation…",
+      "error": "Impossible de lancer la demande. Réessayez.",
+      "declined": "Très bien. Si vous avez besoin d'un NDA, décrivez votre situation et nous commencerons."
+    },
+    "field": {
+      "submit": "Valider",
+      "placeholder": "Votre réponse…"
+    },
+    "mode": {
+      "label": "Mode d'affichage",
+      "edit": "Rédaction",
+      "preview": "Aperçu"
+    },
+    "history": {
+      "title": "Conversations récentes",
+      "new": "Nouvelle"
+    },
     "errors": {
       "unauthorized": "Connectez-vous en tant que client pour rédiger un contrat.",
       "sessionExpired": "Session expirée — reconnectez-vous.",
@@ -210,6 +266,7 @@
     },
     "viewer": {
       "label": "Contrat généré",
+      "draftLabel": "Aperçu du brouillon",
       "copy": "Copier",
       "pdf": "PDF",
       "analyze": "Lancer l'analyse",
@@ -227,19 +284,37 @@
     "submit": "Lancer l'analyse",
     "submitting": "Envoi en cours…",
     "backToDashboard": "← Retour à mes contrats",
+    "backToContracts": "← Mes contrats",
     "awaitingAnalysis": "En attente d'analyse",
     "triageIaSuffit": "Relecture assistée possible",
     "triageAvocat": "Avocat recommandé",
     "triageActe": "Acte réglementé",
     "draftInProgress": "Rédaction en cours",
+    "lawyerReviewed": "Revu par un avocat",
+    "reviewedBy": "Revu par {name}",
+    "viewLawyerProfile": "Voir le profil de {name}",
+    "readyForLawyer": "Prêt à soumettre",
+    "missionInProgress": "Relecture avocat en cours",
+    "lawyerFollowUp": "Messages et note de l'avocat",
+    "trackLawyerReview": "Suivre la relecture",
     "documentPreview": "Aperçu du document",
+    "lawyerSubmit": {
+      "title": "Soumettre à un avocat",
+      "description": "Faites relire et valider votre contrat par un avocat inscrit au barreau.",
+      "disclaimer": "Aide documentaire uniquement — pas un avis juridique tant que l'avocat n'a pas validé."
+    },
+    "lawyerProfile": {
+      "title": "Votre avocat",
+      "description": "Profil de l'avocat qui a revu votre contrat."
+    },
     "viewer": {
       "aiFieldsLegend": "{count, plural, one {# champ rempli par l'IA} other {# champs remplis par l'IA}}",
       "validate": "Valider",
       "validated": "Validé",
       "validationProgress": "{done} / {total} validés",
       "allValidated": "Tous les champs sont validés",
-      "allValidatedHint": "Validation terminée pour ce document. La persistance serveur est gérée via les missions avocat."
+      "allValidatedHint": "Validation terminée pour ce document. La persistance serveur est gérée via les missions avocat.",
+      "noHighlights": "Aucun champ modèle détecté — utilisez l'édition texte complet."
     },
     "errors": {
       "unauthorized": "Vous devez être connecté en tant que client.",
@@ -373,7 +448,7 @@
       "title": "Avocat sélectionné pour vous",
       "description": "Nous avons trouvé l'avocat le mieux adapté à votre contrat. Vous pouvez en choisir un autre si vous le souhaitez.",
       "searchingTitle": "Recherche d'un avocat…",
-      "searchingDescription": "Analyse de la spécialité, du tarif, de la réactivité et des avis clients.",
+      "searchingDescription": "Sélection selon la spécialité, le tarif, la réactivité et les avis clients.",
       "searchingHint": "Cela ne prend que quelques secondes.",
       "selectedLabel": "Recommandé pour vous",
       "changeLabel": "Changer d'avocat",
@@ -386,8 +461,7 @@
       "errors": {
         "no_lawyers": "Aucun avocat disponible pour le moment.",
         "not_found": "Contrat introuvable.",
-        "out_of_scope": "Ce contrat ne peut pas être traité.",
-        "analysis_failed": "L'analyse a échoué. Réessayez.",
+        "empty_contract": "Le contrat ne contient pas encore de texte à soumettre.",
         "generic": "Impossible de trouver un avocat. Réessayez plus tard."
       }
     },
@@ -427,7 +501,7 @@
     "specialties": "Spécialités",
     "nav": {
       "label": "Navigation avocat",
-      "missions": "Missions",
+      "missions": "Contrats à traiter",
       "profile": "Profil"
     },
     "workQueue": {
@@ -464,18 +538,20 @@
       }
     },
     "review": {
-      "backToMissions": "← Missions",
+      "backToMissions": "← Contrats à traiter",
       "clientLabel": "Client : {name}",
       "intro": "Les passages surlignés ont été remplis par l'IA à partir du modèle. Validez chaque champ avant de clôturer la relecture.",
       "documentPreview": "Aperçu du document"
     },
     "missions": {
-      "title": "Mes missions",
-      "subtitle": "Toutes vos missions, du paiement à la livraison.",
+      "title": "Contrats à traiter",
+      "subtitle": "Contrats en attente de relecture ou en cours de traitement.",
       "back": "← Tableau de bord",
-      "empty": "Aucune mission pour le moment.",
-      "emptyFiltered": "Aucune mission ne correspond à vos filtres.",
+      "empty": "Aucun contrat en attente de relecture.",
+      "emptyHint": "Lorsqu'un client paie une relecture avocat, le contrat apparaîtra ici.",
+      "emptyFiltered": "Aucun contrat ne correspond à vos filtres.",
       "emptyFilteredHint": "Modifiez la recherche ou réinitialisez les filtres.",
+      "reviewedBadge": "Revu",
       "type": {
         "VALIDATION": "Validation",
         "RELECTURE": "Relecture",
@@ -494,8 +570,9 @@
           "table": "Liste"
         },
         "status": {
+          "active": "À traiter",
           "all": "Toutes",
-          "ACCEPTEE": "À démarrer",
+          "ACCEPTEE": "À relire",
           "EN_COURS": "En cours",
           "done": "Terminées",
           "ANNULEE": "Annulées"
@@ -524,11 +601,11 @@
         "deadlineOverdue": "Retard"
       },
       "board": {
-        "emptyColumn": "Aucune mission",
-        "actionStart": "Démarrer",
+        "emptyColumn": "Aucun contrat",
+        "actionStart": "Commencer la relecture",
         "actionOpen": "Ouvrir",
         "columns": {
-          "ACCEPTEE": "À démarrer",
+          "ACCEPTEE": "À relire",
           "EN_COURS": "En cours",
           "done": "Terminées",
           "ANNULEE": "Annulées"
@@ -536,7 +613,7 @@
       },
       "status": {
         "PROPOSEE": "En attente de paiement",
-        "ACCEPTEE": "À démarrer",
+        "ACCEPTEE": "À relire",
         "EN_COURS": "En cours",
         "LIVREE": "En attente client",
         "TERMINEE": "Clôturée",
@@ -544,7 +621,7 @@
       }
     },
     "mission": {
-      "back": "← Missions",
+      "back": "← Contrats à traiter",
       "client": "Client",
       "start": "Démarrer la mission",
       "mod": "Modification {order}",
@@ -558,6 +635,17 @@
       "chatTitle": "Messagerie",
       "autoAssigned": "Mission assignée automatiquement selon spécialité, tarif, réactivité et avis clients.",
       "contractText": "Texte du contrat à relire",
+      "contractEditHint": "Validez les informations fournies par le client dans le panneau latéral. Les champs sont surlignés dans le document.",
+      "fieldsTitle": "Informations client",
+      "fieldsProgress": "{done} / {total} validées",
+      "approveField": "Valider",
+      "fieldApproved": "Validé",
+      "saveContract": "Enregistrer le contrat",
+      "savingContract": "Enregistrement…",
+      "contractSaved": "Contrat enregistré.",
+      "deliveredContract": "Contrat revu",
+      "fullEdit": "Éditer le texte complet",
+      "structuredEdit": "Champs surlignés",
       "timer": {
         "label": "Temps de travail",
         "projectedPrice": "Prix estimé (temps réel)",
@@ -585,6 +673,9 @@
     "paymentSuccess": "Paiement enregistré — l'avocat va prendre en charge votre dossier.",
     "paymentCancelled": "Paiement annulé.",
     "modificationsTitle": "Modifications proposées",
+    "contractDocument": "Votre contrat",
+    "openContract": "Ouvrir dans mes documents",
+    "viewMission": "Voir la mission",
     "lawyerDelivery": "Note de l'avocat",
     "chatTitle": "Messagerie avec l'avocat",
     "status": {

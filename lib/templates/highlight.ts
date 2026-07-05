@@ -14,6 +14,8 @@ export type ContractHighlightData = {
   templateBody: string;
   fields: HighlightField[];
   answers: Record<string, string>;
+  /** Pre-built segments when highlighting a rendered contract (no {{}} placeholders left). */
+  segments?: ContractSegment[];
 };
 
 export function buildContractSegments(
@@ -65,5 +67,62 @@ export function getContractHighlightData(input: {
     templateBody: input.templateBody,
     fields,
     answers,
+  };
+}
+
+/** Highlights user-filled values inside the rendered contract when the template file is unavailable. */
+export function highlightFromRenderedContract(input: {
+  extractedText: string;
+  draftAnswers?: unknown;
+}): ContractHighlightData | null {
+  const answers = parseDraftAnswers(input.draftAnswers);
+  const entries = Object.entries(answers)
+    .filter(([, value]) => value.trim())
+    .map(([fieldId, value]) => ({
+      fieldId,
+      value: value.trim(),
+      index: input.extractedText.indexOf(value.trim()),
+    }))
+    .filter((entry) => entry.index >= 0)
+    .sort((a, b) => a.index - b.index || b.value.length - a.value.length);
+
+  if (entries.length === 0) return null;
+
+  const usedRanges: Array<{ start: number; end: number }> = [];
+  const segments: ContractSegment[] = [];
+  let cursor = 0;
+
+  for (const entry of entries) {
+    const start = entry.index;
+    const end = start + entry.value.length;
+    if (usedRanges.some((range) => start < range.end && end > range.start)) continue;
+    usedRanges.push({ start, end });
+
+    if (start > cursor) {
+      segments.push({ kind: "text", content: input.extractedText.slice(cursor, start) });
+    }
+    segments.push({
+      kind: "field",
+      fieldId: entry.fieldId,
+      label: humanizePlaceholder(entry.fieldId),
+      value: entry.value,
+    });
+    cursor = end;
+  }
+
+  if (cursor < input.extractedText.length) {
+    segments.push({ kind: "text", content: input.extractedText.slice(cursor) });
+  }
+
+  const fields = [...new Set(entries.map((entry) => entry.fieldId))].map((id) => ({
+    id,
+    label: humanizePlaceholder(id),
+  }));
+
+  return {
+    templateBody: input.extractedText,
+    fields,
+    answers,
+    segments,
   };
 }

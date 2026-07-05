@@ -25,6 +25,7 @@ export default async function ClientAreaLayout({
         homeHref="/app"
         areaLabel={t("areaLabel")}
         userName={session.user.name ?? session.user.email ?? ""}
+        showClientNav
       />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-12">{children}</main>
       <footer className="border-t border-border/60 py-5">

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { canDownloadContract } from "@/lib/contracts/export-access";
 import { generateContractPdf } from "@/lib/pdf/contract";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -12,25 +12,22 @@ export async function GET(_request: Request, context: RouteContext) {
   }
 
   const { id } = await context.params;
-  const contract = await prisma.contract.findUnique({
-    where: { id },
-    select: { title: true, extractedText: true, ownerId: true },
+  const access = await canDownloadContract({
+    contractId: id,
+    userId: session.user.id,
+    role: session.user.role,
   });
 
-  if (!contract || contract.ownerId !== session.user.id) {
+  if (!access.ok) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  if (!contract.extractedText.trim()) {
-    return NextResponse.json({ error: "Empty contract" }, { status: 400 });
-  }
-
   const pdf = await generateContractPdf({
-    title: contract.title,
-    body: contract.extractedText,
+    title: access.title,
+    body: access.extractedText,
   });
 
-  const filename = `${contract.title.replace(/[^\w\s-]/g, "").slice(0, 80) || "contrat"}.pdf`;
+  const filename = `${access.title.replace(/[^\w\s-]/g, "").slice(0, 80) || "contrat"}.pdf`;
 
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
