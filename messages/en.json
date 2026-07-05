@@ -362,7 +362,9 @@
       "nextQuestion": "Thanks! {label}",
       "resumeQuestion": "Let’s continue. {label}",
       "retryQuestion": "I didn’t quite catch that. {label}",
-      "optionsHint": "Choose an option"
+      "optionsHint": "Choose an option",
+      "useExample": "Example: {value}",
+      "demoFilled": "I pre-filled the fields with demo data."
     },
     "mode": {
       "label": "Display mode",
@@ -378,7 +380,8 @@
       "sessionExpired": "Session expired — please sign in again.",
       "generic": "Something went wrong. Please try again.",
       "aiRequiredForDraft": "Guided drafting requires NVIDIA_API_KEY in .env.",
-      "templateLoadFailed": "Could not load the contract template."
+      "templateLoadFailed": "Could not load the contract template.",
+      "noDemoPreset": "No demo data for this template."
     },
     "viewer": {
       "label": "Generated contract",
@@ -389,7 +392,8 @@
       "requestBarrister": "Request barrister review",
       "requestBarristerPending": "Assigning…",
       "disclaimer": "Document assistance template — have a barrister review if needed."
-    }
+    },
+    "demoFill": "Prefill (demo)"
   },
   "contracts": {
     "questionLabel": "Your question (optional if you upload a file)",

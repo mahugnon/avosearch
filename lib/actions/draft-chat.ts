@@ -21,6 +21,7 @@ import {
   type FieldInputType,
   type FieldOption,
 } from "@/lib/templates/field-meta";
+import { getDemoPresets, getDemoValue } from "@/lib/templates/demo-presets";
 import {
   parseDraftAnswers,
   renderTemplateBody,
@@ -37,6 +38,8 @@ export type AwaitingField = {
   hint?: string;
   type?: FieldInputType;
   options?: FieldOption[];
+  /** Preset example value for live demos (one-click fill). */
+  demoValue?: string;
 };
 
 export type DraftPreview = {
@@ -70,12 +73,20 @@ function isContractRelatedMessage(message: string): boolean {
 
 function awaitingFieldFromMissing(
   missing: string[],
-  locale: AppLocale
+  locale: AppLocale,
+  templateSlug?: string | null
 ): AwaitingField | undefined {
   const key = missing[0];
   if (!key) return undefined;
   const meta = resolveFieldMeta(key, locale);
-  return { key, label: meta.label, hint: meta.hint, type: meta.type, options: meta.options };
+  return {
+    key,
+    label: meta.label,
+    hint: meta.hint,
+    type: meta.type,
+    options: meta.options,
+    demoValue: getDemoValue(templateSlug, key),
+  };
 }
 
 /** The clear, localized question for a given placeholder key. */
@@ -332,7 +343,7 @@ export async function draftChatAction(input: {
   try {
     const templateBody = await resolveTemplateBody(template);
     const placeholders = resolveTemplatePlaceholders(template, templateBody);
-    awaitingField = awaitingFieldFromMissing(missingForCollection(placeholders, {}), locale);
+    awaitingField = awaitingFieldFromMissing(missingForCollection(placeholders, {}), locale, template.slug);
     draftPreview = await buildDraftPreview({
       ...contract,
       template,
@@ -371,7 +382,7 @@ async function applyDirectFieldAnswer(
     return {
       contractId,
       assistantMessage: t("errors.generic"),
-      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers), locale),
+      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers), locale, contract.template?.slug),
     };
   }
 
@@ -385,7 +396,7 @@ async function applyDirectFieldAnswer(
     contractId,
     assistantMessage: t("field.nextQuestion", { label: fieldQuestion(nextKey, locale) }),
     completed: false,
-    awaitingField: awaitingFieldFromMissing(missingAfter, locale),
+    awaitingField: awaitingFieldFromMissing(missingAfter, locale, contract.template?.slug),
     draftPreview,
     contractTitle: contract.title,
   };
@@ -452,7 +463,7 @@ async function continueDraftChat(
       return {
         contractId,
         assistantMessage: t("field.retryQuestion", { label: fieldQuestion(currentKey, locale) }),
-        awaitingField: awaitingFieldFromMissing(missingBefore, locale),
+        awaitingField: awaitingFieldFromMissing(missingBefore, locale, contract.template?.slug),
         draftPreview,
         contractTitle: contract.title,
       };
@@ -460,7 +471,7 @@ async function continueDraftChat(
     return {
       contractId,
       assistantMessage: t("errors.generic"),
-      awaitingField: awaitingFieldFromMissing(missingBefore, locale),
+      awaitingField: awaitingFieldFromMissing(missingBefore, locale, contract.template?.slug),
     };
   }
 
@@ -473,7 +484,7 @@ async function continueDraftChat(
     return {
       contractId,
       assistantMessage: t("errors.generic"),
-      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers), locale),
+      awaitingField: awaitingFieldFromMissing(missingForCollection(placeholders, answers), locale, contract.template?.slug),
     };
   }
 
@@ -486,7 +497,7 @@ async function continueDraftChat(
     contractId,
     assistantMessage: llmTurn.result.assistant_message,
     completed: false,
-    awaitingField: awaitingFieldFromMissing(missingAfter, locale),
+    awaitingField: awaitingFieldFromMissing(missingAfter, locale, contract.template?.slug),
     draftPreview,
     contractTitle: contract.title,
   };
@@ -585,7 +596,7 @@ async function sessionStateForInProgressContract(
     contractTitle: contract.title,
     completed: false,
     draftPreview,
-    awaitingField: awaitingFieldFromMissing(missing, locale),
+    awaitingField: awaitingFieldFromMissing(missing, locale, contract.template?.slug),
   };
 }
 
@@ -637,7 +648,7 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
   if (missing.length === 0) return null;
 
   const draftPreview = await buildDraftPreview(contract);
-  const awaitingField = awaitingFieldFromMissing(missing, locale);
+  const awaitingField = awaitingFieldFromMissing(missing, locale, contract.template?.slug);
 
   const resumePrompt =
     locale === "en"
@@ -675,6 +686,69 @@ export async function resumeDraftChatAction(contractId: string): Promise<DraftCh
     assistantMessage: llmTurn.result.assistant_message,
     completed: false,
     awaitingField,
+    draftPreview,
+    contractTitle: contract.title,
+  };
+}
+
+/**
+ * Live-demo helper: fill the current draft with the template's preset demo
+ * answers in one click. Completes the contract if all required fields are then
+ * present, otherwise advances to the next remaining question.
+ */
+export async function prefillDraftDemoAction(contractId: string): Promise<DraftChatResult> {
+  const t = await getTranslations("chat");
+  const locale = (await getLocale()) as AppLocale;
+  const session = await getClientSession();
+  if (!session.ok) return { assistantMessage: "", error: session.reason };
+
+  const contract = await loadDraftContract(contractId, session.userId);
+  if (!contract?.template) {
+    return { contractId, assistantMessage: t("sessionLost") };
+  }
+
+  let templateBody: string;
+  try {
+    templateBody = await resolveTemplateBody(contract.template);
+  } catch {
+    return { contractId, assistantMessage: t("errors.templateLoadFailed") };
+  }
+
+  const placeholders = resolveTemplatePlaceholders(contract.template, templateBody);
+  const presets = getDemoPresets(contract.template.slug);
+  if (Object.keys(presets).length === 0) {
+    return { contractId, assistantMessage: t("errors.noDemoPreset") };
+  }
+
+  // Only fill collectable fields the user would otherwise be asked for.
+  const collectable = new Set(missingForCollection(placeholders, {}).concat(
+    placeholders.filter((key) => presets[key])
+  ));
+  const answers = { ...parseDraftAnswers(contract.draftAnswers) };
+  for (const [key, value] of Object.entries(presets)) {
+    if (collectable.has(key)) answers[key] = value;
+  }
+
+  let draftPreview: DraftPreview | undefined;
+  try {
+    draftPreview = await persistDraftAnswers(contractId, contract, answers);
+  } catch {
+    return { contractId, assistantMessage: t("errors.generic") };
+  }
+
+  if (isDraftReadyToComplete(placeholders, answers)) {
+    return completeDraftContract(contractId, contract, answers);
+  }
+
+  const missingAfter = missingForCollection(placeholders, answers);
+  const nextKey = missingAfter[0];
+  return {
+    contractId,
+    assistantMessage: nextKey
+      ? t("field.nextQuestion", { label: fieldQuestion(nextKey, locale) })
+      : t("field.demoFilled"),
+    completed: false,
+    awaitingField: awaitingFieldFromMissing(missingAfter, locale, contract.template.slug),
     draftPreview,
     contractTitle: contract.title,
   };

@@ -362,7 +362,9 @@
       "nextQuestion": "Merci ! {label}",
       "resumeQuestion": "Reprenons. {label}",
       "retryQuestion": "Je n’ai pas bien compris. {label}",
-      "optionsHint": "Choisissez une option"
+      "optionsHint": "Choisissez une option",
+      "useExample": "Exemple : {value}",
+      "demoFilled": "J’ai pré-rempli les champs avec des données de démonstration."
     },
     "mode": {
       "label": "Mode d'affichage",
@@ -378,7 +380,8 @@
       "sessionExpired": "Session expirée — reconnectez-vous.",
       "generic": "Une erreur est survenue. Réessayez.",
       "aiRequiredForDraft": "La rédaction guidée nécessite NVIDIA_API_KEY dans .env.",
-      "templateLoadFailed": "Impossible de charger le modèle de contrat."
+      "templateLoadFailed": "Impossible de charger le modèle de contrat.",
+      "noDemoPreset": "Aucune donnée de démo pour ce modèle."
     },
     "viewer": {
       "label": "Contrat généré",
@@ -389,7 +392,8 @@
       "requestBarrister": "Demander un avis d'avocat",
       "requestBarristerPending": "Attribution en cours…",
       "disclaimer": "Modèle d'aide documentaire — faites relire par un avocat si nécessaire."
-    }
+    },
+    "demoFill": "Pré-remplir (démo)"
   },
   "contracts": {
     "questionLabel": "Votre question (optionnel si vous téléversez un fichier)",

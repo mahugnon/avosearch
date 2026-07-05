@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ type Props = {
   hint?: string;
   type?: "text" | "radio";
   options?: FieldOption[];
+  demoValue?: string;
   onSubmit: (value: string, fieldKey: string) => void;
   disabled?: boolean;
 };
@@ -25,6 +26,7 @@ export function ChatFieldCard({
   hint,
   type = "text",
   options,
+  demoValue,
   onSubmit,
   disabled,
 }: Props) {
@@ -92,6 +94,17 @@ export function ChatFieldCard({
             </div>
           ) : (
             <div className="mt-2.5 space-y-2">
+              {demoValue && (
+                <button
+                  type="button"
+                  disabled={disabled}
+                  onClick={() => submit(demoValue)}
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-dashed border-primary/40 px-2.5 py-1 text-[0.6875rem] font-medium text-primary transition-colors hover:bg-primary/[0.06] disabled:opacity-50"
+                >
+                  <Sparkles className="size-3 shrink-0" aria-hidden />
+                  <span className="truncate">{t("useExample", { value: demoValue })}</span>
+                </button>
+              )}
               <Input
                 value={value}
                 onChange={(e) => setValue(e.target.value)}

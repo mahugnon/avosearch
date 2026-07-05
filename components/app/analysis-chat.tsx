@@ -3,7 +3,12 @@
 import { ArrowUp, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { draftChatAction, getDraftSessionStateAction, type AwaitingField } from "@/lib/actions/draft-chat";
+import {
+  draftChatAction,
+  getDraftSessionStateAction,
+  prefillDraftDemoAction,
+  type AwaitingField,
+} from "@/lib/actions/draft-chat";
 import { ContractViewer } from "@/components/contracts/contract-viewer";
 import { ChatFieldCard } from "@/components/app/chat-field-card";
 import { ChatHistoryPanel } from "@/components/app/chat-history-panel";
@@ -255,6 +260,46 @@ export function AnalysisChat() {
     [contractId, isThinking, barristerInquiry, messages, persistThread, t]
   );
 
+  const prefillDemo = useCallback(async () => {
+    if (!contractId || isThinking) return;
+    setError(null);
+    setAwaitingField(undefined);
+    setIsThinking(true);
+    try {
+      const result = await prefillDraftDemoAction(contractId);
+      if (result.error) {
+        setError(t(`errors.${result.error}` as "errors.unauthorized"));
+        return;
+      }
+      if (result.draftPreview) {
+        setContractBody(result.draftPreview.body);
+        setContractTitle(result.draftPreview.title);
+        setDraftInProgress(result.draftPreview.inProgress);
+      }
+      if (result.completed && result.contractBody) {
+        setContractBody(result.contractBody);
+        if (result.contractTitle) setContractTitle(result.contractTitle);
+        setDraftInProgress(false);
+        setPanelMode("preview");
+        setAwaitingField(undefined);
+      } else if (result.awaitingField) {
+        setAwaitingField(result.awaitingField);
+      }
+      if (result.assistantMessage) {
+        const finalMessages: ChatMessage[] = [
+          ...messages,
+          { id: crypto.randomUUID(), role: "assistant", content: result.assistantMessage },
+        ];
+        setMessages(finalMessages);
+        persistThread(finalMessages, { contractId });
+      }
+    } catch {
+      setError(t("errors.generic"));
+    } finally {
+      setIsThinking(false);
+    }
+  }, [contractId, isThinking, messages, persistThread, t]);
+
   function handleSend() {
     void sendMessage(draft.trim());
   }
@@ -374,6 +419,7 @@ export function AnalysisChat() {
                 hint={awaitingField.hint}
                 type={awaitingField.type}
                 options={awaitingField.options}
+                demoValue={awaitingField.demoValue}
                 disabled={isThinking}
                 onSubmit={(value, key) => void sendMessage(value, key)}
               />
@@ -384,8 +430,27 @@ export function AnalysisChat() {
             )}
           </div>
 
+          {draftInProgress && contractId && (
+            <div className="flex justify-end border-t border-border/60 bg-card px-4 pt-3 sm:px-5">
+              <button
+                type="button"
+                onClick={() => void prefillDemo()}
+                disabled={isThinking}
+                className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-primary/40 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/[0.06] disabled:opacity-50"
+              >
+                <Sparkles className="size-3.5" aria-hidden />
+                {t("demoFill")}
+              </button>
+            </div>
+          )}
+
           {showTextInput && (
-            <footer className="space-y-3 border-t border-border/60 bg-card px-4 py-4 sm:px-5">
+            <footer
+              className={cn(
+                "space-y-3 bg-card px-4 py-4 sm:px-5",
+                !(draftInProgress && contractId) && "border-t border-border/60"
+              )}
+            >
               <div className="flex items-end gap-2 rounded-xl border border-border/60 bg-muted/30 p-2 focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10">
                 <Textarea
                   value={draft}
