@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // Keep pdfkit/fontkit unbundled so their bundled font-metric (.afm) files
+  // resolve from node_modules at runtime instead of a missing bundle path.
+  serverExternalPackages: ["pdfkit", "fontkit"],
 };
 
 export default withNextIntl(nextConfig);

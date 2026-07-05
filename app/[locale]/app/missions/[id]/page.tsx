@@ -135,6 +135,7 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
           title={t("contractDocument")}
           body={mission.contract.extractedText}
           contractId={mission.contractId}
+          canDownload={isBarristerReviewDelivered(mission.status)}
         />
       )}
 

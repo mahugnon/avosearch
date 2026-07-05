@@ -25,6 +25,7 @@ export async function GET(_request: Request, context: RouteContext) {
   const pdf = await generateContractPdf({
     title: access.title,
     body: access.extractedText,
+    reviewedBy: access.reviewedBy,
   });
 
   const filename = `${access.title.replace(/[^\w\s-]/g, "").slice(0, 80) || "contrat"}.pdf`;

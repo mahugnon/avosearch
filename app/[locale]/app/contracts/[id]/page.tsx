@@ -154,6 +154,7 @@ export default async function ContractDetailPage({ params }: Props) {
           body={contract.extractedText}
           contractId={contract.id}
           highlight={highlight}
+          canDownload={!!deliveredMission}
         />
       )}
 

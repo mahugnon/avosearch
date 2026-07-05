@@ -132,6 +132,7 @@ export default async function BarristerMissionDetailPage({ params }: Props) {
               body={mission.contract.extractedText}
               contractId={mission.contractId}
               mode="barrister"
+              canDownload
             />
           )}
         </>

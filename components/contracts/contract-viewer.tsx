@@ -21,6 +21,8 @@ type Props = {
   mode?: ContractViewerMode;
   showBarristerRequest?: boolean;
   draftPreview?: boolean;
+  /** PDF export is only offered once a barrister has reviewed the contract. */
+  canDownload?: boolean;
 };
 
 export function ContractViewer({
@@ -32,6 +34,7 @@ export function ContractViewer({
   mode = "client",
   showBarristerRequest,
   draftPreview,
+  canDownload,
 }: Props) {
   const t = useTranslations("chat.viewer");
 
@@ -66,16 +69,18 @@ export function ContractViewer({
           {contractId && !draftPreview && (
             <>
               {showBarristerRequest && <RequestBarristerButton contractId={contractId} />}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1.5"
-                onClick={handlePdfDownload}
-              >
-                <Download className="size-3.5" />
-                {t("pdf")}
-              </Button>
+              {canDownload && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1.5"
+                  onClick={handlePdfDownload}
+                >
+                  <Download className="size-3.5" />
+                  {t("pdf")}
+                </Button>
+              )}
             </>
           )}
         </div>
