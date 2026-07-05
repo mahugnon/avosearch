@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Plus_Jakarta_Sans, Source_Serif_4 } from "next/font/google";
+import { IBM_Plex_Mono, Instrument_Sans, Instrument_Serif, Source_Serif_4 } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
@@ -9,10 +9,18 @@ import { CookieConsent } from "@/components/layout/cookie-consent";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({
+const instrumentSans = Instrument_Sans({
   variable: "--font-sans-app",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+});
+
+// Editorial display face used for headings and the wordmark.
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
@@ -63,7 +71,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html
       lang={locale}
-      className={`${plusJakarta.variable} ${ibmPlexMono.variable} ${sourceSerif.variable} h-full antialiased`}
+      className={`${instrumentSans.variable} ${instrumentSerif.variable} ${ibmPlexMono.variable} ${sourceSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>

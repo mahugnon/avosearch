@@ -51,7 +51,7 @@
   },
   "landing": {
     "heroBadge": "Contrats uniquement — orientation en moins d'une minute",
-    "heroTitle": "Vos contrats, relus et sécurisés — avec ou sans avocat",
+    "heroTitle": "Vos contrats, <em>relus</em> et sécurisés — avec ou sans avocat",
     "heroDescription": "Déposez votre contrat : AvoSearch repère les clauses à risque, propose des modifications en suivi de modifications, et vous met en relation avec un avocat vérifié quand votre situation le demande.",
     "analyzeContract": "Analyser mon contrat",
     "iAmBarrister": "Je suis avocat",
@@ -112,7 +112,8 @@
     },
     "ctaTitle": "Un contrat à signer cette semaine ?",
     "ctaDescription": "Déposez-le maintenant : vous saurez en quelques minutes s'il peut être ajusté directement ou s'il mérite l'œil d'un avocat.",
-    "ctaButton": "Commencer gratuitement"
+    "ctaButton": "Commencer gratuitement",
+    "howItWorksKicker": "Trois étapes, une réponse claire"
   },
   "auth": {
     "layoutDisclaimer": "Plateforme de démonstration — aucune donnée réelle. AvoSearch est un outil d'aide documentaire et ne fournit pas de consultation juridique.",

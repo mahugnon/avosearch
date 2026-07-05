@@ -8,8 +8,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans-app), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, "Times New Roman", serif;
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-serif);
   --color-brand-ink: var(--brand-ink);
   --color-brand-blue: var(--brand-blue);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -51,69 +52,71 @@
 }
 
 :root {
-  --brand-ink: #0f172a;
-  --brand-blue: #2563eb;
-  --background: oklch(0.992 0.002 260);
-  --foreground: oklch(0.17 0.025 265);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.17 0.025 265);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.17 0.025 265);
-  --primary: oklch(0.52 0.19 264);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.975 0.008 264);
-  --secondary-foreground: oklch(0.35 0.04 265);
-  --muted: oklch(0.965 0.006 264);
-  --muted-foreground: oklch(0.52 0.03 265);
-  --accent: oklch(0.96 0.02 264);
-  --accent-foreground: oklch(0.45 0.12 264);
+  /* Editorial palette: warm paper, ink navy, royal blue. */
+  --brand-ink: #0c1428;
+  --brand-blue: #2547e8;
+  --background: #f7f5ef;
+  --foreground: #10141f;
+  --card: #ffffff;
+  --card-foreground: #10141f;
+  --popover: #ffffff;
+  --popover-foreground: #10141f;
+  --primary: #2547e8;
+  --primary-foreground: #ffffff;
+  --secondary: #edeadd;
+  --secondary-foreground: #3a4356;
+  --muted: #efece2;
+  --muted-foreground: #6a7286;
+  --accent: #e9edfb;
+  --accent-foreground: #2547e8;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0.008 264);
-  --input: oklch(0.94 0.006 264);
-  --ring: oklch(0.52 0.19 264 / 40%);
-  --chart-1: oklch(0.52 0.19 264);
-  --chart-2: oklch(0.17 0.025 265);
-  --chart-3: oklch(0.62 0.12 264);
-  --chart-4: oklch(0.75 0.06 264);
-  --chart-5: oklch(0.88 0.03 264);
+  --border: #e4e0d4;
+  --input: #d8d3c4;
+  --ring: color-mix(in srgb, #2547e8 45%, transparent);
+  --chart-1: #2547e8;
+  --chart-2: #10141f;
+  --chart-3: #7d93f2;
+  --chart-4: #a9b6ea;
+  --chart-5: #d0d7f5;
   --radius: 0.75rem;
-  --sidebar: oklch(0.985 0.004 264);
-  --sidebar-foreground: oklch(0.17 0.025 265);
-  --sidebar-primary: oklch(0.52 0.19 264);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.96 0.02 264);
-  --sidebar-accent-foreground: oklch(0.45 0.12 264);
-  --sidebar-border: oklch(0.91 0.008 264);
-  --sidebar-ring: oklch(0.52 0.19 264 / 40%);
+  --sidebar: #f2efe6;
+  --sidebar-foreground: #10141f;
+  --sidebar-primary: #2547e8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e9edfb;
+  --sidebar-accent-foreground: #2547e8;
+  --sidebar-border: #e4e0d4;
+  --sidebar-ring: color-mix(in srgb, #2547e8 45%, transparent);
 }
 
 .dark {
-  --background: oklch(0.15 0.025 265);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.19 0.03 265);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.19 0.03 265);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.58 0.18 264);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.26 0.035 265);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.26 0.035 265);
-  --muted-foreground: oklch(0.65 0.03 264);
-  --accent: oklch(0.26 0.05 264);
-  --accent-foreground: oklch(0.75 0.1 264);
+  /* Ink-navy dark surface, matching the mockup's dark plan card. */
+  --background: #0d1017;
+  --foreground: #f5f2e9;
+  --card: #0c1428;
+  --card-foreground: #f5f2e9;
+  --popover: #0c1428;
+  --popover-foreground: #f5f2e9;
+  --primary: #2547e8;
+  --primary-foreground: #ffffff;
+  --secondary: #1b2334;
+  --secondary-foreground: #f5f2e9;
+  --muted: #1b2334;
+  --muted-foreground: #8a93a6;
+  --accent: #1b2740;
+  --accent-foreground: #8fa0d8;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
+  --border: #232a3a;
   --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.58 0.18 264 / 45%);
-  --sidebar: oklch(0.19 0.03 265);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.58 0.18 264);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.26 0.05 264);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.58 0.18 264 / 45%);
+  --ring: color-mix(in srgb, #2547e8 50%, transparent);
+  --sidebar: #0c1428;
+  --sidebar-foreground: #f5f2e9;
+  --sidebar-primary: #2547e8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1b2740;
+  --sidebar-accent-foreground: #8fa0d8;
+  --sidebar-border: #232a3a;
+  --sidebar-ring: color-mix(in srgb, #2547e8 50%, transparent);
 }
 
 @layer base {
@@ -126,8 +129,13 @@
   html {
     @apply font-sans;
   }
+  /* Editorial serif display headings — light weight, tight tracking. */
   h1,
-  h2,
+  h2 {
+    @apply font-heading font-normal tracking-tight text-foreground;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
   h3,
   h4 {
     @apply font-semibold tracking-tight text-foreground;
@@ -136,6 +144,45 @@
 }
 
 @layer utilities {
+  /* Small-caps editorial label used above section titles. */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  /* Thin ink rule + eyebrow, as in the mockup's hero kicker. */
+  .rule-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .rule-kicker::before {
+    content: "";
+    width: 2.5rem;
+    height: 1px;
+    background: var(--foreground);
+  }
+
+  /* Oversized § watermark behind hero content. */
+  .section-mark {
+    font-family: var(--font-serif);
+    color: var(--brand-blue);
+    opacity: 0.06;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .font-display {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
   .bg-dot-grid {
     background-image: radial-gradient(
       oklch(0.75 0.015 264 / 28%) 1px,

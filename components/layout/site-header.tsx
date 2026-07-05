@@ -18,19 +18,19 @@ export async function SiteHeader() {
   const homeHref = role ? ROLE_HOME[role] : null;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="shrink-0">
           <Logo priority />
         </Link>
-        <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <Link href="/#comment-ca-marche" className="transition-colors hover:text-foreground">
+        <nav className="hidden items-center gap-9 md:flex">
+          <Link href="/#comment-ca-marche" className="eyebrow transition-colors hover:text-foreground">
             {t("howItWorks")}
           </Link>
-          <Link href="/#tarifs" className="transition-colors hover:text-foreground">
+          <Link href="/#tarifs" className="eyebrow transition-colors hover:text-foreground">
             {t("pricing")}
           </Link>
-          <Link href="/#faq" className="transition-colors hover:text-foreground">
+          <Link href="/#faq" className="eyebrow transition-colors hover:text-foreground">
             {t("faq")}
           </Link>
         </nav>

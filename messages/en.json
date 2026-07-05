@@ -51,7 +51,7 @@
   },
   "landing": {
     "heroBadge": "Contracts only — guidance in under a minute",
-    "heroTitle": "Your contracts, reviewed and secured — with or without a barrister",
+    "heroTitle": "Your contracts, <em>reviewed</em> and secured — with or without a barrister",
     "heroDescription": "Upload your contract: AvoSearch flags risky clauses, suggests tracked changes, and connects you with a verified barrister when your situation calls for it.",
     "analyzeContract": "Review my contract",
     "iAmBarrister": "I'm a barrister",
@@ -112,7 +112,8 @@
     },
     "ctaTitle": "A contract to sign this week?",
     "ctaDescription": "Upload it now: in a few minutes you'll know whether it can be adjusted directly or deserves a barrister's review.",
-    "ctaButton": "Get started for free"
+    "ctaButton": "Get started for free",
+    "howItWorksKicker": "Three steps, one clear answer"
   },
   "auth": {
     "layoutDisclaimer": "Demo platform — no real data. AvoSearch is a document assistance tool and does not provide legal advice.",
@@ -869,12 +870,42 @@
         "retention": "Retention"
       },
       "rows": {
-        "1": { "purpose": "User account", "data": "Name, email, hashed password, role", "legalBasis": "Contract (ToS)", "retention": "Account lifetime" },
-        "2": { "purpose": "AI analysis / review", "data": "Contract texts, questions, results", "legalBasis": "Explicit consent", "retention": "Account lifetime" },
-        "3": { "purpose": "Barrister missions", "data": "Messages, attachments", "legalBasis": "Contract", "retention": "Account lifetime" },
-        "4": { "purpose": "Payments", "data": "Stripe IDs, amounts", "legalBasis": "Contract / legal obligation", "retention": "10 years (prod)" },
-        "5": { "purpose": "Email notifications", "data": "Email, notification content", "legalBasis": "Legitimate interest", "retention": "12 months" },
-        "6": { "purpose": "Essential cookies", "data": "Session, language, consent", "legalBasis": "Legitimate interest", "retention": "13 months max." }
+        "1": {
+          "purpose": "User account",
+          "data": "Name, email, hashed password, role",
+          "legalBasis": "Contract (ToS)",
+          "retention": "Account lifetime"
+        },
+        "2": {
+          "purpose": "AI analysis / review",
+          "data": "Contract texts, questions, results",
+          "legalBasis": "Explicit consent",
+          "retention": "Account lifetime"
+        },
+        "3": {
+          "purpose": "Barrister missions",
+          "data": "Messages, attachments",
+          "legalBasis": "Contract",
+          "retention": "Account lifetime"
+        },
+        "4": {
+          "purpose": "Payments",
+          "data": "Stripe IDs, amounts",
+          "legalBasis": "Contract / legal obligation",
+          "retention": "10 years (prod)"
+        },
+        "5": {
+          "purpose": "Email notifications",
+          "data": "Email, notification content",
+          "legalBasis": "Legitimate interest",
+          "retention": "12 months"
+        },
+        "6": {
+          "purpose": "Essential cookies",
+          "data": "Session, language, consent",
+          "legalBasis": "Legitimate interest",
+          "retention": "13 months max."
+        }
       },
       "subprocessorsHint": "Subprocessors:",
       "subprocessorsLink": "Subprocessors (DPA) page"
@@ -888,10 +919,34 @@
       "data": "Data processed",
       "safeguards": "Safeguards",
       "vendors": {
-        "1": { "name": "NVIDIA NIM", "role": "LLM contract processing", "location": "US / EU", "data": "Contract excerpts", "safeguards": "DPA / SCC" },
-        "2": { "name": "Stripe", "role": "Payments", "location": "EU / US", "data": "Transaction data", "safeguards": "PCI-DSS, DPA" },
-        "3": { "name": "Hosting", "role": "App hosting", "location": "EU", "data": "All platform data", "safeguards": "DPA, encryption" },
-        "4": { "name": "SMTP provider", "role": "Transactional email", "location": "EU", "data": "Email addresses", "safeguards": "DPA" }
+        "1": {
+          "name": "NVIDIA NIM",
+          "role": "LLM contract processing",
+          "location": "US / EU",
+          "data": "Contract excerpts",
+          "safeguards": "DPA / SCC"
+        },
+        "2": {
+          "name": "Stripe",
+          "role": "Payments",
+          "location": "EU / US",
+          "data": "Transaction data",
+          "safeguards": "PCI-DSS, DPA"
+        },
+        "3": {
+          "name": "Hosting",
+          "role": "App hosting",
+          "location": "EU",
+          "data": "All platform data",
+          "safeguards": "DPA, encryption"
+        },
+        "4": {
+          "name": "SMTP provider",
+          "role": "Transactional email",
+          "location": "EU",
+          "data": "Email addresses",
+          "safeguards": "DPA"
+        }
       },
       "dpaNote": "Signed DPAs must be archived before production."
     },
