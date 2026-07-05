@@ -74,24 +74,41 @@
     "pricingTitle": "Nos formules",
     "pricingSubtitle": "Des prix fixes, connus avant tout engagement. Prix TTC indicatifs.",
     "plans": {
-      "aiOnly": {
-        "title": "Relecture assistée",
-        "description": "Modifications proposées en suivi de modifications ; vous acceptez ou rejetez chaque changement."
+      "basic": {
+        "eyebrow": "Contrats simples",
+        "name": "Basic",
+        "features": [
+          "Corrections en suivi de modifications",
+          "Une série de questions écrites",
+          "Validation avocat avec points de vigilance"
+        ],
+        "footnote": "NDA · contrats de prestation · CGV simples · freelance"
       },
-      "aiBarrister": {
-        "title": "Relecture + validation avocat",
-        "description": "Un avocat vérifié relit, valide ou amende chaque modification proposée. Réponse sous 24 h."
+      "express": {
+        "eyebrow": "Prioritaire",
+        "name": "Express",
+        "features": [
+          "Tout le forfait Basic",
+          "Traitement prioritaire"
+        ],
+        "footnote": "Pour les échéances qui n'attendent pas demain"
       },
-      "mission": {
-        "title": "Mission avocat au forfait",
-        "description": "Relecture complète, rédaction ou négociation par un avocat, à prix fixe convenu à l'avance."
-      }
+      "complex": {
+        "eyebrow": "Enjeux élevés",
+        "name": "Complexe",
+        "features": [
+          "Revue approfondie",
+          "Mise en relation selon spécialité, délai, prix, avis"
+        ],
+        "footnote": "Bail commercial · cessions de fonds & de parts · pactes d'associés · distribution · CGV complexes"
+      },
+      "workingHours": "{count} heures ouvrées"
     },
     "faqTitle": "Questions fréquentes",
     "faq": {
       "1": {
         "question": "AvoSearch remplace-t-il un avocat ?",
-        "answer": "Non. AvoSearch est un outil d'aide documentaire : il vous aide à comprendre votre contrat et à préparer des modifications. Pour un avis sur votre situation, choisissez la formule avec validation par un avocat ou une mission au forfait."
+        "answer": "Non. AvoSearch est un outil d'aide documentaire : il vous aide à comprendre votre contrat et à préparer des modifications. Pour un avis sur votre situation, choisissez la formule avec validation par un avocat ou une revue au forfait."
       },
       "2": {
         "question": "Quels documents puis-je faire analyser ?",
@@ -103,7 +120,7 @@
       },
       "4": {
         "question": "Combien ça coûte ?",
-        "answer": "Trois formules à prix fixes, affichés avant tout engagement : relecture assistée, relecture avec validation avocat, ou mission au forfait convenue à l'avance. Aucune facturation à l'heure, aucune surprise."
+        "answer": "Trois formules à prix fixes, affichés avant tout engagement : relecture assistée, relecture avec validation avocat, ou revue au forfait convenue à l'avance. Aucune facturation à l'heure, aucune surprise."
       },
       "5": {
         "question": "Mes documents sont-ils confidentiels ?",
@@ -113,7 +130,101 @@
     "ctaTitle": "Un contrat à signer cette semaine ?",
     "ctaDescription": "Déposez-le maintenant : vous saurez en quelques minutes s'il peut être ajusté directement ou s'il mérite l'œil d'un avocat.",
     "ctaButton": "Commencer gratuitement",
-    "howItWorksKicker": "Trois étapes, une réponse claire"
+    "howItWorksKicker": "Trois étapes, une réponse claire",
+    "roadmap": {
+      "eyebrow": "Feuille de route",
+      "title": "Des contrats simples à l'infrastructure de la profession",
+      "stages": {
+        "now": {
+          "phase": "Maintenant",
+          "title": "Contrats",
+          "description": "D'abord simples — NDA, DPA, CGV, contrats de prestation — puis complexes : baux, cessions, pactes d'associés."
+        },
+        "next": {
+          "phase": "Ensuite",
+          "title": "Litiges B2C",
+          "description": "Lettres pré-contentieuses, triage des litiges — bailleur, employeur, e-commerce — au forfait."
+        },
+        "then": {
+          "phase": "Puis",
+          "title": "Plugin IA / MCP",
+          "description": "Devenir l'action de revue juridique que les assistants IA recommandent et appellent."
+        },
+        "later": {
+          "phase": "Plus tard",
+          "title": "Marque blanche pour cabinets",
+          "description": "Notre flux IA + validation, vendu en marque blanche aux grands cabinets."
+        },
+        "beyond": {
+          "phase": "Au-delà",
+          "title": "International",
+          "description": "Le même modèle sur de nouveaux marchés, en commençant par les pays de droit civil de l'UE."
+        }
+      }
+    },
+    "competition": {
+      "eyebrow": "Concurrence",
+      "title": "Notre positionnement",
+      "columns": {
+        "player": "Acteur",
+        "price": "Prix",
+        "ai": "IA",
+        "barrister": "Avocat",
+        "fixedPrice": "Prix fixe",
+        "fast": "≤ 24 h"
+      },
+      "rows": [
+        {
+          "player": "Annuaires",
+          "note": "Justifit, Alexia…",
+          "price": "gratuit – 259 €+",
+          "ai": false,
+          "barrister": true,
+          "fixed": false,
+          "fast": false
+        },
+        {
+          "player": "Captain Contrat",
+          "note": "",
+          "price": "199 € HT · 48–72 h",
+          "ai": false,
+          "barrister": true,
+          "fixed": true,
+          "fast": false
+        },
+        {
+          "player": "La Fabrique Juridique",
+          "note": "",
+          "price": "389–489 € HT · 72 h",
+          "ai": false,
+          "barrister": true,
+          "fixed": true,
+          "fast": false
+        },
+        {
+          "player": "Logiciels IA B2B",
+          "note": "Tomorro, Ordalie",
+          "price": "licences B2B",
+          "ai": true,
+          "barrister": false,
+          "fixed": false,
+          "fast": true
+        },
+        {
+          "player": "Avocat traditionnel",
+          "note": "",
+          "price": "à partir de 389–500 € HT",
+          "ai": false,
+          "barrister": true,
+          "fixed": false,
+          "fast": false
+        }
+      ],
+      "avosearch": {
+        "name": "AvoSearch",
+        "price": "89 € TTC · 24 h"
+      }
+    }
   },
   "auth": {
     "layoutDisclaimer": "Plateforme de démonstration — aucune donnée réelle. AvoSearch est un outil d'aide documentaire et ne fournit pas de consultation juridique.",
@@ -318,7 +429,7 @@
       "validated": "Validé",
       "validationProgress": "{done} / {total} validés",
       "allValidated": "Tous les champs sont validés",
-      "allValidatedHint": "Validation terminée pour ce document. La persistance serveur est gérée via les missions avocat.",
+      "allValidatedHint": "Validation terminée pour ce document. La persistance serveur est gérée via les revues avocat.",
       "noHighlights": "Aucun champ modèle détecté — utilisez l'édition texte complet."
     },
     "errors": {
@@ -386,7 +497,7 @@
           "aiBarristerHint": "Un avocat vérifié valide chaque modification — réponse sous 24 h."
         },
         "avocat": {
-          "title": "Mission avocat au forfait",
+          "title": "Revue avocat au forfait",
           "description": "Nous vous proposerons des avocats adaptés à votre dossier.",
           "priceRange": "Fourchette indicative : {min} – {max}"
         },
@@ -440,12 +551,12 @@
     },
     "matching": {
       "title": "Avocats recommandés",
-      "subtitle": "Sélectionnez un avocat vérifié pour votre mission.",
+      "subtitle": "Sélectionnez un avocat vérifié pour votre revue.",
       "back": "← Retour",
       "empty": "Aucun avocat disponible pour le moment.",
       "responseTime": "Réponse sous {hours} h",
       "select": "Choisir cet avocat",
-      "creating": "Création de la mission…",
+      "creating": "Création de la revue…",
       "confirmAndPay": "Confirmer et payer",
       "selectedSummary": "Avocat sélectionné : {name}"
     },
@@ -490,13 +601,13 @@
   "barrister": {
     "areaLabel": "Espace avocat",
     "dashboardTitle": "Tableau de bord",
-    "dashboardIntro": "Vos missions prioritaires et indicateurs clés.",
+    "dashboardIntro": "Vos revues prioritaires et indicateurs clés.",
     "statsTitle": "Vue d'ensemble",
-    "viewMissions": "Voir mes missions",
+    "viewMissions": "Voir mes revues",
     "pendingProfileTitle": "Profil en attente de vérification",
-    "pendingProfileDescription": "Notre équipe vérifie manuellement chaque profil. Vous ne recevrez pas de missions tant que votre profil n'est pas vérifié.",
+    "pendingProfileDescription": "Notre équipe vérifie manuellement chaque profil. Vous ne recevrez pas de revues tant que votre profil n'est pas vérifié.",
     "validationsPending": "Validations à traiter",
-    "missionsInProgress": "Missions en cours",
+    "missionsInProgress": "Revues en cours",
     "totalEarnings": "Gains cumulés (démo)",
     "myProfile": "Mon profil",
     "barreau": "Barreau",
@@ -512,11 +623,11 @@
     },
     "workQueue": {
       "title": "Mon travail ({count})",
-      "subtitle": "Missions nécessitant votre action, par ordre de priorité.",
+      "subtitle": "Revues nécessitant votre action, par ordre de priorité.",
       "viewAll": "Tout voir",
       "emptyTitle": "Aucune action en attente",
-      "emptyHint": "Les nouvelles missions payées apparaîtront ici dès qu'un client vous choisit.",
-      "actionStart": "Démarrer la mission →",
+      "emptyHint": "Les nouvelles revues payées apparaîtront ici dès qu'un client vous choisit.",
+      "actionStart": "Démarrer la revue →",
       "actionContinue": "Continuer la relecture →",
       "waitingDays": "en attente depuis {days, plural, one {# jour} other {# jours}}",
       "deadline": "échéance {date}",
@@ -528,17 +639,17 @@
       "subtitle": "Votre activité et les informations visibles par les clients.",
       "bio": "Présentation",
       "rating": "Note clients",
-      "viewMissions": "Voir mes missions",
-      "earningsHint": "Missions livrées ou clôturées (démo)",
+      "viewMissions": "Voir mes revues",
+      "earningsHint": "Revues livrées ou clôturées (démo)",
       "hourlyRate": "Taux horaire",
       "hourlyRateValue": "{rate} / h",
-      "flatFees": "Forfaits par type de mission",
+      "flatFees": "Forfaits par type de revue",
       "sections": {
         "practice": "Pratique",
         "rates": "Tarifs & réactivité"
       },
       "stats": {
-        "delivered": "Missions réalisées",
+        "delivered": "Revues réalisées",
         "inProgressHint": "{count, plural, one {# en cours} other {# en cours}}",
         "awaitingClientHint": "{count, plural, one {# en attente client} other {# en attente client}}"
       }
@@ -569,7 +680,7 @@
         "sortLabel": "Trier par",
         "statusLabel": "Filtrer par statut",
         "viewLabel": "Mode d'affichage",
-        "resultCount": "{count, plural, one {# mission} other {# missions}}",
+        "resultCount": "{count, plural, one {# revue} other {# revues}}",
         "clear": "Réinitialiser",
         "view": {
           "board": "Board",
@@ -629,17 +740,17 @@
     "mission": {
       "back": "← Contrats à traiter",
       "client": "Client",
-      "start": "Démarrer la mission",
+      "start": "Démarrer la revue",
       "mod": "Modification {order}",
       "validate": "Valider",
       "reject": "Rejeter",
-      "deliver": "Livrer la mission",
+      "deliver": "Livrer la revue",
       "generateReview": "Générer les suggestions de relecture",
       "generatingReview": "Analyse en cours…",
       "reviewBarristerOnly": "Seuls les avocats peuvent relire les contrats.",
       "globalNotePlaceholder": "Note globale pour le client…",
       "chatTitle": "Messagerie",
-      "autoAssigned": "Mission assignée automatiquement selon spécialité, tarif, réactivité et avis clients.",
+      "autoAssigned": "Revue assignée automatiquement selon spécialité, tarif, réactivité et avis clients.",
       "contractText": "Texte du contrat à relire",
       "contractEditHint": "Validez les informations fournies par le client dans le panneau latéral. Les champs sont surlignés dans le document.",
       "fieldsTitle": "Informations client",
@@ -676,14 +787,14 @@
     "estimatedPrice": "Tarif indicatif : {price}",
     "finalPrice": "Montant facturé : {price}",
     "autoAssigned": "Avocat sélectionné automatiquement (spécialité, tarif, réactivité, avis).",
-    "pay": "Payer la mission",
-    "paymentPending": "Finalisez le paiement pour lancer la mission.",
+    "pay": "Payer la revue",
+    "paymentPending": "Finalisez le paiement pour lancer la revue.",
     "paymentSuccess": "Paiement enregistré — l'avocat va prendre en charge votre dossier.",
     "paymentCancelled": "Paiement annulé.",
     "modificationsTitle": "Modifications proposées",
     "contractDocument": "Votre contrat",
     "openContract": "Ouvrir dans mes documents",
-    "viewMission": "Voir la mission",
+    "viewMission": "Voir la revue",
     "barristerDelivery": "Note de l'avocat",
     "chatTitle": "Messagerie avec l'avocat",
     "status": {
@@ -718,7 +829,7 @@
     "rgpdNotice": "Conformément au RGPD, vous pouvez exporter l'ensemble de vos données ou demander la suppression de votre compte. La suppression est définitive et efface vos contrats, analyses et messages.",
     "export": {
       "title": "Exporter mes données",
-      "description": "Téléchargez une copie JSON de vos contrats, analyses et missions.",
+      "description": "Téléchargez une copie JSON de vos contrats, analyses et revues.",
       "button": "Générer l'export"
     },
     "delete": {
@@ -886,7 +997,7 @@
           "retention": "Durée du compte"
         },
         "3": {
-          "purpose": "Missions avocat",
+          "purpose": "Revues avocat",
           "data": "Messages, pièces jointes, validations",
           "legalBasis": "Exécution du contrat",
           "retention": "Durée du compte + obligations légales"
@@ -966,7 +1077,7 @@
         },
         "3": {
           "title": "3. Rôle des avocats",
-          "body": "Les avocats interviennent en leur nom propre, sous leur responsabilité professionnelle et dans le respect de leur déontologie. Les honoraires des missions sont fixés au forfait et affichés avant tout engagement."
+          "body": "Les avocats interviennent en leur nom propre, sous leur responsabilité professionnelle et dans le respect de leur déontologie. Les honoraires des revues sont fixés au forfait et affichés avant tout engagement."
         },
         "4": {
           "title": "4. Comptes et sécurité",
@@ -1004,11 +1115,11 @@
       "sections": {
         "1": {
           "title": "Données collectées",
-          "body": "Compte (nom, e-mail, mot de passe chiffré), documents téléversés et textes saisis, analyses produites, échanges de messagerie liés aux missions."
+          "body": "Compte (nom, e-mail, mot de passe chiffré), documents téléversés et textes saisis, analyses produites, échanges de messagerie liés aux revues."
         },
         "2": {
           "title": "Finalités",
-          "body": "Fournir le service : analyse documentaire des contrats, mise en relation avec des avocats, suivi des missions. Aucune revente de données, aucune publicité."
+          "body": "Fournir le service : analyse documentaire des contrats, mise en relation avec des avocats, suivi des revues. Aucune revente de données, aucune publicité."
         },
         "3": {
           "title": "Sous-traitants",

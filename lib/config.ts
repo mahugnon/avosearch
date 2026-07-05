@@ -10,14 +10,28 @@ function intFromEnv(name: string, fallback: number): number {
   return Number.isNaN(parsed) ? fallback : parsed;
 }
 
+// Three-tier offer (see landing "Three tiers"). All amounts in cents, TTC.
+const basicCents = intFromEnv("PRICE_BASIC_CENTS", 8900);
+const expressCents = intFromEnv("PRICE_EXPRESS_CENTS", 14900);
+const complexMinCents = intFromEnv("PRICE_COMPLEX_MIN_CENTS", 29000);
+const complexMaxCents = intFromEnv("PRICE_COMPLEX_MAX_CENTS", 59000);
+
 export const pricing = {
-  /** "IA seule" formula — per contract */
+  /** Basic — simple agreements, 72 working hours */
+  basicCents,
+  basicHours: intFromEnv("PRICE_BASIC_HOURS", 72),
+  /** Express — priority handling, 24 working hours */
+  expressCents,
+  expressHours: intFromEnv("PRICE_EXPRESS_HOURS", 24),
+  /** Complex — higher-stakes matters, indicative range */
+  complexMinCents,
+  complexMaxCents,
+
+  // Aliases kept for the review/matching flow, aligned to the tier offer.
   aiOnlyCents: intFromEnv("PRICE_AI_ONLY_CENTS", 1900),
-  /** "IA + validation avocat" formula — per contract, 24h turnaround */
-  aiPlusBarristerCents: intFromEnv("PRICE_AI_BARRISTER_CENTS", 7900),
-  /** Flat-fee barrister missions — indicative range */
-  missionMinCents: intFromEnv("PRICE_MISSION_MIN_CENTS", 15000),
-  missionMaxCents: intFromEnv("PRICE_MISSION_MAX_CENTS", 50000),
+  aiPlusBarristerCents: basicCents,
+  missionMinCents: complexMinCents,
+  missionMaxCents: complexMaxCents,
 };
 
 export function formatEuros(cents: number, locale: AppLocale = "fr"): string {

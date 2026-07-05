@@ -74,24 +74,41 @@
     "pricingTitle": "Our plans",
     "pricingSubtitle": "Fixed prices, known before you commit. Indicative prices incl. VAT.",
     "plans": {
-      "aiOnly": {
-        "title": "Assisted review",
-        "description": "Suggested changes in tracked mode; you accept or reject each one."
+      "basic": {
+        "eyebrow": "Simple agreements",
+        "name": "Basic",
+        "features": [
+          "Tracked-changes corrections",
+          "One round of written questions",
+          "Barrister validation with vigilance notes"
+        ],
+        "footnote": "NDA · service agreements · simple T&Cs · freelance"
       },
-      "aiBarrister": {
-        "title": "Review + barrister validation",
-        "description": "A verified barrister reviews, validates, or amends each suggested change. Response within 24 h."
+      "express": {
+        "eyebrow": "Priority",
+        "name": "Express",
+        "features": [
+          "Everything in Basic",
+          "Priority handling"
+        ],
+        "footnote": "For deadlines that can't wait until tomorrow"
       },
-      "mission": {
-        "title": "Flat-fee barrister mission",
-        "description": "Full review, drafting, or negotiation by a barrister, at a fixed price agreed upfront."
-      }
+      "complex": {
+        "eyebrow": "Higher stakes",
+        "name": "Complex",
+        "features": [
+          "In-depth review",
+          "Matched on specialty, speed, price, reviews"
+        ],
+        "footnote": "Commercial lease · business & share transfers · shareholders' agreements · distribution · complex T&Cs"
+      },
+      "workingHours": "{count} working hours"
     },
     "faqTitle": "Frequently asked questions",
     "faq": {
       "1": {
         "question": "Does AvoSearch replace a barrister?",
-        "answer": "No. AvoSearch is a document assistance tool: it helps you understand your contract and prepare changes. For advice on your situation, choose the plan with barrister validation or a flat-fee mission."
+        "answer": "No. AvoSearch is a document assistance tool: it helps you understand your contract and prepare changes. For advice on your situation, choose the plan with barrister validation or a flat-fee review."
       },
       "2": {
         "question": "What documents can I have analyzed?",
@@ -103,7 +120,7 @@
       },
       "4": {
         "question": "How much does it cost?",
-        "answer": "Three fixed-price plans, shown before you commit: assisted review, review with barrister validation, or flat-fee mission agreed upfront. No hourly billing, no surprises."
+        "answer": "Three fixed-price plans, shown before you commit: assisted review, review with barrister validation, or flat-fee review agreed upfront. No hourly billing, no surprises."
       },
       "5": {
         "question": "Are my documents confidential?",
@@ -113,7 +130,101 @@
     "ctaTitle": "A contract to sign this week?",
     "ctaDescription": "Upload it now: in a few minutes you'll know whether it can be adjusted directly or deserves a barrister's review.",
     "ctaButton": "Get started for free",
-    "howItWorksKicker": "Three steps, one clear answer"
+    "howItWorksKicker": "Three steps, one clear answer",
+    "roadmap": {
+      "eyebrow": "Roadmap",
+      "title": "From simple agreements to infrastructure for the profession",
+      "stages": {
+        "now": {
+          "phase": "Now",
+          "title": "Agreements",
+          "description": "Simple first — NDA, DPA, T&Cs, service agreements — then complex: leases, transfers, shareholders' agreements."
+        },
+        "next": {
+          "phase": "Next",
+          "title": "B2C disputes",
+          "description": "Pre-litigation letters, dispute triage — landlord, employer, e-commerce — at fixed fees."
+        },
+        "then": {
+          "phase": "Then",
+          "title": "AI plugin / MCP",
+          "description": "Be the legal-review action AI assistants recommend and call."
+        },
+        "later": {
+          "phase": "Later",
+          "title": "White-label for law firms",
+          "description": "Our AI + validation workflow, sold as a white-label tool to large firms."
+        },
+        "beyond": {
+          "phase": "Beyond",
+          "title": "International",
+          "description": "The same playbook in new markets, starting with EU civil-law countries."
+        }
+      }
+    },
+    "competition": {
+      "eyebrow": "Competition",
+      "title": "Where we stand",
+      "columns": {
+        "player": "Player",
+        "price": "Price",
+        "ai": "AI",
+        "barrister": "Barrister",
+        "fixedPrice": "Fixed price",
+        "fast": "≤ 24 h"
+      },
+      "rows": [
+        {
+          "player": "Directories",
+          "note": "Justifit, Alexia…",
+          "price": "free – €259+",
+          "ai": false,
+          "barrister": true,
+          "fixed": false,
+          "fast": false
+        },
+        {
+          "player": "Captain Contrat",
+          "note": "",
+          "price": "€199 excl. VAT · 48–72 h",
+          "ai": false,
+          "barrister": true,
+          "fixed": true,
+          "fast": false
+        },
+        {
+          "player": "La Fabrique Juridique",
+          "note": "",
+          "price": "€389–489 excl. VAT · 72 h",
+          "ai": false,
+          "barrister": true,
+          "fixed": true,
+          "fast": false
+        },
+        {
+          "player": "B2B AI software",
+          "note": "Tomorro, Ordalie",
+          "price": "B2B licences",
+          "ai": true,
+          "barrister": false,
+          "fixed": false,
+          "fast": true
+        },
+        {
+          "player": "Traditional barrister",
+          "note": "",
+          "price": "from €389–500 excl. VAT",
+          "ai": false,
+          "barrister": true,
+          "fixed": false,
+          "fast": false
+        }
+      ],
+      "avosearch": {
+        "name": "AvoSearch",
+        "price": "€89 incl. VAT · 24 h"
+      }
+    }
   },
   "auth": {
     "layoutDisclaimer": "Demo platform — no real data. AvoSearch is a document assistance tool and does not provide legal advice.",
@@ -318,7 +429,7 @@
       "validated": "Validated",
       "validationProgress": "{done} / {total} validated",
       "allValidated": "All fields validated",
-      "allValidatedHint": "Validation complete for this document. Persistence is handled via barrister missions.",
+      "allValidatedHint": "Validation complete for this document. Persistence is handled via barrister reviews.",
       "noHighlights": "No template fields detected — use full text edit."
     },
     "errors": {
@@ -386,7 +497,7 @@
           "aiBarristerHint": "A verified barrister validates each change — response within 24 h."
         },
         "avocat": {
-          "title": "Flat-fee barrister mission",
+          "title": "Flat-fee barrister review",
           "description": "We will suggest barristers suited to your case.",
           "priceRange": "Indicative range: {min} – {max}"
         },
@@ -440,12 +551,12 @@
     },
     "matching": {
       "title": "Recommended barristers",
-      "subtitle": "Select a verified barrister for your mission.",
+      "subtitle": "Select a verified barrister for your review.",
       "back": "← Back",
       "empty": "No barristers available right now.",
       "responseTime": "Response within {hours} h",
       "select": "Choose this barrister",
-      "creating": "Creating mission…",
+      "creating": "Creating review…",
       "confirmAndPay": "Confirm and pay",
       "selectedSummary": "Selected barrister: {name}"
     },
@@ -490,13 +601,13 @@
   "barrister": {
     "areaLabel": "Barrister dashboard",
     "dashboardTitle": "Dashboard",
-    "dashboardIntro": "Your priority missions and key metrics.",
+    "dashboardIntro": "Your priority reviews and key metrics.",
     "statsTitle": "Overview",
-    "viewMissions": "View my missions",
+    "viewMissions": "View my reviews",
     "pendingProfileTitle": "Profile pending verification",
-    "pendingProfileDescription": "Our team manually verifies each profile. You won't receive missions until your profile is verified.",
+    "pendingProfileDescription": "Our team manually verifies each profile. You won't receive reviews until your profile is verified.",
     "validationsPending": "Validations to process",
-    "missionsInProgress": "Missions in progress",
+    "missionsInProgress": "Reviews in progress",
     "totalEarnings": "Total earnings (demo)",
     "myProfile": "My profile",
     "barreau": "Bar association",
@@ -512,11 +623,11 @@
     },
     "workQueue": {
       "title": "My work ({count})",
-      "subtitle": "Missions requiring your action, sorted by priority.",
+      "subtitle": "Reviews requiring your action, sorted by priority.",
       "viewAll": "View all",
       "emptyTitle": "No pending actions",
-      "emptyHint": "New paid missions will appear here as soon as a client selects you.",
-      "actionStart": "Start mission →",
+      "emptyHint": "New paid reviews will appear here as soon as a client selects you.",
+      "actionStart": "Start review →",
       "actionContinue": "Continue review →",
       "waitingDays": "waiting {days, plural, one {# day} other {# days}}",
       "deadline": "due {date}",
@@ -528,17 +639,17 @@
       "subtitle": "Your activity and the information clients can see.",
       "bio": "Bio",
       "rating": "Client rating",
-      "viewMissions": "View my missions",
-      "earningsHint": "Delivered or closed missions (demo)",
+      "viewMissions": "View my reviews",
+      "earningsHint": "Delivered or closed reviews (demo)",
       "hourlyRate": "Hourly rate",
       "hourlyRateValue": "{rate} / h",
-      "flatFees": "Flat fees by mission type",
+      "flatFees": "Flat fees by review type",
       "sections": {
         "practice": "Practice",
         "rates": "Rates & responsiveness"
       },
       "stats": {
-        "delivered": "Missions delivered",
+        "delivered": "Reviews delivered",
         "inProgressHint": "{count, plural, one {# in progress} other {# in progress}}",
         "awaitingClientHint": "{count, plural, one {# awaiting client} other {# awaiting client}}"
       }
@@ -569,7 +680,7 @@
         "sortLabel": "Sort by",
         "statusLabel": "Filter by status",
         "viewLabel": "View mode",
-        "resultCount": "{count, plural, one {# mission} other {# missions}}",
+        "resultCount": "{count, plural, one {# review} other {# reviews}}",
         "clear": "Reset",
         "view": {
           "board": "Board",
@@ -629,17 +740,17 @@
     "mission": {
       "back": "← Contracts to review",
       "client": "Client",
-      "start": "Start mission",
+      "start": "Start review",
       "mod": "Change {order}",
       "validate": "Approve",
       "reject": "Reject",
-      "deliver": "Deliver mission",
+      "deliver": "Deliver review",
       "generateReview": "Generate review suggestions",
       "generatingReview": "Analysis in progress…",
       "reviewBarristerOnly": "Only barristers can review contracts.",
       "globalNotePlaceholder": "Global note for the client…",
       "chatTitle": "Messaging",
-      "autoAssigned": "Mission auto-assigned by specialty, price, responsiveness and client reviews.",
+      "autoAssigned": "Review auto-assigned by specialty, price, responsiveness and client reviews.",
       "contractText": "Contract text to review",
       "contractEditHint": "Approve client-provided information in the sidebar. Fields are highlighted in the document.",
       "fieldsTitle": "Client information",
@@ -656,7 +767,7 @@
         "label": "Work time",
         "projectedPrice": "Estimated price (live)",
         "rate": "{rate} / h (15-minute billing increments)",
-        "hint": "Timer runs from mission start. Final price is computed on delivery, with a minimum at the quoted fee."
+        "hint": "Timer runs from review start. Final price is computed on delivery, with a minimum at the quoted fee."
       },
       "status": {
         "PROPOSEE": "Awaiting payment",
@@ -676,14 +787,14 @@
     "estimatedPrice": "Estimated fee: {price}",
     "finalPrice": "Billed amount: {price}",
     "autoAssigned": "Barrister selected automatically (specialty, price, responsiveness, reviews).",
-    "pay": "Pay for mission",
-    "paymentPending": "Complete payment to start the mission.",
+    "pay": "Pay for review",
+    "paymentPending": "Complete payment to start the review.",
     "paymentSuccess": "Payment recorded — your barrister will take over shortly.",
     "paymentCancelled": "Payment cancelled.",
     "modificationsTitle": "Proposed changes",
     "contractDocument": "Your contract",
     "openContract": "Open in my documents",
-    "viewMission": "View mission",
+    "viewMission": "View review",
     "barristerDelivery": "Barrister's note",
     "chatTitle": "Message your barrister",
     "status": {
@@ -718,7 +829,7 @@
     "rgpdNotice": "Under GDPR, you can export all your data or request account deletion. Deletion is permanent and removes contracts, analyses, and messages.",
     "export": {
       "title": "Export my data",
-      "description": "Download a JSON copy of your contracts, analyses, and missions.",
+      "description": "Download a JSON copy of your contracts, analyses, and reviews.",
       "button": "Generate export"
     },
     "delete": {
@@ -886,7 +997,7 @@
           "retention": "Account lifetime"
         },
         "3": {
-          "purpose": "Barrister missions",
+          "purpose": "Barrister reviews",
           "data": "Messages, attachments",
           "legalBasis": "Contract",
           "retention": "Account lifetime"
@@ -966,7 +1077,7 @@
         },
         "3": {
           "title": "3. Role of barristers",
-          "body": "Barristers act in their own name, under their professional responsibility and ethical rules. Mission fees are flat-rate and displayed before any commitment."
+          "body": "Barristers act in their own name, under their professional responsibility and ethical rules. Review fees are flat-rate and displayed before any commitment."
         },
         "4": {
           "title": "4. Accounts and security",
@@ -1004,11 +1115,11 @@
       "sections": {
         "1": {
           "title": "Data collected",
-          "body": "Account (name, email, hashed password), uploaded documents and entered text, generated analyses, mission-related messages."
+          "body": "Account (name, email, hashed password), uploaded documents and entered text, generated analyses, review-related messages."
         },
         "2": {
           "title": "Purposes",
-          "body": "Provide the service: contract document analysis, barrister matching, mission tracking. No data resale, no advertising."
+          "body": "Provide the service: contract document analysis, barrister matching, review tracking. No data resale, no advertising."
         },
         "3": {
           "title": "Sub-processors",
