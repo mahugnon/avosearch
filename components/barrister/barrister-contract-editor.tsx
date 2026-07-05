@@ -7,14 +7,7 @@ import { Loader2 } from "lucide-react";
 import { updateBarristerContractAction } from "@/lib/actions/barrister-contract";
 import { HighlightedContractBody } from "@/components/contracts/highlighted-contract-body";
 import { ContractDocumentFromBody } from "@/components/contracts/contract-document";
-import {
-  BarristerFieldReviewHeader,
-  BarristerFieldReviewSidebar,
-} from "@/components/barrister/barrister-field-review-sidebar";
-import {
-  FIELD_PILL_HEIGHT,
-  useFieldAnchorPositions,
-} from "@/components/barrister/use-field-anchor-positions";
+import { BarristerFieldReviewSidebar } from "@/components/barrister/barrister-field-review-sidebar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -77,19 +70,13 @@ export function BarristerContractEditor({
     [activeHighlight]
   );
 
-  const filledFieldIds = useMemo(() => filledFields.map((field) => field.id), [filledFields]);
-
-  const validatedCount = filledFields.filter((field) => validatedIds.has(field.id)).length;
-
-  const { lineGroups, trackHeight } = useFieldAnchorPositions(trackRef, filledFieldIds, [
-    validatedIds,
-    focusedFieldId,
-    previewSegments,
-  ]);
-
   function handleValidate(fieldId: string) {
     setValidatedIds((prev) => new Set(prev).add(fieldId));
     setFocusedFieldId(fieldId);
+  }
+
+  function handleValidateAll() {
+    setValidatedIds(new Set(filledFields.map((field) => field.id)));
   }
 
   function handleFieldFocus(fieldId: string) {
@@ -168,90 +155,46 @@ export function BarristerContractEditor({
           className="font-mono text-sm leading-relaxed"
         />
       ) : (
-        <div className="rounded-2xl border bg-neutral-100/60">
+        <div
+          ref={trackRef}
+          className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]"
+        >
+          <div className="min-w-0 overflow-x-auto rounded-2xl border bg-neutral-100/60 px-3 py-5 sm:px-5 sm:py-6">
+            {activeHighlight && previewSegments ? (
+              <HighlightedContractBody
+                highlight={{
+                  ...activeHighlight,
+                  segments: previewSegments,
+                }}
+                mode="barrister"
+                validatedIds={validatedIds}
+                onValidate={handleValidate}
+                focusedFieldId={focusedFieldId}
+                inlineFieldActions={false}
+                showLegend={false}
+              />
+            ) : (
+              <>
+                <ContractDocumentFromBody body={extractedText} mode="barrister" />
+                <p className="mt-3 font-sans text-xs text-muted-foreground">{tc("noHighlights")}</p>
+              </>
+            )}
+          </div>
+
           {showSidebar && activeHighlight && (
-            <div className="border-b p-3 lg:hidden">
+            <div className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)]">
               <BarristerFieldReviewSidebar
                 fields={activeHighlight.fields}
                 answers={activeHighlight.answers}
                 validatedIds={validatedIds}
                 onValidate={handleValidate}
+                onValidateAll={handleValidateAll}
                 onFieldFocus={handleFieldFocus}
                 focusedFieldId={focusedFieldId}
+                className="max-h-[calc(100vh-6rem)]"
               />
             </div>
           )}
-
-          {showSidebar && (
-            <div className="hidden border-b border-border/60 bg-card/80 px-3 py-2 sm:px-5 lg:grid lg:grid-cols-[minmax(0,1fr)_1.25rem_13rem] lg:items-end lg:gap-0">
-              <div />
-              <div />
-              <BarristerFieldReviewHeader
-                validatedCount={validatedCount}
-                totalCount={filledFields.length}
-              />
-            </div>
-          )}
-
-          <div className="overflow-x-auto px-3 py-5 sm:px-5 sm:py-6">
-            <div
-              ref={trackRef}
-              className="relative grid min-w-0 items-start lg:grid-cols-[minmax(0,1fr)_1.25rem_13rem]"
-            >
-              <div className="min-w-0">
-                {activeHighlight && previewSegments ? (
-                  <HighlightedContractBody
-                    highlight={{
-                      ...activeHighlight,
-                      segments: previewSegments,
-                    }}
-                    mode="barrister"
-                    validatedIds={validatedIds}
-                    onValidate={handleValidate}
-                    focusedFieldId={focusedFieldId}
-                    inlineFieldActions={false}
-                    showLegend={false}
-                  />
-                ) : (
-                  <>
-                    <ContractDocumentFromBody body={extractedText} mode="barrister" />
-                    <p className="mt-3 font-sans text-xs text-muted-foreground">{tc("noHighlights")}</p>
-                  </>
-                )}
-              </div>
-
-              {showSidebar && (
-                <div
-                  className="relative hidden lg:block"
-                  style={{ minHeight: trackHeight > 0 ? trackHeight : undefined }}
-                >
-                  {lineGroups.map((group) => (
-                    <div
-                      key={group.fieldIds.join("-")}
-                      className="pointer-events-none absolute inset-x-0 border-t border-amber-300/70"
-                      style={{ top: group.top + FIELD_PILL_HEIGHT / 2 }}
-                      aria-hidden
-                    />
-                  ))}
-                </div>
-              )}
-
-              {showSidebar && activeHighlight && (
-                <div className="hidden lg:block">
-                  <BarristerFieldReviewSidebar
-                    fields={activeHighlight.fields}
-                    answers={activeHighlight.answers}
-                    validatedIds={validatedIds}
-                    onValidate={handleValidate}
-                    onFieldFocus={handleFieldFocus}
-                    focusedFieldId={focusedFieldId}
-                    lineGroups={lineGroups}
-                    trackHeight={trackHeight}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       )}
     </section>

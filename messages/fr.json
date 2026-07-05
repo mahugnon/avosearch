@@ -665,7 +665,9 @@
         "LIVREE": "En attente client",
         "TERMINEE": "Clôturée",
         "ANNULEE": "Annulée"
-      }
+      },
+      "validateAll": "Tout valider",
+      "allValidated": "Tout est validé"
     }
   },
   "missions": {

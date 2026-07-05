@@ -665,7 +665,9 @@
         "LIVREE": "Awaiting client",
         "TERMINEE": "Closed",
         "ANNULEE": "Cancelled"
-      }
+      },
+      "validateAll": "Validate all",
+      "allValidated": "All validated"
     }
   },
   "missions": {

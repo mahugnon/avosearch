@@ -193,3 +193,61 @@ export function resolveFieldMeta(key: string, locale: Locale): ResolvedFieldMeta
     options: entry.options?.map((o) => ({ value: o.value, label: o.label[locale] })),
   };
 }
+
+// ---------------------------------------------------------------------------
+// Short labels + grouping for the barrister review panel.
+// ---------------------------------------------------------------------------
+
+export type FieldGroup = "partyA" | "partyB" | "terms" | "standard";
+
+export const FIELD_GROUP_ORDER: FieldGroup[] = ["partyA", "partyB", "terms", "standard"];
+
+const GROUP_LABELS: Record<FieldGroup, LocalizedText> = {
+  partyA: { fr: "Partie A", en: "Party A" },
+  partyB: { fr: "Partie B", en: "Party B" },
+  terms: { fr: "Objet & durée", en: "Subject & term" },
+  standard: { fr: "Clauses standard", en: "Standard clauses" },
+};
+
+const FIELD_DISPLAY: Record<string, { group: FieldGroup; label: LocalizedText }> = {
+  PARTY_A_NAME: { group: "partyA", label: { fr: "Dénomination", en: "Legal name" } },
+  PARTY_A_CAPITAL: { group: "partyA", label: { fr: "Capital social", en: "Share capital" } },
+  PARTY_A_ADDRESS: { group: "partyA", label: { fr: "Siège social", en: "Registered office" } },
+  PARTY_A_RCS_CITY: { group: "partyA", label: { fr: "Ville d'immatriculation", en: "Registration city" } },
+  PARTY_A_RCS_NUMBER: { group: "partyA", label: { fr: "N° RCS / SIREN", en: "Registration no." } },
+  PARTY_A_REPRESENTATIVE: { group: "partyA", label: { fr: "Signataire", en: "Signatory" } },
+  PARTY_A_SHORT_NAME: { group: "partyA", label: { fr: "Nom abrégé", en: "Short name" } },
+  PARTY_B_NAME: { group: "partyB", label: { fr: "Dénomination", en: "Legal name" } },
+  PARTY_B_CAPITAL: { group: "partyB", label: { fr: "Capital social", en: "Share capital" } },
+  PARTY_B_ADDRESS: { group: "partyB", label: { fr: "Siège social", en: "Registered office" } },
+  PARTY_B_RCS_CITY: { group: "partyB", label: { fr: "Ville d'immatriculation", en: "Registration city" } },
+  PARTY_B_RCS_NUMBER: { group: "partyB", label: { fr: "N° RCS / SIREN", en: "Registration no." } },
+  PARTY_B_REPRESENTATIVE: { group: "partyB", label: { fr: "Signataire", en: "Signatory" } },
+  PARTY_B_SHORT_NAME: { group: "partyB", label: { fr: "Nom abrégé", en: "Short name" } },
+  PROJECT_DESCRIPTION: { group: "terms", label: { fr: "Objet du projet", en: "Project" } },
+  CONFIDENTIALITY_YEARS: { group: "terms", label: { fr: "Durée de confidentialité", en: "Confidentiality term" } },
+  AGREEMENT_DURATION: { group: "terms", label: { fr: "Durée de l'accord", en: "Agreement term" } },
+  TERMINATION_NOTICE: { group: "terms", label: { fr: "Préavis de résiliation", en: "Termination notice" } },
+  CONFIDENTIAL_INFO_DEFINITION: { group: "terms", label: { fr: "Informations confidentielles", en: "Confidential information" } },
+  AUTHORIZED_PERSONNEL: { group: "terms", label: { fr: "Personnes autorisées", en: "Authorized personnel" } },
+  EFFECTIVE_DATE: { group: "standard", label: { fr: "Date d'effet", en: "Effective date" } },
+  DURATION_YEARS: { group: "standard", label: { fr: "Durée (années)", en: "Duration (years)" } },
+  DISPUTE_JURISDICTION: { group: "standard", label: { fr: "Juridiction compétente", en: "Jurisdiction" } },
+  SIGNATURE_CITY: { group: "standard", label: { fr: "Lieu de signature", en: "Signature city" } },
+  SIGNATURE_COPIES: { group: "standard", label: { fr: "Nombre d'exemplaires", en: "Number of copies" } },
+  SIGNATURE_PARTY_A_NAME: { group: "standard", label: { fr: "Signataire partie A", en: "Party A signatory" } },
+  SIGNATURE_PARTY_B_NAME: { group: "standard", label: { fr: "Signataire partie B", en: "Party B signatory" } },
+};
+
+/** Short, human label for the review panel (falls back to a humanized key). */
+export function resolveFieldLabel(key: string, locale: Locale): string {
+  return FIELD_DISPLAY[key]?.label[locale] ?? humanize(key);
+}
+
+export function resolveFieldGroup(key: string): FieldGroup {
+  return FIELD_DISPLAY[key]?.group ?? "standard";
+}
+
+export function groupLabel(group: FieldGroup, locale: Locale): string {
+  return GROUP_LABELS[group][locale];
+}
