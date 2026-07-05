@@ -74,7 +74,9 @@ export function BarristerMissionsFilters({
   );
 
   useEffect(() => {
-    setSearch(filters.q);
+    // Deferred so the state update is not synchronous within the effect
+    const id = window.setTimeout(() => setSearch(filters.q), 0);
+    return () => window.clearTimeout(id);
   }, [filters.q]);
 
   useEffect(() => {

@@ -95,7 +95,9 @@ export function BarristerSelectionDialog({
 
   useEffect(() => {
     if (hideTrigger && open && step === "idle") {
-      void loadSelection();
+      // Deferred: loadSelection sets state synchronously before its first await
+      const id = window.setTimeout(() => void loadSelection(), 0);
+      return () => window.clearTimeout(id);
     }
   }, [hideTrigger, open, step, loadSelection]);
 

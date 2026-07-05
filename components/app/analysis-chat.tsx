@@ -148,17 +148,21 @@ export function AnalysisChat() {
   useEffect(() => {
     if (hydratedRef.current) return;
     hydratedRef.current = true;
-    const stored = loadChatThreads();
-    setThreads(stored);
-    if (stored[0]) {
-      loadThread(stored[0]);
-    } else {
-      const thread = createThread(t("welcome"));
-      setActiveThreadId(thread.id);
-      setMessages(fromStored(thread.messages));
-      upsertChatThread(thread);
-      setThreads(loadChatThreads());
-    }
+    // Deferred so the state updates are not synchronous within the effect
+    const id = window.setTimeout(() => {
+      const stored = loadChatThreads();
+      setThreads(stored);
+      if (stored[0]) {
+        loadThread(stored[0]);
+      } else {
+        const thread = createThread(t("welcome"));
+        setActiveThreadId(thread.id);
+        setMessages(fromStored(thread.messages));
+        upsertChatThread(thread);
+        setThreads(loadChatThreads());
+      }
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [loadThread, t]);
 
   useEffect(() => {
