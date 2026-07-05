@@ -43,7 +43,7 @@ export type DraftChatResult = {
   contractBody?: string;
   contractTitle?: string;
   draftPreview?: DraftPreview;
-  suggestLawyer?: boolean;
+  suggestBarrister?: boolean;
   inquiryMessage?: string;
   awaitingField?: AwaitingField;
   error?: string;
@@ -94,16 +94,16 @@ async function persistDraftAnswers(
   return draftPreview;
 }
 
-async function lawyerInquiryResponse(message: string): Promise<DraftChatResult> {
+async function barristerInquiryResponse(message: string): Promise<DraftChatResult> {
   const t = await getTranslations("chat");
   return {
     assistantMessage: t("noTemplateMatch"),
-    suggestLawyer: true,
+    suggestBarrister: true,
     inquiryMessage: message,
   };
 }
 
-export async function createLawyerInquiryContractAction(
+export async function createBarristerInquiryContractAction(
   message: string
 ): Promise<{ contractId?: string; error?: string }> {
   const session = await getClientSession();
@@ -273,14 +273,14 @@ export async function draftChatAction(input: {
 
   if (!llmStart.result.is_draft_intent) {
     if (isContractRelatedMessage(message)) {
-      return lawyerInquiryResponse(message);
+      return barristerInquiryResponse(message);
     }
     return { assistantMessage: t("notDraftIntent") };
   }
 
   const template = templates.find((item) => item.slug === llmStart.result.template_slug);
   if (!template) {
-    return lawyerInquiryResponse(message);
+    return barristerInquiryResponse(message);
   }
 
   const contract = await prisma.contract.create({

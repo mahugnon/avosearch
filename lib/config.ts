@@ -14,8 +14,8 @@ export const pricing = {
   /** "IA seule" formula — per contract */
   aiOnlyCents: intFromEnv("PRICE_AI_ONLY_CENTS", 1900),
   /** "IA + validation avocat" formula — per contract, 24h turnaround */
-  aiPlusLawyerCents: intFromEnv("PRICE_AI_LAWYER_CENTS", 7900),
-  /** Flat-fee lawyer missions — indicative range */
+  aiPlusBarristerCents: intFromEnv("PRICE_AI_BARRISTER_CENTS", 7900),
+  /** Flat-fee barrister missions — indicative range */
   missionMinCents: intFromEnv("PRICE_MISSION_MIN_CENTS", 15000),
   missionMaxCents: intFromEnv("PRICE_MISSION_MAX_CENTS", 50000),
 };

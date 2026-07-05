@@ -1,5 +1,5 @@
 import { ContractDraftStatus, type Contract } from "@prisma/client";
-import { LAWYER_DELIVERED_STATUSES } from "@/lib/contracts/lawyer-review";
+import { BARRISTER_DELIVERED_STATUSES } from "@/lib/contracts/barrister-review";
 
 type ContractDocumentFields = Pick<
   Contract,
@@ -14,7 +14,7 @@ export function hasCompletedDraftDocument(contract: ContractDocumentFields): boo
   );
 }
 
-export function hasLawyerDeliveredDocument(
+export function hasBarristerDeliveredDocument(
   contract: Pick<Contract, "extractedText">,
   hasDeliveredMission: boolean
 ): boolean {
@@ -25,7 +25,7 @@ export function hasViewableDocument(
   contract: ContractDocumentFields,
   hasDeliveredMission: boolean
 ): boolean {
-  return hasCompletedDraftDocument(contract) || hasLawyerDeliveredDocument(contract, hasDeliveredMission);
+  return hasCompletedDraftDocument(contract) || hasBarristerDeliveredDocument(contract, hasDeliveredMission);
 }
 
 export function contractMatchingContext(
@@ -50,7 +50,7 @@ export const listableClientContractsFilter = {
     {
       extractedText: { not: "" },
       missions: {
-        some: { status: { in: LAWYER_DELIVERED_STATUSES } },
+        some: { status: { in: BARRISTER_DELIVERED_STATUSES } },
       },
     },
   ],

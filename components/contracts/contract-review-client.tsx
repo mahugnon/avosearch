@@ -15,7 +15,7 @@ import { useLocale } from "next-intl";
 
 type Props = {
   contractId: string;
-  plan: "ai-only" | "ai-lawyer";
+  plan: "ai-only" | "ai-barrister";
   aiConsentAt: Date | null;
   initialModifications: ModificationView[];
 };
@@ -57,7 +57,7 @@ export function ContractReviewClient({
   }
 
   const price =
-    plan === "ai-lawyer" ? pricing.aiPlusLawyerCents : pricing.aiOnlyCents;
+    plan === "ai-barrister" ? pricing.aiPlusBarristerCents : pricing.aiOnlyCents;
 
   if (!consented) {
     return (
@@ -77,7 +77,7 @@ export function ContractReviewClient({
         <div>
           <p className="text-sm text-muted-foreground">{t("planLabel")}</p>
           <p className="text-lg font-semibold">
-            {plan === "ai-lawyer" ? t("planAiLawyer") : t("planAiOnly")} —{" "}
+            {plan === "ai-barrister" ? t("planAiBarrister") : t("planAiOnly")} —{" "}
             {formatEuros(price, locale)}
           </p>
         </div>
@@ -109,9 +109,9 @@ export function ContractReviewClient({
 
       {modifications.length > 0 && (
         <div className="flex flex-wrap gap-3 border-t pt-4">
-          {plan === "ai-lawyer" ? (
+          {plan === "ai-barrister" ? (
             <Button asChild>
-              <Link href={`/app/contracts/${contractId}/matching?plan=ai-lawyer`}>
+              <Link href={`/app/contracts/${contractId}/matching?plan=ai-barrister`}>
                 {t("continueMatching")}
               </Link>
             </Button>

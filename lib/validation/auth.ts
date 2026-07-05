@@ -11,7 +11,7 @@ export const registerClientSchema = z.object({
   password: z.string().min(8, "passwordTooShort").max(100),
 });
 
-export const registerLawyerSchema = registerClientSchema.extend({
+export const registerBarristerSchema = registerClientSchema.extend({
   barreau: z.string().min(2, "barreauRequired").max(100),
   city: z.string().min(2, "cityRequired").max(100),
   specialties: z.string().min(2, "specialtyRequired").max(300),

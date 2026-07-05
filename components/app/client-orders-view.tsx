@@ -44,7 +44,7 @@ export async function ClientOrdersView({ orders, locale }: Props) {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{order.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {order.lawyerName ? t("lawyerLine", { name: order.lawyerName }) : t("lawyerPending")} ·{" "}
+                      {order.barristerName ? t("barristerLine", { name: order.barristerName }) : t("barristerPending")} ·{" "}
                       {formatEuros(price, locale)} · {dateFmt.format(order.createdAt)}
                     </p>
                   </div>

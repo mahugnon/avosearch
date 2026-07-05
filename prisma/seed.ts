@@ -63,7 +63,7 @@ async function seedTemplateFile(input: (typeof SEED_TEMPLATES)[number]) {
   };
 }
 
-function lawyerPhoto(seed: string) {
+function barristerPhoto(seed: string) {
   return `https://api.dicebear.com/9.x/personas/png?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
 }
 
@@ -140,7 +140,7 @@ async function main() {
   await prisma.analysis.deleteMany();
   await prisma.contract.deleteMany();
   await prisma.contractTemplate.deleteMany();
-  await prisma.lawyerProfile.deleteMany();
+  await prisma.barristerProfile.deleteMany();
   await prisma.user.deleteMany();
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
@@ -172,14 +172,14 @@ async function main() {
     },
   });
 
-  const lawyers = [
+  const barristers = [
     {
       email: "avocat1@avosearch.test",
-      name: "Demo Lawyer One",
+      name: "Demo Barrister One",
       barreau: "Paris",
       city: "Paris",
       specialties: ["Commercial leases", "Commercial law"],
-      bio: "Fictional lawyer at Demo & Partners. Works on commercial leases and distribution agreements. Demo profile only.",
+      bio: "Fictional barrister at Demo & Partners. Works on commercial leases and distribution agreements. Demo profile only.",
       validationPriceCents: 7900,
       hourlyRateCents: 18000,
       flatFees: { RELECTURE: 25000, REDACTION: 40000, NEGOCIATION: 50000 },
@@ -187,15 +187,15 @@ async function main() {
       verified: true,
       rating: 4.8,
       ratingCount: 32,
-      photoUrl: lawyerPhoto("avocat1"),
+      photoUrl: barristerPhoto("avocat1"),
     },
     {
       email: "avocat2@avosearch.test",
-      name: "Demo Lawyer Two",
+      name: "Demo Barrister Two",
       barreau: "Lyon",
       city: "Lyon",
       specialties: ["Corporate law", "Services agreements"],
-      bio: "Fictional lawyer at Demo & Partners. Advises small businesses and freelancers on day-to-day contracts. Demo profile only.",
+      bio: "Fictional barrister at Demo & Partners. Advises small businesses and freelancers on day-to-day contracts. Demo profile only.",
       validationPriceCents: 6900,
       hourlyRateCents: 16000,
       flatFees: { RELECTURE: 20000, REDACTION: 35000, NEGOCIATION: 45000 },
@@ -203,15 +203,15 @@ async function main() {
       verified: true,
       rating: 4.9,
       ratingCount: 51,
-      photoUrl: lawyerPhoto("avocat2"),
+      photoUrl: barristerPhoto("avocat2"),
     },
     {
       email: "avocat3@avosearch.test",
-      name: "Demo Lawyer Three",
+      name: "Demo Barrister Three",
       barreau: "Bordeaux",
       city: "Bordeaux",
       specialties: ["Employment law", "Freelance contracts"],
-      bio: "Fictional lawyer specializing in contractual relationships between independents and clients. Demo profile only.",
+      bio: "Fictional barrister specializing in contractual relationships between independents and clients. Demo profile only.",
       validationPriceCents: 7500,
       hourlyRateCents: 17000,
       flatFees: { RELECTURE: 22000, REDACTION: 38000, NEGOCIATION: 48000 },
@@ -219,15 +219,15 @@ async function main() {
       verified: true,
       rating: 4.5,
       ratingCount: 18,
-      photoUrl: lawyerPhoto("avocat3"),
+      photoUrl: barristerPhoto("avocat3"),
     },
     {
       email: "avocat4@avosearch.test",
-      name: "Demo Lawyer Four",
+      name: "Demo Barrister Four",
       barreau: "Lille",
       city: "Lille",
       specialties: ["Intellectual property", "Technology"],
-      bio: "Fictional lawyer. IT contracts, software licenses and digital services. Demo profile only.",
+      bio: "Fictional barrister. IT contracts, software licenses and digital services. Demo profile only.",
       validationPriceCents: 8900,
       hourlyRateCents: 20000,
       flatFees: { RELECTURE: 28000, REDACTION: 42000, NEGOCIATION: 52000 },
@@ -235,15 +235,15 @@ async function main() {
       verified: true,
       rating: 4.2,
       ratingCount: 9,
-      photoUrl: lawyerPhoto("avocat4"),
+      photoUrl: barristerPhoto("avocat4"),
     },
     {
       email: "avocat5@avosearch.test",
-      name: "Demo Lawyer Five",
+      name: "Demo Barrister Five",
       barreau: "Marseille",
       city: "Marseille",
       specialties: ["Commercial law", "Consumer law"],
-      bio: "Fictional lawyer pending verification by the AvoSearch team. Demo profile only.",
+      bio: "Fictional barrister pending verification by the AvoSearch team. Demo profile only.",
       validationPriceCents: 5900,
       hourlyRateCents: 14000,
       flatFees: { RELECTURE: 18000, REDACTION: 30000, NEGOCIATION: 40000 },
@@ -254,11 +254,11 @@ async function main() {
     },
     {
       email: "avocat6@avosearch.test",
-      name: "Demo Lawyer Six",
+      name: "Demo Barrister Six",
       barreau: "Nantes",
       city: "Nantes",
       specialties: ["Commercial leases", "Real estate contracts"],
-      bio: "Fictional lawyer pending verification by the AvoSearch team. Demo profile only.",
+      bio: "Fictional barrister pending verification by the AvoSearch team. Demo profile only.",
       validationPriceCents: 6500,
       hourlyRateCents: 15000,
       flatFees: { RELECTURE: 21000, REDACTION: 36000, NEGOCIATION: 46000 },
@@ -269,15 +269,15 @@ async function main() {
     },
   ];
 
-  for (const lawyer of lawyers) {
-    const { email, name, ...profile } = lawyer;
+  for (const barrister of barristers) {
+    const { email, name, ...profile } = barrister;
     await prisma.user.create({
       data: {
         email,
         passwordHash,
         name,
-        role: Role.LAWYER,
-        lawyerProfile: { create: profile },
+        role: Role.BARRISTER,
+        barristerProfile: { create: profile },
       },
     });
   }
@@ -325,7 +325,7 @@ async function main() {
           confidence: 0.88,
           domain: "services / intellectual property",
           justification:
-            "The agreement shows notable asymmetry: intellectual property retained by the provider, very low liability cap and high late payment penalties. The stakes justify lawyer support to renegotiate key clauses.",
+            "The agreement shows notable asymmetry: intellectual property retained by the provider, very low liability cap and high late payment penalties. The stakes justify barrister support to renegotiate key clauses.",
           flags: [
             "intellectual property retained by provider",
             "liability capped at 10%",
@@ -340,7 +340,7 @@ async function main() {
   });
 
   console.log("Seed completed:");
-  console.log("  1 admin, 2 clients, 6 lawyers (4 verified, 2 pending), 2 contracts, 3 templates");
+  console.log("  1 admin, 2 clients, 6 barristers (4 verified, 2 pending), 2 contracts, 3 templates");
   console.log(`  All demo accounts use password: ${DEMO_PASSWORD}`);
 }
 

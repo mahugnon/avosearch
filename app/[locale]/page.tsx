@@ -39,7 +39,7 @@ export default async function LandingPage() {
               <Link href="/register">{t("analyzeContract")}</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/register/lawyer">{t("iAmLawyer")}</Link>
+              <Link href="/register/barrister">{t("iAmBarrister")}</Link>
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">{t("disclaimer")}</p>
@@ -96,14 +96,14 @@ export default async function LandingPage() {
               <Card className="flex flex-col border-foreground/20">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle>{t("plans.aiLawyer.title")}</CardTitle>
+                    <CardTitle>{t("plans.aiBarrister.title")}</CardTitle>
                     <Badge>{tc("recommended")}</Badge>
                   </div>
-                  <CardDescription>{t("plans.aiLawyer.description")}</CardDescription>
+                  <CardDescription>{t("plans.aiBarrister.description")}</CardDescription>
                 </CardHeader>
                 <CardContent className="mt-auto">
                   <p className="text-3xl font-semibold">
-                    {formatEuros(pricing.aiPlusLawyerCents, locale)}
+                    {formatEuros(pricing.aiPlusBarristerCents, locale)}
                     <span className="text-sm font-normal text-muted-foreground">
                       {" "}
                       {tc("perContract")}

@@ -8,7 +8,7 @@ import { ContractViewer } from "@/components/contracts/contract-viewer";
 import { ChatFieldCard } from "@/components/app/chat-field-card";
 import { ChatHistoryPanel } from "@/components/app/chat-history-panel";
 import { DraftPanelModeToggle, type DraftPanelMode } from "@/components/app/draft-panel-mode-toggle";
-import { LawyerContactPrompt } from "@/components/app/lawyer-contact-prompt";
+import { BarristerContactPrompt } from "@/components/app/barrister-contact-prompt";
 import { LogoLoader } from "@/components/brand/logo-loader";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,7 @@ export function AnalysisChat() {
   const [contractTitle, setContractTitle] = useState<string | undefined>();
   const [draftInProgress, setDraftInProgress] = useState(false);
   const [panelMode, setPanelMode] = useState<DraftPanelMode>("edit");
-  const [lawyerInquiry, setLawyerInquiry] = useState<string | undefined>();
+  const [barristerInquiry, setBarristerInquiry] = useState<string | undefined>();
   const [awaitingField, setAwaitingField] = useState<AwaitingField | undefined>();
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -75,13 +75,13 @@ export function AnalysisChat() {
         updatedAt: Date.now(),
         messages: stored,
         contractId: patch?.contractId ?? contractId,
-        inquiryMessage: patch?.inquiryMessage ?? lawyerInquiry,
+        inquiryMessage: patch?.inquiryMessage ?? barristerInquiry,
         ...patch,
       };
       upsertChatThread(thread);
       setThreads(loadChatThreads());
     },
-    [activeThreadId, contractId, lawyerInquiry]
+    [activeThreadId, contractId, barristerInquiry]
   );
 
   const resetSessionState = useCallback(() => {
@@ -91,7 +91,7 @@ export function AnalysisChat() {
     setContractTitle(undefined);
     setDraftInProgress(false);
     setPanelMode("edit");
-    setLawyerInquiry(undefined);
+    setBarristerInquiry(undefined);
     setAwaitingField(undefined);
     setError(null);
   }, []);
@@ -102,7 +102,7 @@ export function AnalysisChat() {
       setMessages(fromStored(thread.messages));
       userHistoryRef.current = thread.messages.filter((m) => m.role === "user").map((m) => m.content);
       setContractId(thread.contractId);
-      setLawyerInquiry(thread.inquiryMessage);
+      setBarristerInquiry(thread.inquiryMessage);
       setContractBody(undefined);
       setContractTitle(undefined);
       setDraftInProgress(false);
@@ -131,7 +131,7 @@ export function AnalysisChat() {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, isThinking, lawyerInquiry, awaitingField]);
+  }, [messages, isThinking, barristerInquiry, awaitingField]);
 
   const sendMessage = useCallback(
     async (text: string) => {
@@ -161,11 +161,11 @@ export function AnalysisChat() {
 
         if (result.contractId) {
           setContractId(result.contractId);
-          setLawyerInquiry(undefined);
+          setBarristerInquiry(undefined);
         }
 
-        if (result.suggestLawyer && result.inquiryMessage) {
-          setLawyerInquiry(result.inquiryMessage);
+        if (result.suggestBarrister && result.inquiryMessage) {
+          setBarristerInquiry(result.inquiryMessage);
           setContractId(undefined);
           setContractBody(undefined);
           setContractTitle(undefined);
@@ -202,7 +202,7 @@ export function AnalysisChat() {
 
         persistThread(finalMessages, {
           contractId: result.contractId ?? contractId,
-          inquiryMessage: result.inquiryMessage ?? lawyerInquiry,
+          inquiryMessage: result.inquiryMessage ?? barristerInquiry,
         });
       } catch {
         setError(t("errors.generic"));
@@ -210,7 +210,7 @@ export function AnalysisChat() {
         setIsThinking(false);
       }
     },
-    [contractId, isThinking, lawyerInquiry, messages, persistThread, t]
+    [contractId, isThinking, barristerInquiry, messages, persistThread, t]
   );
 
   function handleSend() {
@@ -224,11 +224,11 @@ export function AnalysisChat() {
     }
   }
 
-  function handleDeclineLawyer() {
-    setLawyerInquiry(undefined);
+  function handleDeclineBarrister() {
+    setBarristerInquiry(undefined);
     const finalMessages: ChatMessage[] = [
       ...messages,
-      { id: crypto.randomUUID(), role: "assistant", content: t("lawyerOffer.declined") },
+      { id: crypto.randomUUID(), role: "assistant", content: t("barristerOffer.declined") },
     ];
     setMessages(finalMessages);
     persistThread(finalMessages, { inquiryMessage: undefined });
@@ -249,8 +249,8 @@ export function AnalysisChat() {
   }
 
   const hasPreviewData = Boolean(contractBody && contractTitle && contractId);
-  const showFieldCard = Boolean(awaitingField && contractId && !lawyerInquiry && draftInProgress);
-  const showTextInput = !showFieldCard && !lawyerInquiry;
+  const showFieldCard = Boolean(awaitingField && contractId && !barristerInquiry && draftInProgress);
+  const showTextInput = !showFieldCard && !barristerInquiry;
   const showEditPanel = !hasPreviewData || panelMode === "edit";
   const showPreviewPanel = hasPreviewData && panelMode === "preview";
 
@@ -333,8 +333,8 @@ export function AnalysisChat() {
               />
             )}
 
-            {lawyerInquiry && (
-              <LawyerContactPrompt inquiryMessage={lawyerInquiry} onDecline={handleDeclineLawyer} />
+            {barristerInquiry && (
+              <BarristerContactPrompt inquiryMessage={barristerInquiry} onDecline={handleDeclineBarrister} />
             )}
           </div>
 
@@ -372,7 +372,7 @@ export function AnalysisChat() {
           body={contractBody!}
           contractId={contractId}
           draftPreview={draftInProgress}
-          showLawyerRequest={!draftInProgress}
+          showBarristerRequest={!draftInProgress}
           className="min-h-[28rem]"
         />
       )}

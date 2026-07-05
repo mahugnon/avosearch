@@ -1,11 +1,11 @@
 import { MissionType } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { LawyerMatchingList } from "@/components/contracts/lawyer-matching";
+import { BarristerMatchingList } from "@/components/contracts/barrister-matching";
 import { Button } from "@/components/ui/button";
 import { requireClientContract } from "@/lib/contracts/access";
 import { contractMatchingContext } from "@/lib/contracts/document";
-import { matchLawyersForContract } from "@/lib/matching/lawyers";
+import { matchBarristersForContract } from "@/lib/matching/barristers";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -16,15 +16,15 @@ type Props = {
 export default async function ContractMatchingPage({ params, searchParams }: Props) {
   const { id } = await params;
   const { plan: planParam } = await searchParams;
-  const plan = planParam === "ai-lawyer" ? "ai-lawyer" : "mission";
+  const plan = planParam === "ai-barrister" ? "ai-barrister" : "mission";
 
   const { contract } = await requireClientContract(id);
   const t = await getTranslations("contracts.matching");
 
   if (!contractMatchingContext(contract)) notFound();
 
-  const profiles = await matchLawyersForContract(id);
-  const lawyers = profiles.map((p) => ({
+  const profiles = await matchBarristersForContract(id);
+  const barristers = profiles.map((p) => ({
     userId: p.user.id,
     name: p.user.name,
     photoUrl: p.photoUrl,
@@ -49,9 +49,9 @@ export default async function ContractMatchingPage({ params, searchParams }: Pro
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
-      <LawyerMatchingList
+      <BarristerMatchingList
         contractId={id}
-        lawyers={lawyers}
+        barristers={barristers}
         plan={plan}
         missionType={missionType}
       />

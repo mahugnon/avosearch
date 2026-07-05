@@ -3,9 +3,9 @@
 import { MissionStatus, MissionType, type ModStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getClientSession } from "@/lib/auth/client-session";
-import { missionPriceForType } from "@/lib/matching/lawyers";
-import { priceForValidationMission, toLawyerMatchView } from "@/lib/matching/lawyer-view";
-import { rankLawyersForContract } from "@/lib/matching/select-lawyer";
+import { missionPriceForType } from "@/lib/matching/barristers";
+import { priceForValidationMission, toBarristerMatchView } from "@/lib/matching/barrister-view";
+import { rankBarristersForContract } from "@/lib/matching/select-barrister";
 import { computeTimedPriceCents, elapsedWorkSeconds } from "@/lib/matching/billing";
 import { localizedPath, type AppLocale } from "@/lib/i18n";
 import { pricing } from "@/lib/config";
@@ -27,7 +27,7 @@ async function requireOwnedContract(contractId: string, ownerId: string) {
   return { contract };
 }
 
-export async function getLawyerSelectionAction(contractId: string) {
+export async function getBarristerSelectionAction(contractId: string) {
   const session = await getClientSession();
   if (!session.ok) return { error: session.reason as string };
 
@@ -46,22 +46,22 @@ export async function getLawyerSelectionAction(contractId: string) {
   const owned = await requireOwnedContract(contractId, session.userId);
   if ("error" in owned) return { error: owned.error };
 
-  const ranked = await rankLawyersForContract(contractId, 5);
-  if (ranked.length === 0) return { error: "no_lawyers" as const };
+  const ranked = await rankBarristersForContract(contractId, 5);
+  if (ranked.length === 0) return { error: "no_barristers" as const };
 
-  const lawyers = ranked.map(toLawyerMatchView);
-  const selectedLawyerId = lawyers[0]!.userId;
+  const barristers = ranked.map(toBarristerMatchView);
+  const selectedBarristerId = barristers[0]!.userId;
   const priceCents = priceForValidationMission(ranked[0]!.profile);
 
   return {
     ok: true as const,
-    lawyers,
-    selectedLawyerId,
+    barristers,
+    selectedBarristerId,
     priceCents,
   };
 }
 
-export async function confirmLawyerMissionAction(contractId: string, lawyerUserId: string): Promise<void> {
+export async function confirmBarristerMissionAction(contractId: string, barristerUserId: string): Promise<void> {
   const session = await getClientSession();
   const locale = (await getLocale()) as AppLocale;
   if (!session.ok) {
@@ -85,29 +85,29 @@ export async function confirmLawyerMissionAction(contractId: string, lawyerUserI
     redirect(localizedPath(`/app/contracts/${contractId}`, locale));
   }
 
-  const lawyer = await prisma.lawyerProfile.findFirst({
-    where: { userId: lawyerUserId, verified: true, available: true },
+  const barrister = await prisma.barristerProfile.findFirst({
+    where: { userId: barristerUserId, verified: true, available: true },
   });
-  if (!lawyer) {
+  if (!barrister) {
     redirect(localizedPath(`/app/contracts/${contractId}`, locale));
   }
 
-  const ranked = await rankLawyersForContract(contractId, 5);
-  const match = ranked.find((r) => r.profile.userId === lawyerUserId);
-  const flatFees = (lawyer.flatFees ?? {}) as Record<string, number>;
-  const priceCents = missionPriceForType(MissionType.VALIDATION, lawyer.validationPriceCents, flatFees);
+  const ranked = await rankBarristersForContract(contractId, 5);
+  const match = ranked.find((r) => r.profile.userId === barristerUserId);
+  const flatFees = (barrister.flatFees ?? {}) as Record<string, number>;
+  const priceCents = missionPriceForType(MissionType.VALIDATION, barrister.validationPriceCents, flatFees);
 
   const mission = await prisma.mission.create({
     data: {
       type: MissionType.VALIDATION,
       contractId,
       clientId: session.userId,
-      lawyerId: lawyer.userId,
+      barristerId: barrister.userId,
       priceCents,
       status: MissionStatus.ACCEPTEE,
       paidAt: new Date(),
       stripeSessionId: "demo",
-      deadline: new Date(Date.now() + lawyer.responseTimeHours * 3600_000),
+      deadline: new Date(Date.now() + barrister.responseTimeHours * 3600_000),
       autoAssigned: true,
       selectionScore: match?.breakdown.total ?? null,
     },
@@ -118,14 +118,14 @@ export async function confirmLawyerMissionAction(contractId: string, lawyerUserI
   redirect(localizedPath(`/app/orders?paid=${mission.id}`, locale));
 }
 
-export async function requestLawyerOpinionAction(contractId: string): Promise<void> {
+export async function requestBarristerOpinionAction(contractId: string): Promise<void> {
   const session = await getClientSession();
   const locale = (await getLocale()) as AppLocale;
   if (!session.ok) {
     redirect(localizedPath("/login", locale));
   }
 
-  const selection = await getLawyerSelectionAction(contractId);
+  const selection = await getBarristerSelectionAction(contractId);
 
   if ("existingMissionId" in selection && selection.existingMissionId) {
     redirect(localizedPath(`/app/missions/${selection.existingMissionId}`, locale));
@@ -135,14 +135,14 @@ export async function requestLawyerOpinionAction(contractId: string): Promise<vo
     redirect(localizedPath(`/app/contracts/${contractId}`, locale));
   }
 
-  await confirmLawyerMissionAction(contractId, selection.selectedLawyerId);
+  await confirmBarristerMissionAction(contractId, selection.selectedBarristerId);
 }
 
 export async function createMissionAction(input: {
   contractId: string;
-  lawyerUserId: string;
+  barristerUserId: string;
   type: MissionType;
-  plan?: "ai-lawyer" | "mission";
+  plan?: "ai-barrister" | "mission";
 }) {
   const session = await getClientSession();
   if (!session.ok) return { error: session.reason };
@@ -153,16 +153,16 @@ export async function createMissionAction(input: {
   });
   if (!contract || !contractMatchingContext(contract)) return { error: "empty_contract" };
 
-  const lawyer = await prisma.lawyerProfile.findFirst({
-    where: { userId: input.lawyerUserId, verified: true, available: true },
+  const barrister = await prisma.barristerProfile.findFirst({
+    where: { userId: input.barristerUserId, verified: true, available: true },
   });
-  if (!lawyer) return { error: "lawyer_unavailable" };
+  if (!barrister) return { error: "barrister_unavailable" };
 
-  const flatFees = (lawyer.flatFees ?? {}) as Record<string, number>;
-  let priceCents = missionPriceForType(input.type, lawyer.validationPriceCents, flatFees);
+  const flatFees = (barrister.flatFees ?? {}) as Record<string, number>;
+  let priceCents = missionPriceForType(input.type, barrister.validationPriceCents, flatFees);
 
-  if (input.plan === "ai-lawyer" && input.type === MissionType.VALIDATION) {
-    priceCents = pricing.aiPlusLawyerCents;
+  if (input.plan === "ai-barrister" && input.type === MissionType.VALIDATION) {
+    priceCents = pricing.aiPlusBarristerCents;
   }
 
   const mission = await prisma.mission.create({
@@ -170,10 +170,10 @@ export async function createMissionAction(input: {
       type: input.type,
       contractId: contract.id,
       clientId: session.userId,
-      lawyerId: lawyer.userId,
+      barristerId: barrister.userId,
       priceCents,
       status: MissionStatus.PROPOSEE,
-      deadline: new Date(Date.now() + lawyer.responseTimeHours * 3600_000),
+      deadline: new Date(Date.now() + barrister.responseTimeHours * 3600_000),
     },
   });
 
@@ -182,17 +182,17 @@ export async function createMissionAction(input: {
   return { ok: true as const, missionId: mission.id };
 }
 
-export async function lawyerAcceptMissionAction(missionId: string) {
+export async function barristerAcceptMissionAction(missionId: string) {
   const session = await auth();
-  if (!session || session.user.role !== "LAWYER") return { error: "unauthorized" };
+  if (!session || session.user.role !== "BARRISTER") return { error: "unauthorized" };
 
   const mission = await prisma.mission.findFirst({
-    where: { id: missionId, lawyerId: session.user.id },
-    include: { lawyer: { include: { lawyerProfile: true } } },
+    where: { id: missionId, barristerId: session.user.id },
+    include: { barrister: { include: { barristerProfile: true } } },
   });
   if (!mission) return { error: "not_found" };
 
-  const hourlyRate = mission.lawyer?.lawyerProfile?.hourlyRateCents ?? 15000;
+  const hourlyRate = mission.barrister?.barristerProfile?.hourlyRateCents ?? 15000;
 
   await prisma.mission.update({
     where: { id: missionId },
@@ -206,21 +206,21 @@ export async function lawyerAcceptMissionAction(missionId: string) {
   return { ok: true as const };
 }
 
-export async function lawyerValidateModificationAction(input: {
+export async function barristerValidateModificationAction(input: {
   modificationId: string;
   action: "VALIDEE_AVOCAT" | "REJETEE_AVOCAT" | "AMENDEE_AVOCAT";
   amendedText?: string;
-  lawyerComment?: string;
+  barristerComment?: string;
 }) {
   const session = await auth();
-  if (!session || session.user.role !== "LAWYER") return { error: "unauthorized" };
+  if (!session || session.user.role !== "BARRISTER") return { error: "unauthorized" };
 
   const mod = await prisma.modification.findUnique({
     where: { id: input.modificationId },
     include: {
       analysis: {
         include: {
-          contract: { include: { missions: { where: { lawyerId: session.user.id } } } },
+          contract: { include: { missions: { where: { barristerId: session.user.id } } } },
         },
       },
     },
@@ -235,7 +235,7 @@ export async function lawyerValidateModificationAction(input: {
     data: {
       status: input.action as ModStatus,
       amendedText: input.amendedText ?? null,
-      lawyerComment: input.lawyerComment ?? null,
+      barristerComment: input.barristerComment ?? null,
     },
   });
 
@@ -244,10 +244,10 @@ export async function lawyerValidateModificationAction(input: {
 
 export async function deliverMissionAction(missionId: string, globalNote: string) {
   const session = await auth();
-  if (!session || session.user.role !== "LAWYER") return { error: "unauthorized" };
+  if (!session || session.user.role !== "BARRISTER") return { error: "unauthorized" };
 
   const mission = await prisma.mission.findFirst({
-    where: { id: missionId, lawyerId: session.user.id },
+    where: { id: missionId, barristerId: session.user.id },
   });
   if (!mission) return { error: "not_found" };
 

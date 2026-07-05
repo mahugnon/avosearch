@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { verifyLawyerAction, rejectLawyerAction } from "@/lib/actions/admin";
+import { verifyBarristerAction, rejectBarristerAction } from "@/lib/actions/admin";
 import { prisma } from "@/lib/db";
 import { formatEuros } from "@/lib/config";
 import type { AppLocale } from "@/lib/i18n";
@@ -20,7 +20,7 @@ export default async function AdminPage() {
   const tc = await getTranslations("common");
   const locale = (await getLocale()) as AppLocale;
 
-  const profiles = await prisma.lawyerProfile.findMany({
+  const profiles = await prisma.barristerProfile.findMany({
     include: { user: { select: { name: true, email: true } } },
     orderBy: [{ verified: "asc" }, { createdAt: "asc" }],
   });
@@ -42,7 +42,7 @@ export default async function AdminPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("columns.lawyer")}</TableHead>
+              <TableHead>{t("columns.barrister")}</TableHead>
               <TableHead>{t("columns.barreau")}</TableHead>
               <TableHead>{t("columns.specialties")}</TableHead>
               <TableHead>{t("columns.validationPrice")}</TableHead>
@@ -74,12 +74,12 @@ export default async function AdminPage() {
                 <TableCell>
                   {!profile.verified ? (
                     <div className="flex gap-2">
-                      <form action={verifyLawyerAction.bind(null, profile.id)}>
+                      <form action={verifyBarristerAction.bind(null, profile.id)}>
                         <Button type="submit" size="sm">
                           {t("verify")}
                         </Button>
                       </form>
-                      <form action={rejectLawyerAction.bind(null, profile.id)}>
+                      <form action={rejectBarristerAction.bind(null, profile.id)}>
                         <Button type="submit" size="sm" variant="outline">
                           {t("reject")}
                         </Button>

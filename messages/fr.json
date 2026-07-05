@@ -5,7 +5,7 @@
     "description": "Déposez votre contrat : une aide documentaire automatisée identifie les points d'attention, et des avocats inscrits au barreau peuvent valider chaque modification ou prendre le relais au forfait.",
     "login": "Connexion",
     "register": "Créer un compte",
-    "registerLawyer": "Inscription avocat",
+    "registerBarrister": "Inscription avocat",
     "cgu": "Conditions générales d'utilisation",
     "mentionsLegales": "Mentions légales",
     "confidentialite": "Politique de confidentialité",
@@ -54,7 +54,7 @@
     "heroTitle": "Vos contrats, relus et sécurisés — avec ou sans avocat",
     "heroDescription": "Déposez votre contrat : AvoSearch repère les clauses à risque, propose des modifications en suivi de modifications, et vous met en relation avec un avocat vérifié quand votre situation le demande.",
     "analyzeContract": "Analyser mon contrat",
-    "iAmLawyer": "Je suis avocat",
+    "iAmBarrister": "Je suis avocat",
     "disclaimer": "Aide documentaire automatisée — ne constitue pas une consultation juridique.",
     "howItWorksTitle": "Comment ça marche",
     "steps": {
@@ -78,7 +78,7 @@
         "title": "Relecture assistée",
         "description": "Modifications proposées en suivi de modifications ; vous acceptez ou rejetez chaque changement."
       },
-      "aiLawyer": {
+      "aiBarrister": {
         "title": "Relecture + validation avocat",
         "description": "Un avocat vérifié relit, valide ou amende chaque modification proposée. Réponse sous 24 h."
       },
@@ -133,12 +133,12 @@
     "creatingAccount": "Création du compte...",
     "createMyAccount": "Créer mon compte",
     "alreadyRegistered": "Déjà inscrit ?",
-    "areYouLawyer": "Vous êtes avocat ?",
-    "lawyerRegistration": "Inscription avocat",
-    "lawyerRegisterTitle": "Inscription avocat",
-    "lawyerRegisterDescription": "Votre profil sera vérifié manuellement par notre équipe avant d'être visible des clients.",
+    "areYouBarrister": "Vous êtes avocat ?",
+    "barristerRegistration": "Inscription avocat",
+    "barristerRegisterTitle": "Inscription avocat",
+    "barristerRegisterDescription": "Votre profil sera vérifié manuellement par notre équipe avant d'être visible des clients.",
     "professionalEmail": "Adresse e-mail professionnelle",
-    "lawyerNamePlaceholder": "Me Exemple Sept",
+    "barristerNamePlaceholder": "Me Exemple Sept",
     "barreau": "Barreau",
     "city": "Ville d'exercice",
     "cityPlaceholder": "Paris",
@@ -150,7 +150,7 @@
     "responseTimeHours": "Délai de réponse (heures)",
     "bio": "Présentation",
     "bioPlaceholder": "Votre pratique, vos types de dossiers, votre approche...",
-    "createLawyerAccount": "Créer mon compte avocat",
+    "createBarristerAccount": "Créer mon compte avocat",
     "demoAccountsTitle": "Comptes de démonstration",
     "demoAccountsList": "client1@avosearch.test · avocat1@avosearch.test · admin@avosearch.test",
     "demoPassword": "Mot de passe :"
@@ -197,8 +197,8 @@
       "settingsHint": "Suivez vos demandes avocat, le paiement et les documents livrés.",
       "empty": "Aucune commande",
       "emptyHint": "Lorsque vous contactez un avocat depuis le chat, votre commande apparaîtra ici.",
-      "lawyerLine": "Avocat : {name}",
-      "lawyerPending": "Avocat en attente",
+      "barristerLine": "Avocat : {name}",
+      "barristerPending": "Avocat en attente",
       "viewContract": "Voir le contrat livré →",
       "paymentSuccess": "Paiement enregistré — l'avocat va prendre en charge votre dossier."
     },
@@ -235,7 +235,7 @@
     "templateLoadFailed": "Impossible de charger le modèle de contrat. Contactez le support.",
     "missingFields": "Il manque encore des informations. Répondez à la question ci-dessus.",
     "contractReady": "Votre contrat est prêt dans l'aperçu à droite. Vous pouvez continuer à poser des questions ou demander des ajustements ici. Quand vous êtes satisfait, cliquez sur « Demander un avocat » pour une validation professionnelle.",
-    "lawyerOffer": {
+    "barristerOffer": {
       "title": "Souhaitez-vous contacter un avocat ?",
       "description": "Un avocat inscrit peut rédiger le contrat sur mesure dont vous avez besoin.",
       "yes": "Oui",
@@ -270,8 +270,8 @@
       "copy": "Copier",
       "pdf": "PDF",
       "analyze": "Lancer l'analyse",
-      "requestLawyer": "Demander un avis d'avocat",
-      "requestLawyerPending": "Attribution en cours…",
+      "requestBarrister": "Demander un avis d'avocat",
+      "requestBarristerPending": "Attribution en cours…",
       "disclaimer": "Modèle d'aide documentaire — faites relire par un avocat si nécessaire."
     }
   },
@@ -290,20 +290,20 @@
     "triageAvocat": "Avocat recommandé",
     "triageActe": "Acte réglementé",
     "draftInProgress": "Rédaction en cours",
-    "lawyerReviewed": "Revu par un avocat",
+    "barristerReviewed": "Revu par un avocat",
     "reviewedBy": "Revu par {name}",
-    "viewLawyerProfile": "Voir le profil de {name}",
-    "readyForLawyer": "Prêt à soumettre",
+    "viewBarristerProfile": "Voir le profil de {name}",
+    "readyForBarrister": "Prêt à soumettre",
     "missionInProgress": "Relecture avocat en cours",
-    "lawyerFollowUp": "Messages et note de l'avocat",
-    "trackLawyerReview": "Suivre la relecture",
+    "barristerFollowUp": "Messages et note de l'avocat",
+    "trackBarristerReview": "Suivre la relecture",
     "documentPreview": "Aperçu du document",
-    "lawyerSubmit": {
+    "barristerSubmit": {
       "title": "Soumettre à un avocat",
       "description": "Faites relire et valider votre contrat par un avocat inscrit au barreau.",
       "disclaimer": "Aide documentaire uniquement — pas un avis juridique tant que l'avocat n'a pas validé."
     },
-    "lawyerProfile": {
+    "barristerProfile": {
       "title": "Votre avocat",
       "description": "Profil de l'avocat qui a revu votre contrat."
     },
@@ -367,18 +367,18 @@
         }
       },
       "nextSteps": {
-        "lawyerReviewOnly": "La relecture du contrat est réalisée par un avocat inscrit — pas par l'administration.",
+        "barristerReviewOnly": "La relecture du contrat est réalisée par un avocat inscrit — pas par l'administration.",
         "startReview": "Lancer la relecture IA",
-        "startReviewLawyer": "Relecture + validation avocat",
-        "findLawyer": "Trouver un avocat",
+        "startReviewBarrister": "Relecture + validation avocat",
+        "findBarrister": "Trouver un avocat",
         "phase2Hint": "Relecture en suivi de modifications.",
         "phase3Hint": "Matching avocats",
         "iaSuffit": {
           "title": "Choisissez votre formule",
           "description": "Vous pourrez accepter ou rejeter chaque modification proposée.",
           "aiOnly": "IA seule",
-          "aiLawyer": "IA + validation avocat",
-          "aiLawyerHint": "Un avocat vérifié valide chaque modification — réponse sous 24 h."
+          "aiBarrister": "IA + validation avocat",
+          "aiBarristerHint": "Un avocat vérifié valide chaque modification — réponse sous 24 h."
         },
         "avocat": {
           "title": "Mission avocat au forfait",
@@ -398,14 +398,14 @@
       "back": "← Retour au contrat",
       "planLabel": "Formule",
       "planAiOnly": "IA seule",
-      "planAiLawyer": "IA + validation avocat",
+      "planAiBarrister": "IA + validation avocat",
       "generate": "Générer les modifications",
       "generating": "Analyse en cours…",
       "noModifications": "Aucune modification pour le moment.",
       "modification": "Modification {order}",
       "original": "Texte original",
       "proposed": "Texte proposé",
-      "lawyerNote": "Note avocat",
+      "barristerNote": "Note avocat",
       "accept": "Accepter",
       "reject": "Rejeter",
       "continueMatching": "Choisir un avocat validateur",
@@ -444,7 +444,7 @@
       "confirmAndPay": "Confirmer et payer",
       "selectedSummary": "Avocat sélectionné : {name}"
     },
-    "lawyerSelection": {
+    "barristerSelection": {
       "title": "Avocat sélectionné pour vous",
       "description": "Nous avons trouvé l'avocat le mieux adapté à votre contrat. Vous pouvez en choisir un autre si vous le souhaitez.",
       "searchingTitle": "Recherche d'un avocat…",
@@ -459,7 +459,7 @@
       "confirming": "Paiement en cours…",
       "confirmPrice": "Montant : {price} — paiement immédiat (démo)",
       "errors": {
-        "no_lawyers": "Aucun avocat disponible pour le moment.",
+        "no_barristers": "Aucun avocat disponible pour le moment.",
         "not_found": "Contrat introuvable.",
         "empty_contract": "Le contrat ne contient pas encore de texte à soumettre.",
         "generic": "Impossible de trouver un avocat. Réessayez plus tard."
@@ -481,7 +481,7 @@
       }
     }
   },
-  "lawyer": {
+  "barrister": {
     "areaLabel": "Espace avocat",
     "dashboardTitle": "Tableau de bord",
     "dashboardIntro": "Vos missions prioritaires et indicateurs clés.",
@@ -630,7 +630,7 @@
       "deliver": "Livrer la mission",
       "generateReview": "Générer les suggestions de relecture",
       "generatingReview": "Analyse en cours…",
-      "reviewLawyerOnly": "Seuls les avocats peuvent relire les contrats.",
+      "reviewBarristerOnly": "Seuls les avocats peuvent relire les contrats.",
       "globalNotePlaceholder": "Note globale pour le client…",
       "chatTitle": "Messagerie",
       "autoAssigned": "Mission assignée automatiquement selon spécialité, tarif, réactivité et avis clients.",
@@ -664,7 +664,7 @@
   },
   "missions": {
     "back": "← Retour",
-    "lawyer": "Avocat",
+    "barrister": "Avocat",
     "estimatedPrice": "Tarif indicatif : {price}",
     "finalPrice": "Montant facturé : {price}",
     "autoAssigned": "Avocat sélectionné automatiquement (spécialité, tarif, réactivité, avis).",
@@ -676,7 +676,7 @@
     "contractDocument": "Votre contrat",
     "openContract": "Ouvrir dans mes documents",
     "viewMission": "Voir la mission",
-    "lawyerDelivery": "Note de l'avocat",
+    "barristerDelivery": "Note de l'avocat",
     "chatTitle": "Messagerie avec l'avocat",
     "status": {
       "PROPOSEE": "En attente de paiement",
@@ -730,11 +730,11 @@
     "verify": "Vérifier",
     "reject": "Refuser",
     "nav": {
-      "lawyers": "Avocats",
+      "barristers": "Avocats",
       "templates": "Modèles de contrats"
     },
     "columns": {
-      "lawyer": "Avocat",
+      "barrister": "Avocat",
       "barreau": "Barreau",
       "specialties": "Spécialités",
       "validationPrice": "Tarif validation",

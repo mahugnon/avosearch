@@ -9,7 +9,7 @@ export function AdminNav() {
   const pathname = usePathname();
 
   const links = [
-    { href: "/admin", label: t("lawyers"), match: (p: string) => p === "/admin" },
+    { href: "/admin", label: t("barristers"), match: (p: string) => p === "/admin" },
     {
       href: "/admin/templates",
       label: t("templates"),

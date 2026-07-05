@@ -8,8 +8,8 @@ function missionUrl(missionId: string, locale: AppLocale = "fr") {
   return `${APP_URL()}${localizedPath(`/app/missions/${missionId}`, locale)}`;
 }
 
-function lawyerMissionUrl(missionId: string, locale: AppLocale = "fr") {
-  return `${APP_URL()}${localizedPath(`/lawyer/missions/${missionId}`, locale)}`;
+function barristerMissionUrl(missionId: string, locale: AppLocale = "fr") {
+  return `${APP_URL()}${localizedPath(`/barrister/missions/${missionId}`, locale)}`;
 }
 
 export async function notifyMissionCreated(missionId: string) {
@@ -17,16 +17,16 @@ export async function notifyMissionCreated(missionId: string) {
     where: { id: missionId },
     include: {
       client: { select: { name: true, email: true } },
-      lawyer: { select: { name: true, email: true } },
+      barrister: { select: { name: true, email: true } },
       contract: { select: { title: true } },
     },
   });
-  if (!mission?.lawyer?.email) return;
+  if (!mission?.barrister?.email) return;
 
   await sendEmail({
-    to: mission.lawyer.email,
+    to: mission.barrister.email,
     subject: `[AvoSearch] Nouvelle mission — ${mission.contract.title}`,
-    text: `Bonjour ${mission.lawyer.name},\n\n${mission.client.name} vous a choisi pour une mission sur « ${mission.contract.title} ».\n\nConsultez la mission : ${lawyerMissionUrl(missionId)}`,
+    text: `Bonjour ${mission.barrister.name},\n\n${mission.client.name} vous a choisi pour une mission sur « ${mission.contract.title} ».\n\nConsultez la mission : ${barristerMissionUrl(missionId)}`,
   });
 }
 
@@ -35,17 +35,17 @@ export async function notifyMissionPaid(missionId: string) {
     where: { id: missionId },
     include: {
       client: { select: { name: true, email: true } },
-      lawyer: { select: { name: true, email: true } },
+      barrister: { select: { name: true, email: true } },
       contract: { select: { title: true } },
     },
   });
   if (!mission) return;
 
-  if (mission.lawyer?.email) {
+  if (mission.barrister?.email) {
     await sendEmail({
-      to: mission.lawyer.email,
+      to: mission.barrister.email,
       subject: `[AvoSearch] Paiement reçu — ${mission.contract.title}`,
-      text: `Bonjour ${mission.lawyer.name},\n\nLe client a réglé la mission « ${mission.contract.title} ». Vous pouvez démarrer.\n\n${lawyerMissionUrl(missionId)}`,
+      text: `Bonjour ${mission.barrister.name},\n\nLe client a réglé la mission « ${mission.contract.title} ». Vous pouvez démarrer.\n\n${barristerMissionUrl(missionId)}`,
     });
   }
 
@@ -66,8 +66,8 @@ export async function notifyNewMessage(missionId: string, recipientUserId: strin
   if (!user?.email) return;
 
   const url =
-    user.role === "LAWYER"
-      ? lawyerMissionUrl(missionId)
+    user.role === "BARRISTER"
+      ? barristerMissionUrl(missionId)
       : missionUrl(missionId);
 
   await sendEmail({
@@ -94,9 +94,9 @@ export async function notifyMissionDelivered(missionId: string) {
   });
 }
 
-export async function notifyLawyerVerified(lawyerUserId: string) {
+export async function notifyBarristerVerified(barristerUserId: string) {
   const user = await prisma.user.findUnique({
-    where: { id: lawyerUserId },
+    where: { id: barristerUserId },
     select: { email: true, name: true },
   });
   if (!user?.email) return;
@@ -104,6 +104,6 @@ export async function notifyLawyerVerified(lawyerUserId: string) {
   await sendEmail({
     to: user.email,
     subject: "[AvoSearch] Profil avocat vérifié",
-    text: `Bonjour ${user.name},\n\nVotre profil AvoSearch est désormais vérifié. Vous pouvez recevoir des missions clients.\n\n${APP_URL()}${localizedPath("/lawyer/missions", "fr")}`,
+    text: `Bonjour ${user.name},\n\nVotre profil AvoSearch est désormais vérifié. Vous pouvez recevoir des missions clients.\n\n${APP_URL()}${localizedPath("/barrister/missions", "fr")}`,
   });
 }

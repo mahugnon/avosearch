@@ -2,7 +2,7 @@ import type { DefaultSession } from "next-auth";
 // Required so the "next-auth/jwt" module augmentation below is applied
 import type {} from "next-auth/jwt";
 
-export type AppRole = "CLIENT" | "LAWYER" | "ADMIN";
+export type AppRole = "CLIENT" | "BARRISTER" | "ADMIN";
 
 declare module "next-auth" {
   interface Session {

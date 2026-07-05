@@ -17,7 +17,7 @@ export type ModificationView = {
   riskLevel: RiskLevel;
   status: ModStatus;
   amendedText?: string | null;
-  lawyerComment?: string | null;
+  barristerComment?: string | null;
 };
 
 type Props = {
@@ -86,10 +86,10 @@ export function ReviewPanel({ modifications, readOnly, onRefresh }: Props) {
               </div>
             </div>
             <p className="text-muted-foreground">{mod.rationale}</p>
-            {mod.lawyerComment && (
+            {mod.barristerComment && (
               <p className="rounded-md bg-muted p-3 text-muted-foreground">
-                <span className="font-medium text-foreground">{t("lawyerNote")}: </span>
-                {mod.lawyerComment}
+                <span className="font-medium text-foreground">{t("barristerNote")}: </span>
+                {mod.barristerComment}
               </p>
             )}
             {!readOnly && mod.status === "PROPOSEE" && (

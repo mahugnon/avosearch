@@ -276,7 +276,7 @@ export function DraftResumeChat({
           contractId={contractId}
           highlight={previewHighlight}
           draftPreview={previewInProgress}
-          showLawyerRequest={!previewInProgress}
+          showBarristerRequest={!previewInProgress}
           className="min-h-[28rem]"
         />
       )}

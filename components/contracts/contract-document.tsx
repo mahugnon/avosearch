@@ -14,7 +14,7 @@ import {
 } from "@/lib/templates/document-structure";
 import type { ContractSegment } from "@/lib/templates/highlight";
 
-export type ContractViewerMode = "client" | "lawyer";
+export type ContractViewerMode = "client" | "barrister";
 
 type FieldRenderProps = {
   node: Extract<InlineNode, { kind: "field" }>;
@@ -49,7 +49,7 @@ function FieldValue({
       <mark className={markClass} title={node.label} data-field-id={node.fieldId}>
         {node.value}
       </mark>
-      {mode === "lawyer" && inlineFieldActions && (
+      {mode === "barrister" && inlineFieldActions && (
         <span className="ml-1 inline-flex align-middle font-sans">
           {validated ? (
             <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[0.625rem] font-medium text-emerald-800">
@@ -266,7 +266,7 @@ export function ContractDocument({
             <Sparkles className="size-3.5 shrink-0" aria-hidden />
             {t("aiFieldsLegend", { count: totalFields })}
           </p>
-          {mode === "lawyer" && (
+          {mode === "barrister" && (
             <p className="text-xs text-muted-foreground">
               {allValidated
                 ? t("allValidated")
@@ -290,7 +290,7 @@ export function ContractDocument({
         ))}
       </div>
 
-      {mode === "lawyer" && allValidated && (
+      {mode === "barrister" && allValidated && (
         <p className="rounded-lg border border-emerald-400/40 bg-emerald-50 px-3 py-2 font-sans text-xs text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300">
           {t("allValidatedHint")}
         </p>

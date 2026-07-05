@@ -7,7 +7,7 @@ type Props = {
   params: Promise<{ locale: string; id: string }>;
 };
 
-/** Client review page removed — contract review is lawyer-only. */
+/** Client review page removed — contract review is barrister-only. */
 export default async function ContractReviewPage({ params }: Props) {
   const { id } = await params;
   const session = await auth();
@@ -17,8 +17,8 @@ export default async function ContractReviewPage({ params }: Props) {
     redirect(localizedPath("/login", locale));
   }
 
-  if (session.user.role === "LAWYER") {
-    redirect(localizedPath("/lawyer/missions", locale));
+  if (session.user.role === "BARRISTER") {
+    redirect(localizedPath("/barrister/missions", locale));
   }
 
   if (session.user.role === "ADMIN") {

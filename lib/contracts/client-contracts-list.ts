@@ -2,9 +2,9 @@ import { ContractDraftStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import {
   getActiveMissionContractIds,
-  getReviewLawyersByContractIds,
-  type ContractReviewLawyer,
-} from "@/lib/contracts/lawyer-review";
+  getReviewBarristersByContractIds,
+  type ContractReviewBarrister,
+} from "@/lib/contracts/barrister-review";
 import { listableClientContractsFilter } from "@/lib/contracts/document";
 
 export type ClientContractView = "cards" | "list";
@@ -19,7 +19,7 @@ export type ClientContractRow = {
   title: string;
   createdAt: Date;
   draftStatus: ContractDraftStatus | null;
-  reviewedLawyer: ContractReviewLawyer | null;
+  reviewedBarrister: ContractReviewBarrister | null;
   missionInProgress: boolean;
 };
 
@@ -55,14 +55,14 @@ export async function listClientContracts(
   });
 
   const ids = contracts.map((c) => c.id);
-  const [lawyersByContract, inProgressIds] = await Promise.all([
-    getReviewLawyersByContractIds(ids),
+  const [barristersByContract, inProgressIds] = await Promise.all([
+    getReviewBarristersByContractIds(ids),
     getActiveMissionContractIds(ids, ownerId),
   ]);
 
   return contracts.map((contract) => ({
     ...contract,
-    reviewedLawyer: lawyersByContract.get(contract.id) ?? null,
+    reviewedBarrister: barristersByContract.get(contract.id) ?? null,
     missionInProgress: inProgressIds.has(contract.id),
   }));
 }

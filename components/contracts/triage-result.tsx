@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { RequestLawyerButton } from "@/components/contracts/request-lawyer-button";
+import { RequestBarristerButton } from "@/components/contracts/request-barrister-button";
 import { AlertTriangle, Scale, ShieldCheck, UserRound } from "lucide-react";
 import type { RequiredPro, TriageResult } from "@prisma/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -121,13 +121,13 @@ export function TriageResultView({ data, contractId }: Props) {
         <Card>
           <CardHeader>
             <CardTitle>{t("nextSteps.iaSuffit.title")}</CardTitle>
-            <CardDescription>{t("nextSteps.lawyerReviewOnly")}</CardDescription>
+            <CardDescription>{t("nextSteps.barristerReviewOnly")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              {t("nextSteps.iaSuffit.aiLawyerHint")}
+              {t("nextSteps.iaSuffit.aiBarristerHint")}
             </p>
-            <RequestLawyerButton contractId={contractId} />
+            <RequestBarristerButton contractId={contractId} />
           </CardContent>
         </Card>
       )}
@@ -147,7 +147,7 @@ export function TriageResultView({ data, contractId }: Props) {
             </p>
             <Button asChild>
               <Link href={`/app/contracts/${contractId}/matching`}>
-                {t("nextSteps.findLawyer")}
+                {t("nextSteps.findBarrister")}
               </Link>
             </Button>
           </CardContent>
@@ -167,7 +167,7 @@ export function TriageResultView({ data, contractId }: Props) {
             </Alert>
             <Button asChild variant="outline">
               <Link href={`/app/contracts/${contractId}/matching`}>
-                {t("nextSteps.findLawyer")}
+                {t("nextSteps.findBarrister")}
               </Link>
             </Button>
           </CardContent>

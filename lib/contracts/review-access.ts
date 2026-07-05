@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { Session } from "next-auth";
 import { prisma } from "@/lib/db";
 import { canGenerateContractReview, canViewContractReview, isAdmin } from "@/lib/auth/roles";
-import { findLawyerMissionForContract } from "@/lib/missions/access";
+import { findBarristerMissionForContract } from "@/lib/missions/access";
 
 export async function authorizeContractReviewAccess(
   session: Session | null,
@@ -31,7 +31,7 @@ export async function authorizeContractReviewAccess(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const mission = await findLawyerMissionForContract(contractId, session.user.id);
+    const mission = await findBarristerMissionForContract(contractId, session.user.id);
     if (!mission) {
       return NextResponse.json({ error: "NO_MISSION" }, { status: 403 });
     }
@@ -50,7 +50,7 @@ export async function authorizeContractReviewAccess(
     return { contract };
   }
 
-  const mission = await findLawyerMissionForContract(contractId, session.user.id);
+  const mission = await findBarristerMissionForContract(contractId, session.user.id);
   if (!mission) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }

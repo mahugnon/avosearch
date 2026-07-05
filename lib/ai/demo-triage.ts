@@ -21,7 +21,7 @@ export function runDemoTriage(input: {
       confidence: 0,
       domain: "outside contract scope",
       justification:
-        "This topic is outside AvoSearch's contract scope. Please consult a specialized lawyer directly.",
+        "This topic is outside AvoSearch's contract scope. Please consult a specialized barrister directly.",
       flags: ["outside contract scope"],
       required_pro: "AVOCAT",
     };
@@ -33,7 +33,7 @@ export function runDemoTriage(input: {
       confidence: 0.9,
       domain: "regulated act",
       justification:
-        "This type of act generally requires a regulated professional (lawyer or notary). AvoSearch will guide you without automated substantive analysis.",
+        "This type of act generally requires a regulated professional (barrister or notary). AvoSearch will guide you without automated substantive analysis.",
       flags: ["act requiring a regulated professional"],
       required_pro: /notaire|notary|acte authentique|donation|mariage|marriage/i.test(combined)
         ? "NOTAIRE"
@@ -72,7 +72,7 @@ export function runDemoTriage(input: {
       confidence: 0.85,
       domain: detectDomain(combined),
       justification:
-        "Several clauses deserve attention and the contract stakes justify lawyer support to renegotiate or protect your interests.",
+        "Several clauses deserve attention and the contract stakes justify barrister support to renegotiate or protect your interests.",
       flags: flags.length > 0 ? flags : ["unbalanced or atypical clauses"],
       required_pro: "AVOCAT",
     };

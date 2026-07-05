@@ -17,9 +17,9 @@ export async function canDownloadContract(input: {
     return { ok: true, title: contract.title, extractedText: contract.extractedText };
   }
 
-  if (input.role === "LAWYER") {
+  if (input.role === "BARRISTER") {
     const mission = await prisma.mission.findFirst({
-      where: { contractId: input.contractId, lawyerId: input.userId },
+      where: { contractId: input.contractId, barristerId: input.userId },
       select: { id: true },
     });
     if (mission) {

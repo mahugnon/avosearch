@@ -95,7 +95,7 @@ function draftReplyLanguage(locale: AppLocale): string {
 
 export function draftStartSystemPrompt(locale: AppLocale): string {
   return `You are a contract drafting assistant for AvoSearch.
-You are NOT a lawyer. You guide the user to fill a contract template through a natural conversation.
+You are NOT a barrister. You guide the user to fill a contract template through a natural conversation.
 
 You receive the template list (slug, title, file excerpt, {{PLACEHOLDER}} variables, optional admin notes).
 - Read the template excerpt to understand structure and the logical order of information to collect.
@@ -232,7 +232,7 @@ export function buildDraftTurnUserMessage(input: {
 
 export function draftFollowUpSystemPrompt(locale: AppLocale): string {
   return `You are an AvoSearch assistant. The contract has already been generated from a template by substituting variables.
-You are NOT a lawyer. You answer questions, explain clauses in plain language, and update template variables when the user requests changes.
+You are NOT a barrister. You answer questions, explain clauses in plain language, and update template variables when the user requests changes.
 
 Rules:
 - assistant_message: conversational reply. ${draftReplyLanguage(locale)}
@@ -287,7 +287,7 @@ export function buildDraftFollowUpUserMessage(input: {
     .join("\n");
 }
 
-export const LAWYER_MATCH_SYSTEM_PROMPT = `Tu es un moteur de matching AvoSearch pour recommander un avocat inscrit.
+export const BARRISTER_MATCH_SYSTEM_PROMPT = `Tu es un moteur de matching AvoSearch pour recommander un avocat inscrit.
 Tu n'es PAS un avocat. Tu compares le besoin contractuel du client avec les profils disponibles.
 
 Critères (par ordre d'importance) :
@@ -304,18 +304,18 @@ summary = 1-2 phrases en français expliquant le choix au client (sans promesse 
 Réponds UNIQUEMENT en JSON valide :
 {
   "rankings": [
-    { "lawyer_id": "id", "score": 0.85, "reason": "..." }
+    { "barrister_id": "id", "score": 0.85, "reason": "..." }
   ],
   "selected_id": "id",
   "summary": "..."
 }`;
 
-export function buildLawyerMatchUserMessage(input: {
+export function buildBarristerMatchUserMessage(input: {
   domain: string;
   flags: string[];
   userQuestion?: string | null;
   contractExcerpt: string;
-  lawyers: Array<{
+  barristers: Array<{
     id: string;
     name: string;
     barreau: string;
@@ -328,7 +328,7 @@ export function buildLawyerMatchUserMessage(input: {
     ratingCount: number;
   }>;
 }): string {
-  const profiles = input.lawyers
+  const profiles = input.barristers
     .map(
       (l) =>
         `- id: ${l.id}\n  nom: ${l.name}\n  barreau: ${l.barreau}, ${l.city}\n  spécialités: ${l.specialties.join(", ")}\n  bio: ${l.bio.slice(0, 300)}\n  tarif validation: ${(l.validationPriceCents / 100).toFixed(0)} €\n  délai: ${l.responseTimeHours}h\n  note: ${l.rating ?? "N/A"} (${l.ratingCount} avis)`

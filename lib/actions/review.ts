@@ -28,7 +28,7 @@ export async function recordAiConsentAction(contractId: string) {
 
 export async function runReviewAction(_contractId: string) {
   const session = await auth();
-  if (!session || isAdmin(session.user.role) || session.user.role !== "LAWYER") {
+  if (!session || isAdmin(session.user.role) || session.user.role !== "BARRISTER") {
     return { error: "unauthorized" };
   }
   return { error: "use_api" };
@@ -58,7 +58,7 @@ export async function updateModificationStatusAction(
   return { ok: true as const };
 }
 
-export async function startReviewFlowAction(contractId: string, _plan: "ai-only" | "ai-lawyer") {
+export async function startReviewFlowAction(contractId: string, _plan: "ai-only" | "ai-barrister") {
   const locale = (await getLocale()) as AppLocale;
   redirect(localizedPath(`/app/contracts/${contractId}`, locale));
 }

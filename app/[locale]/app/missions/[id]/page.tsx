@@ -2,7 +2,7 @@ import { MissionStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ContractViewer } from "@/components/contracts/contract-viewer";
-import { LawyerReviewedBy } from "@/components/contracts/lawyer-reviewed-by";
+import { BarristerReviewedBy } from "@/components/contracts/barrister-reviewed-by";
 import { ReviewPanel } from "@/components/contracts/review-panel";
 import { MissionChat } from "@/components/missions/mission-chat";
 import { MissionReviewForm } from "@/components/missions/mission-review-form";
@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { formatEuros } from "@/lib/config";
-import { isLawyerReviewDelivered } from "@/lib/contracts/lawyer-review";
-import type { ContractReviewLawyer } from "@/lib/contracts/lawyer-review";
+import { isBarristerReviewDelivered } from "@/lib/contracts/barrister-review";
+import type { ContractReviewBarrister } from "@/lib/contracts/barrister-review";
 import { getLocale } from "next-intl/server";
 import type { AppLocale } from "@/lib/i18n";
 import { notFound, redirect } from "next/navigation";
@@ -41,8 +41,8 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
     where: { id, clientId: session.user.id },
     include: {
       contract: { include: { analysis: { include: { modifications: { orderBy: { order: "asc" } } } } } },
-      lawyer: {
-        include: { lawyerProfile: true },
+      barrister: {
+        include: { barristerProfile: true },
       },
       messages: {
         include: { sender: { select: { id: true, name: true, role: true } } },
@@ -64,26 +64,26 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
       riskLevel: m.riskLevel,
       status: m.status,
       amendedText: m.amendedText,
-      lawyerComment: m.lawyerComment,
+      barristerComment: m.barristerComment,
     })) ?? [];
 
-  const lawyerReviewed = isLawyerReviewDelivered(mission.status);
+  const barristerReviewed = isBarristerReviewDelivered(mission.status);
   const hasContractText = mission.contract.extractedText.trim().length > 0;
 
-  const reviewLawyer: ContractReviewLawyer | null =
-    lawyerReviewed && mission.lawyer?.lawyerProfile
+  const reviewBarrister: ContractReviewBarrister | null =
+    barristerReviewed && mission.barrister?.barristerProfile
       ? {
-          userId: mission.lawyer.id,
-          name: mission.lawyer.name,
-          photoUrl: mission.lawyer.lawyerProfile.photoUrl,
-          barreau: mission.lawyer.lawyerProfile.barreau,
-          city: mission.lawyer.lawyerProfile.city,
-          specialties: mission.lawyer.lawyerProfile.specialties,
-          bio: mission.lawyer.lawyerProfile.bio,
-          validationPriceCents: mission.lawyer.lawyerProfile.validationPriceCents,
-          responseTimeHours: mission.lawyer.lawyerProfile.responseTimeHours,
-          rating: mission.lawyer.lawyerProfile.rating,
-          ratingCount: mission.lawyer.lawyerProfile.ratingCount,
+          userId: mission.barrister.id,
+          name: mission.barrister.name,
+          photoUrl: mission.barrister.barristerProfile.photoUrl,
+          barreau: mission.barrister.barristerProfile.barreau,
+          city: mission.barrister.barristerProfile.city,
+          specialties: mission.barrister.barristerProfile.specialties,
+          bio: mission.barrister.barristerProfile.bio,
+          validationPriceCents: mission.barrister.barristerProfile.validationPriceCents,
+          responseTimeHours: mission.barrister.barristerProfile.responseTimeHours,
+          rating: mission.barrister.barristerProfile.rating,
+          ratingCount: mission.barrister.barristerProfile.ratingCount,
         }
       : null;
 
@@ -96,10 +96,10 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-semibold tracking-tight">{mission.contract.title}</h1>
           <Badge variant="outline">{t(`status.${mission.status}`)}</Badge>
-          {reviewLawyer && <LawyerReviewedBy lawyer={reviewLawyer} locale={locale} size="md" />}
+          {reviewBarrister && <BarristerReviewedBy barrister={reviewBarrister} locale={locale} size="md" />}
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t("lawyer")}: {mission.lawyer?.name ?? "—"} ·{" "}
+          {t("barrister")}: {mission.barrister?.name ?? "—"} ·{" "}
           {mission.finalPriceCents != null
             ? t("finalPrice", { price: formatEuros(mission.finalPriceCents, locale) })
             : t("estimatedPrice", { price: formatEuros(mission.priceCents, locale) })}
@@ -147,7 +147,7 @@ export default async function ClientMissionPage({ params, searchParams }: Props)
 
       {mission.globalNote && (
         <div className="rounded-xl bg-muted p-4 text-sm">
-          <p className="font-medium">{t("lawyerDelivery")}</p>
+          <p className="font-medium">{t("barristerDelivery")}</p>
           <p className="mt-2 whitespace-pre-wrap">{mission.globalNote}</p>
         </div>
       )}

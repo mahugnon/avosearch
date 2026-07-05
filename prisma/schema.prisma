@@ -9,7 +9,7 @@ datasource db {
 
 enum Role {
   CLIENT
-  LAWYER
+  BARRISTER
   ADMIN
 }
 
@@ -90,14 +90,14 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  lawyerProfile  LawyerProfile?
+  barristerProfile  BarristerProfile?
   contracts      Contract[]
   clientMissions Mission[]      @relation("ClientMissions")
-  lawyerMissions Mission[]      @relation("LawyerMissions")
+  barristerMissions Mission[]      @relation("BarristerMissions")
   messages       Message[]
 }
 
-model LawyerProfile {
+model BarristerProfile {
   id                   String   @id @default(cuid())
   userId               String   @unique
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -165,9 +165,9 @@ model Modification {
   rationale       String
   riskLevel       RiskLevel
   status          ModStatus @default(PROPOSEE)
-  // Text as amended by the lawyer (AMENDEE_AVOCAT)
+  // Text as amended by the barrister (AMENDEE_AVOCAT)
   amendedText     String?
-  lawyerComment   String?
+  barristerComment   String?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -181,8 +181,8 @@ model Mission {
   contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
   clientId    String
   client      User          @relation("ClientMissions", fields: [clientId], references: [id], onDelete: Cascade)
-  lawyerId    String?
-  lawyer      User?         @relation("LawyerMissions", fields: [lawyerId], references: [id], onDelete: SetNull)
+  barristerId    String?
+  barrister      User?         @relation("BarristerMissions", fields: [barristerId], references: [id], onDelete: SetNull)
   priceCents  Int
   /// Estimated flat fee at assignment; final bill may differ after timed work.
   finalPriceCents Int?
@@ -196,7 +196,7 @@ model Mission {
   deliveredAt DateTime?
   paidAt      DateTime?
   stripeSessionId String?
-  // Lawyer's final global note on a VALIDATION mission
+  // Barrister's final global note on a VALIDATION mission
   globalNote  String?
   validatedAt DateTime?
   createdAt   DateTime      @default(now())

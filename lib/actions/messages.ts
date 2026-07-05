@@ -27,12 +27,12 @@ export async function sendMissionMessageFormAction(formData: FormData) {
 
   const mission = await prisma.mission.findUnique({
     where: { id: missionId },
-    select: { clientId: true, lawyerId: true },
+    select: { clientId: true, barristerId: true },
   });
 
   if (!mission) return { error: "not_found" as const };
   const isParticipant =
-    mission.clientId === session.user.id || mission.lawyerId === session.user.id;
+    mission.clientId === session.user.id || mission.barristerId === session.user.id;
   if (!isParticipant) return { error: "forbidden" as const };
 
   let attachmentUrl: string | undefined;
@@ -63,7 +63,7 @@ export async function sendMissionMessageFormAction(formData: FormData) {
   });
 
   const recipientId =
-    session.user.id === mission.clientId ? mission.lawyerId : mission.clientId;
+    session.user.id === mission.clientId ? mission.barristerId : mission.clientId;
   if (recipientId) {
     void notifyNewMessage(missionId, recipientId, text || attachmentName || "Pièce jointe");
   }
@@ -81,11 +81,11 @@ export async function getMissionMessages(missionId: string) {
 
   const mission = await prisma.mission.findUnique({
     where: { id: missionId },
-    select: { clientId: true, lawyerId: true },
+    select: { clientId: true, barristerId: true },
   });
   if (!mission) return [];
   const isParticipant =
-    mission.clientId === session.user.id || mission.lawyerId === session.user.id;
+    mission.clientId === session.user.id || mission.barristerId === session.user.id;
   if (!isParticipant) return [];
 
   return prisma.message.findMany({

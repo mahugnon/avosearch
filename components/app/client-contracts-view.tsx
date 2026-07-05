@@ -1,7 +1,7 @@
 import { ChevronRight, FileText, FolderOpen, Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { LawyerReviewedBy } from "@/components/contracts/lawyer-reviewed-by";
+import { BarristerReviewedBy } from "@/components/contracts/barrister-reviewed-by";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ClientContractRow } from "@/lib/contracts/client-contracts-list";
@@ -19,9 +19,9 @@ function statusLabel(
   t: Awaited<ReturnType<typeof getTranslations<"contracts">>>
 ) {
   if (contract.draftStatus === "IN_PROGRESS") return t("draftInProgress");
-  if (contract.reviewedLawyer) return null;
+  if (contract.reviewedBarrister) return null;
   if (contract.missionInProgress) return t("missionInProgress");
-  return t("readyForLawyer");
+  return t("readyForBarrister");
 }
 
 export async function ClientContractsView({ contracts, locale, view }: Props) {
@@ -63,8 +63,8 @@ export async function ClientContractsView({ contracts, locale, view }: Props) {
                   </div>
                 </Link>
                 <div className="flex shrink-0 items-center gap-2">
-                  {contract.reviewedLawyer ? (
-                    <LawyerReviewedBy lawyer={contract.reviewedLawyer} locale={locale} />
+                  {contract.reviewedBarrister ? (
+                    <BarristerReviewedBy barrister={contract.reviewedBarrister} locale={locale} />
                   ) : (
                     label && (
                       <Badge variant="outline" className="hidden sm:inline-flex">
@@ -110,8 +110,8 @@ export async function ClientContractsView({ contracts, locale, view }: Props) {
                   {t("contracts.uploadedOn", { date: dateFmt.format(contract.createdAt) })}
                 </p>
                 <div className="mt-4 flex min-h-8 flex-wrap items-center gap-2">
-                  {contract.reviewedLawyer ? (
-                    <LawyerReviewedBy lawyer={contract.reviewedLawyer} locale={locale} />
+                  {contract.reviewedBarrister ? (
+                    <BarristerReviewedBy barrister={contract.reviewedBarrister} locale={locale} />
                   ) : (
                     label && <Badge variant="outline">{label}</Badge>
                   )}

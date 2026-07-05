@@ -2,7 +2,7 @@ import { ChevronRight, FileText, Pencil } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { AnalysisChat } from "@/components/app/analysis-chat";
-import { LawyerReviewedBy } from "@/components/contracts/lawyer-reviewed-by";
+import { BarristerReviewedBy } from "@/components/contracts/barrister-reviewed-by";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
@@ -50,7 +50,7 @@ export default async function ClientHomePage() {
                   ? tc("draftInProgress")
                   : contract.missionInProgress
                     ? tc("missionInProgress")
-                    : tc("readyForLawyer");
+                    : tc("readyForBarrister");
               const isDraft = contract.draftStatus === "IN_PROGRESS";
               const href = `/app/contracts/${contract.id}`;
 
@@ -73,8 +73,8 @@ export default async function ClientHomePage() {
                       </div>
                     </Link>
                     <div className="flex shrink-0 items-center gap-2">
-                      {contract.reviewedLawyer ? (
-                        <LawyerReviewedBy lawyer={contract.reviewedLawyer} locale={locale} />
+                      {contract.reviewedBarrister ? (
+                        <BarristerReviewedBy barrister={contract.reviewedBarrister} locale={locale} />
                       ) : (
                         <Badge variant="outline" className="hidden sm:inline-flex">
                           {label}

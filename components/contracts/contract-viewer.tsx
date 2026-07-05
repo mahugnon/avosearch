@@ -7,7 +7,7 @@ import {
   type ContractViewerMode,
 } from "@/components/contracts/highlighted-contract-body";
 import { ContractDocumentFromBody } from "@/components/contracts/contract-document";
-import { RequestLawyerButton } from "@/components/contracts/request-lawyer-button";
+import { RequestBarristerButton } from "@/components/contracts/request-barrister-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ContractHighlightData } from "@/lib/templates/highlight";
@@ -19,7 +19,7 @@ type Props = {
   className?: string;
   highlight?: ContractHighlightData | null;
   mode?: ContractViewerMode;
-  showLawyerRequest?: boolean;
+  showBarristerRequest?: boolean;
   draftPreview?: boolean;
 };
 
@@ -30,7 +30,7 @@ export function ContractViewer({
   className,
   highlight,
   mode = "client",
-  showLawyerRequest,
+  showBarristerRequest,
   draftPreview,
 }: Props) {
   const t = useTranslations("chat.viewer");
@@ -65,7 +65,7 @@ export function ContractViewer({
           </Button>
           {contractId && !draftPreview && (
             <>
-              {showLawyerRequest && <RequestLawyerButton contractId={contractId} />}
+              {showBarristerRequest && <RequestBarristerButton contractId={contractId} />}
               <Button
                 type="button"
                 variant="ghost"

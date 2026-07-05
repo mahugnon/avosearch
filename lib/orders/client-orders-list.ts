@@ -1,6 +1,6 @@
 import { MissionStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import { isLawyerReviewDelivered } from "@/lib/contracts/lawyer-review";
+import { isBarristerReviewDelivered } from "@/lib/contracts/barrister-review";
 
 export type ClientOrderRow = {
   id: string;
@@ -11,7 +11,7 @@ export type ClientOrderRow = {
   status: MissionStatus;
   priceCents: number;
   finalPriceCents: number | null;
-  lawyerName: string | null;
+  barristerName: string | null;
   contractId: string;
   hasDeliveredDocument: boolean;
 };
@@ -25,7 +25,7 @@ export async function listClientOrders(clientId: string): Promise<ClientOrderRow
     orderBy: { createdAt: "desc" },
     include: {
       contract: { select: { id: true, title: true, extractedText: true, userQuestion: true } },
-      lawyer: { select: { name: true } },
+      barrister: { select: { name: true } },
     },
   });
 
@@ -38,9 +38,9 @@ export async function listClientOrders(clientId: string): Promise<ClientOrderRow
     status: mission.status,
     priceCents: mission.priceCents,
     finalPriceCents: mission.finalPriceCents,
-    lawyerName: mission.lawyer?.name ?? null,
+    barristerName: mission.barrister?.name ?? null,
     contractId: mission.contractId,
     hasDeliveredDocument:
-      isLawyerReviewDelivered(mission.status) && mission.contract.extractedText.trim().length > 0,
+      isBarristerReviewDelivered(mission.status) && mission.contract.extractedText.trim().length > 0,
   }));
 }

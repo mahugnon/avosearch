@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 import { signIn, signOut } from "@/lib/auth";
 import {
   registerClientSchema,
-  registerLawyerSchema,
+  registerBarristerSchema,
   translateValidationIssue,
 } from "@/lib/validation/auth";
 import { localizedPath, type AppLocale } from "@/lib/i18n";
@@ -16,7 +16,7 @@ export type AuthActionState = { error?: string } | undefined;
 
 const ROLE_HOME = {
   CLIENT: "/app",
-  LAWYER: "/lawyer/missions",
+  BARRISTER: "/barrister/missions",
   ADMIN: "/admin",
 } as const;
 
@@ -93,7 +93,7 @@ export async function registerClientAction(
   return undefined;
 }
 
-export async function registerLawyerAction(
+export async function registerBarristerAction(
   _prev: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
@@ -101,7 +101,7 @@ export async function registerLawyerAction(
   const tErrors = await getTranslations("errors");
   const tValidation = await getTranslations("validation");
 
-  const parsed = registerLawyerSchema.safeParse({
+  const parsed = registerBarristerSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
@@ -134,8 +134,8 @@ export async function registerLawyerAction(
       email,
       name: parsed.data.name,
       passwordHash: await bcrypt.hash(parsed.data.password, 10),
-      role: "LAWYER",
-      lawyerProfile: {
+      role: "BARRISTER",
+      barristerProfile: {
         create: {
           barreau: parsed.data.barreau,
           city: parsed.data.city,
@@ -154,7 +154,7 @@ export async function registerLawyerAction(
     await signIn("credentials", {
       email,
       password: parsed.data.password,
-      redirectTo: localizedPath("/lawyer/missions", locale),
+      redirectTo: localizedPath("/barrister/missions", locale),
     });
   } catch (error) {
     if (error instanceof AuthError) {

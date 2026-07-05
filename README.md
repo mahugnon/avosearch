@@ -9,7 +9,7 @@ MVP d'une plateforme legaltech française : un utilisateur (particulier, freelan
 - **Next.js (App Router) + TypeScript strict**, `pnpm`
 - **Tailwind CSS + shadcn/ui**
 - **PostgreSQL + Prisma** (Postgres via docker-compose)
-- **Auth.js** (e-mail + mot de passe, sessions JWT, 3 rôles : `CLIENT`, `LAWYER`, `ADMIN`)
+- **Auth.js** (e-mail + mot de passe, sessions JWT, 3 rôles : `CLIENT`, `BARRISTER`, `ADMIN`)
 - **NVIDIA NIM** (Nemotron) pour le triage et la relecture IA
 - **Zod** pour la validation des entrées API et des sorties JSON de l'IA
 - Stockage fichiers : disque local `./storage` derrière une interface `StorageProvider`
@@ -44,9 +44,9 @@ Toutes les identités sont fictives. Mot de passe commun : `demo1234`.
 
 ```
 app/
-  (auth)/           # /login, /register, /register/lawyer
+  (auth)/           # /login, /register, /register/barrister
   app/              # espace client (rôle CLIENT)
-  lawyer/           # espace avocat (rôle LAWYER)
+  barrister/           # espace avocat (rôle BARRISTER)
   admin/            # administration (rôle ADMIN)
   legal/            # CGU, mentions légales, confidentialité
   api/auth/         # routes Auth.js
@@ -127,5 +127,5 @@ Voir [.env.example](.env.example). Les montants des formules sont configurables 
 3. **Phase 3** — matching avocat, créer une mission, échanger via la messagerie.
 4. **Phase 4** — payer (Stripe test ou mode démo sans clé), l'avocat valide et livre, le client note.
 5. **Admin** `admin@avosearch.test` — vérifier les profils avocats en attente.
-6. **Avocat** `avocat1@avosearch.test` — traiter les missions depuis `/lawyer/missions`.
+6. **Avocat** `avocat1@avosearch.test` — traiter les missions depuis `/barrister/missions`.
 7. **RGPD** — `/app/settings` : export JSON ou suppression de compte.

@@ -25,7 +25,7 @@ export async function GET(_request: Request, context: RouteContext) {
 
   const mission = await prisma.mission.findUnique({
     where: { id: missionId },
-    select: { clientId: true, lawyerId: true },
+    select: { clientId: true, barristerId: true },
   });
 
   if (!mission) {
@@ -33,7 +33,7 @@ export async function GET(_request: Request, context: RouteContext) {
   }
 
   const isParticipant =
-    mission.clientId === session.user.id || mission.lawyerId === session.user.id;
+    mission.clientId === session.user.id || mission.barristerId === session.user.id;
   if (!isParticipant) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

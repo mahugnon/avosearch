@@ -88,7 +88,7 @@ export async function submitMissionReviewAction(input: {
 
   const mission = await prisma.mission.findFirst({
     where: { id: input.missionId, clientId: session.user.id, status: "LIVREE" },
-    include: { review: true, lawyer: { include: { lawyerProfile: true } } },
+    include: { review: true, barrister: { include: { barristerProfile: true } } },
   });
 
   if (!mission) return { error: "not_found" };
@@ -105,14 +105,14 @@ export async function submitMissionReviewAction(input: {
       },
     });
 
-    const profile = mission.lawyer?.lawyerProfile;
+    const profile = mission.barrister?.barristerProfile;
     if (profile) {
       const newCount = profile.ratingCount + 1;
       const newRating =
         profile.rating == null
           ? rating
           : (profile.rating * profile.ratingCount + rating) / newCount;
-      await tx.lawyerProfile.update({
+      await tx.barristerProfile.update({
         where: { id: profile.id },
         data: { rating: newRating, ratingCount: newCount },
       });

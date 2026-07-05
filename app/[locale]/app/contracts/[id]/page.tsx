@@ -2,16 +2,16 @@ import { ContractDraftStatus, MissionStatus } from "@prisma/client";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Pencil } from "lucide-react";
-import { ContractLawyerSubmitSection } from "@/components/contracts/contract-lawyer-submit-section";
+import { ContractBarristerSubmitSection } from "@/components/contracts/contract-barrister-submit-section";
 import { ContractViewer } from "@/components/contracts/contract-viewer";
-import { LawyerReviewedBy } from "@/components/contracts/lawyer-reviewed-by";
+import { BarristerReviewedBy } from "@/components/contracts/barrister-reviewed-by";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { requireClientContract } from "@/lib/contracts/access";
 import {
   getClientDeliveredMissionForContract,
-  getReviewLawyerForContract,
-} from "@/lib/contracts/lawyer-review";
+  getReviewBarristerForContract,
+} from "@/lib/contracts/barrister-review";
 import { hasViewableDocument, isListableClientContract } from "@/lib/contracts/document";
 import { prisma } from "@/lib/db";
 import { loadTemplateBody } from "@/lib/templates/load";
@@ -82,7 +82,7 @@ export default async function ContractDetailPage({ params }: Props) {
   }
 
   const deliveredMission = await getClientDeliveredMissionForContract(id, contract.ownerId);
-  const reviewLawyer = await getReviewLawyerForContract(id, contract.ownerId);
+  const reviewBarrister = await getReviewBarristerForContract(id, contract.ownerId);
 
   const activeMission = deliveredMission
     ? null
@@ -140,7 +140,7 @@ export default async function ContractDetailPage({ params }: Props) {
           </Button>
           <h1 className="text-2xl font-semibold tracking-tight">{contract.title}</h1>
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            {reviewLawyer && <LawyerReviewedBy lawyer={reviewLawyer} locale={locale} size="md" />}
+            {reviewBarrister && <BarristerReviewedBy barrister={reviewBarrister} locale={locale} size="md" />}
           </div>
           {contract.userQuestion && (
             <p className="mt-2 text-sm text-muted-foreground">{contract.userQuestion}</p>
@@ -158,7 +158,7 @@ export default async function ContractDetailPage({ params }: Props) {
       )}
 
       {!deliveredMission && !activeMission && (
-        <ContractLawyerSubmitSection contractId={contract.id} />
+        <ContractBarristerSubmitSection contractId={contract.id} />
       )}
     </div>
   );

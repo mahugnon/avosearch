@@ -7,14 +7,15 @@ import { auth } from "@/lib/auth";
 
 const ROLE_HOME = {
   CLIENT: "/app",
-  LAWYER: "/lawyer/missions",
+  BARRISTER: "/barrister/missions",
   ADMIN: "/admin",
 } as const;
 
 export async function SiteHeader() {
   const t = await getTranslations("header");
   const session = await auth();
-  const homeHref = session ? ROLE_HOME[session.user.role] : null;
+  const role = session?.user?.role;
+  const homeHref = role ? ROLE_HOME[role] : null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">

@@ -79,9 +79,9 @@ export function RegisterForm() {
             </Link>
           </p>
           <p className="text-sm text-muted-foreground">
-            {t("areYouLawyer")}{" "}
-            <Link href="/register/lawyer" className="font-medium text-primary underline-offset-4 hover:underline">
-              {t("lawyerRegistration")}
+            {t("areYouBarrister")}{" "}
+            <Link href="/register/barrister" className="font-medium text-primary underline-offset-4 hover:underline">
+              {t("barristerRegistration")}
             </Link>
           </p>
         </CardFooter>

@@ -14,7 +14,7 @@ const intlMiddleware = createIntlMiddleware(routing);
 
 const ROLE_HOME = {
   CLIENT: "/app",
-  LAWYER: "/lawyer/missions",
+  BARRISTER: "/barrister/missions",
   ADMIN: "/admin",
 } as const;
 
@@ -27,7 +27,7 @@ export default auth((req) => {
 
   const isProtected =
     barePath.startsWith("/app") ||
-    barePath.startsWith("/lawyer") ||
+    barePath.startsWith("/barrister") ||
     barePath.startsWith("/admin");
   const isAuthPage = barePath === "/login" || barePath.startsWith("/register");
 
@@ -49,7 +49,7 @@ export default auth((req) => {
   if (barePath.startsWith("/app") && role !== "CLIENT") {
     return NextResponse.redirect(new URL(home, nextUrl));
   }
-  if (barePath.startsWith("/lawyer") && role !== "LAWYER") {
+  if (barePath.startsWith("/barrister") && role !== "BARRISTER") {
     return NextResponse.redirect(new URL(home, nextUrl));
   }
   if (barePath.startsWith("/admin") && role !== "ADMIN") {
