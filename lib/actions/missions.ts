@@ -13,8 +13,18 @@ import { auth } from "@/lib/auth";
 import { notifyMissionDelivered, notifyMissionCreated, notifyMissionPaid } from "@/lib/email/notifications";
 import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 import { contractMatchingContext } from "@/lib/contracts/document";
+
+// Mission mutations are triggered from server-action forms and client
+// transitions; revalidate the mission surfaces so the new status renders
+// without a manual reload.
+function revalidateMissionViews() {
+  revalidatePath("/[locale]/barrister/missions/[id]", "page");
+  revalidatePath("/[locale]/barrister/missions", "page");
+  revalidatePath("/[locale]/app/missions/[id]", "page");
+}
 
 async function requireOwnedContract(contractId: string, ownerId: string) {
   const contract = await prisma.contract.findFirst({
@@ -203,6 +213,7 @@ export async function barristerAcceptMissionAction(missionId: string) {
     },
   });
 
+  revalidateMissionViews();
   return { ok: true as const };
 }
 
@@ -239,6 +250,7 @@ export async function barristerValidateModificationAction(input: {
     },
   });
 
+  revalidateMissionViews();
   return { ok: true as const };
 }
 
@@ -270,6 +282,7 @@ export async function deliverMissionAction(missionId: string, globalNote: string
 
   void notifyMissionDelivered(missionId);
 
+  revalidateMissionViews();
   return { ok: true as const, finalPriceCents, durationSeconds };
 }
 
@@ -282,6 +295,7 @@ export async function completeMissionAction(missionId: string) {
     data: { status: MissionStatus.TERMINEE },
   });
 
+  revalidateMissionViews();
   return { ok: true as const };
 }
 
